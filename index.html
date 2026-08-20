@@ -269,7 +269,7 @@
       return linhas.map(linha => parseLinha(linha));
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (Tratamento Rigoroso para evitar datas/nomes nos badges)
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarTeatroOperacoes() {
       const container = document.getElementById('container-to');
       try {
@@ -305,19 +305,15 @@
 
           const canais = [];
 
-          // Função para sanitizar e extrair só o código do canal
           const limparTextoCanal = (txt, prefixo) => {
             if (!txt) return null;
             let limpo = txt.trim();
             
-            // Rejeita datas (ex: 20/08/2026) ou textos idênticos ao nome do evento
             if (limpo.includes('/') || limpo.toLowerCase() === eventoVal.toLowerCase()) return null;
             
-            // Remove o prefixo duplicado (ex: "BSB: 0301 Geral" -> "0301 Geral")
             const reg = new RegExp(`^${prefixo}:?\\s*`, 'i');
             limpo = limpo.replace(reg, '');
 
-            // Se ainda contiver o nome completo do evento, limpa para formato padrão
             if (limpo.toLowerCase() === 'bsb braga geral' || limpo.toLowerCase() === 'braga geral') {
               limpo = '0301 Geral';
             }
@@ -329,7 +325,6 @@
             if (!celula) return;
             const val = celula.trim();
             
-            // Ignorar células que correspondam à data ou ao título do evento
             if (val === dataVal || val === eventoVal || val.includes('/') || val.toLowerCase() === 'evento') return;
 
             const valLower = val.toLowerCase();
@@ -352,7 +347,6 @@
             }
           });
 
-          // Fallback por colunas fixas caso o evento não tenha indicativos explícitos
           if (canais.length === 0) {
             if (row[2] && !row[2].includes('/')) {
               const txt = limparTextoCanal(row[2], 'BSB') || '0301 Geral';
@@ -483,7 +477,7 @@
       }
     }
 
-    // 4. OBSERVAÇÕES
+    // 4. OBSERVAÇÕES (Filtragem estrita para remover cabeçalhos de tabela como "Título" / "Observações")
     async function carregarObservacoes() {
       const container = document.getElementById('container-observacoes');
       try {
@@ -494,7 +488,19 @@
         container.innerHTML = '';
         if (todasLinhas.length === 0) return;
 
-        const obsValidas = todasLinhas.filter(row => row[1] && row[1].trim() !== '' && !row[0].toLowerCase().includes('titulo'));
+        const obsValidas = todasLinhas.filter(row => {
+          if (!row[1] || row[1].trim() === '') return false;
+
+          // Normaliza texto para remover acentos e converter para minúsculas
+          const col0 = (row[0] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+          const col1 = (row[1] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+          // Ignora a linha de cabeçalho da tabela (ex: "titulo", "observacoes", "header")
+          if (col0.includes('titulo') || col0 === 'header' || col0 === 'data') return false;
+          if (col1 === 'observacoes' || col1 === 'observacao' || col1 === 'texto') return false;
+
+          return true;
+        });
 
         if (obsValidas.length === 0) {
           container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
