@@ -65,8 +65,9 @@
 
     .card-to { border-left: 4px solid var(--accent-green); }
     .to-nome { font-size: clamp(0.85rem, 1.3vh, 1.05rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .to-detalhes { display: flex; flex-direction: column; gap: 2px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); }
-    .badge-canal { display: inline-block; background-color: var(--accent-blue); color: #fff; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-size: clamp(0.7rem, 1vh, 0.8rem); }
+    .to-detalhes { display: flex; flex-direction: column; gap: 4px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); margin-top: 2px; }
+    .canais-lista { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+    .badge-canal { background-color: var(--accent-blue); color: #fff; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: clamp(0.65rem, 0.9vh, 0.75rem); }
 
     .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
     .inop-info { overflow: hidden; }
@@ -153,10 +154,11 @@
   <script>
     const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
     
-    const GID_VIATURAS = '0'; 
-    const GID_TO = '1346973124'; 
-    const GID_AGENDAMENTOS = '1209384525'; 
-    const GID_OBSERVACOES = '1563121154'; 
+    // GIDs exatos correspondentes às abas da folha de cálculo
+    const GID_VIATURAS = '1032427330'; 
+    const GID_CANAIS = '881712175'; 
+    const GID_AGENDAMENTOS = '959314983'; 
+    const GID_COMUNICACOES = '1196343008'; 
 
     const obterUrlGviz = (gid) => 
       `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
@@ -166,17 +168,199 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    function obterNivelPerigoIncendio(rcmVal) {
-      const niveis = {
-        1: { texto: 'Reduzido', bg: '#10b981', color: '#ffffff', icone: '🟢' },
-        2: { texto: 'Moderado', bg: '#eab308', color: '#000000', icone: '🟡' },
-        3: { texto: 'Elevado', bg: '#f97316', color: '#ffffff', icone: '🟠' },
-        4: { texto: 'Muito Elevado', bg: '#ef4444', color: '#ffffff', icone: '🔴' },
-        5: { texto: 'Máximo', bg: '#a855f7', color: '#ffffff', icone: '🟣' }
+    function parseCSV(text) {
+      if (!text || text.includes('<!DOCTYPE html>')) return [];
+      const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (linhas.length < 2) return [];
+
+      const parseLinha = (linha) => {
+        const res = [];
+        let cur = '';
+        let dentroAspas = false;
+        for (let i = 0; i < linha.length; i++) {
+          const c = linha[i];
+          if (c === '"') dentroAspas = !dentroAspas;
+          else if (c === ',' && !dentroAspas) {
+            res.push(cur.trim().replace(/^"|"$/g, ''));
+            cur = '';
+          } else {
+            cur += c;
+          }
+        }
+        res.push(cur.trim().replace(/^"|"$/g, ''));
+        return res;
       };
-      return niveis[rcmVal] || { texto: 'N/A', bg: '#64748b', color: '#ffffff', icone: '⚪' };
+
+      return linhas.slice(1).map(linha => parseLinha(linha));
     }
 
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
+    async function carregarTeatroOperacoes() {
+      const container = document.getElementById('container-to');
+      try {
+        const res = await fetch(obterUrlGviz(GID_CANAIS));
+        const csvTexto = await res.text();
+        const linhas = parseCSV(csvTexto);
+
+        container.innerHTML = '';
+        let encontrou = false;
+
+        linhas.forEach(row => {
+          const dataVal = row[0] || '';
+          const eventoVal = row[1] || '';
+          
+          if (!eventoVal) return;
+
+          const canais = [];
+          if (row[2]) canais.push(`BSB: ${row[2]}`);
+          if (row[3]) canais.push(`ROB: ${row[3]}`);
+          if (row[4]) canais.push(`REPC: ${row[4]}`);
+          if (row[5]) canais.push(`SIRESP: ${row[5]}`);
+          if (row[6]) canais.push(`DMO: ${row[6]}`);
+
+          if (canais.length > 0) {
+            encontrou = true;
+            const div = document.createElement('div');
+            div.className = 'card card-to';
+            
+            const badgesHTML = canais.map(c => `<span class="badge-canal">${c}</span>`).join('');
+            
+            div.innerHTML = `
+              <div class="to-nome">${eventoVal}</div>
+              <div class="to-detalhes">
+                ${dataVal ? `<div>📅 <strong>Data:</strong> ${dataVal}</div>` : ''}
+                <div class="canais-lista">${badgesHTML}</div>
+              </div>
+            `;
+            container.appendChild(div);
+          }
+        });
+
+        if (!encontrou) {
+          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
+        }
+
+      } catch (err) {
+        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
+      }
+    }
+
+    // 2. VIATURAS INOP
+    async function carregarViaturasINOP() {
+      const container = document.getElementById('container-inop');
+      try {
+        const res = await fetch(obterUrlGviz(GID_VIATURAS));
+        const csvTexto = await res.text();
+        const linhas = parseCSV(csvTexto);
+
+        container.innerHTML = '';
+
+        const viaturasInop = linhas.filter(row => {
+          const estado = (row[1] || '').toUpperCase();
+          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
+        });
+
+        if (viaturasInop.length === 0) {
+          container.innerHTML = `<div class="card sem-registos" style="color: var(--accent-green);">✓ Todas as viaturas estão operacionais.</div>`;
+          return;
+        }
+
+        viaturasInop.forEach(row => {
+          const nome = row[0] || 'Viatura';
+          const motivo = row[3] || row[2] || 'Avaria Registada';
+
+          const div = document.createElement('div');
+          div.className = 'card card-inop';
+          div.innerHTML = `
+            <div class="inop-info">
+              <h4>${nome}</h4>
+              <p>${motivo}</p>
+            </div>
+            <span class="badge-inop">INOP</span>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        container.innerHTML = `<div class="card sem-registos">Erro ao carregar viaturas INOP.</div>`;
+      }
+    }
+
+    // 3. AGENDAMENTOS
+    async function carregarAgendamentos() {
+      const container = document.getElementById('container-agendamentos');
+      try {
+        const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
+        const csvTexto = await res.text();
+        const linhas = parseCSV(csvTexto);
+
+        container.innerHTML = '';
+        const agendamentosValidos = linhas.filter(row => row[2] && row[2].trim() !== '');
+
+        if (agendamentosValidos.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem agendamentos registados.</div>`;
+          return;
+        }
+
+        agendamentosValidos.forEach(row => {
+          const dataRaw = row[0] || '';
+          const horaRaw = row[1] || '';
+          const descricao = row[2] || 'Serviço Agendado';
+          const meios = row[3] || '';
+
+          let dataFormatada = dataRaw;
+          if (horaRaw) dataFormatada += ` às ${horaRaw}`;
+
+          const div = document.createElement('div');
+          div.className = 'card card-agendamento';
+          div.innerHTML = `
+            ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
+            <div class="agendamento-desc">${descricao}</div>
+            ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        container.innerHTML = `<div class="card sem-registos">Sem agendamentos registados.</div>`;
+      }
+    }
+
+    // 4. OBSERVAÇÕES / COMUNICAÇÕES
+    async function carregarObservacoes() {
+      const container = document.getElementById('container-observacoes');
+      try {
+        const res = await fetch(obterUrlGviz(GID_COMUNICACOES));
+        const csvTexto = await res.text();
+        const linhas = parseCSV(csvTexto);
+
+        container.innerHTML = '';
+        const obsValidas = linhas.filter(row => row[1] && row[1].trim() !== '');
+
+        if (obsValidas.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
+          return;
+        }
+
+        obsValidas.forEach(row => {
+          const titulo = row[0] || '';
+          const obsTexto = row[1] || '';
+
+          const div = document.createElement('div');
+          div.className = 'card card-observacao';
+          div.innerHTML = `
+            ${titulo ? `<div class="obs-titulo">📌 ${titulo}</div>` : ''}
+            <div class="obs-texto">${obsTexto}</div>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
+      }
+    }
+
+    // IPMA RODAPÉ
     async function carregarMeteoIPMA() {
       const containerTicker = document.getElementById('ticker-texto');
       if (!containerTicker) return;
@@ -208,7 +392,14 @@
           const dataChave = Object.keys(dataRcm)[0];
           if (dataChave && dataRcm[dataChave] && dataRcm[dataChave][DICO_BRAGA]) {
             const rcmVal = dataRcm[dataChave][DICO_BRAGA].rcm;
-            const infoRcm = obterNivelPerigoIncendio(rcmVal);
+            const niveis = {
+              1: { texto: 'Reduzido', bg: '#10b981', color: '#ffffff', icone: '🟢' },
+              2: { texto: 'Moderado', bg: '#eab308', color: '#000000', icone: '🟡' },
+              3: { texto: 'Elevado', bg: '#f97316', color: '#ffffff', icone: '🟠' },
+              4: { texto: 'Muito Elevado', bg: '#ef4444', color: '#ffffff', icone: '🔴' },
+              5: { texto: 'Máximo', bg: '#a855f7', color: '#ffffff', icone: '🟣' }
+            };
+            const infoRcm = niveis[rcmVal] || { texto: 'N/A', bg: '#64748b', color: '#ffffff', icone: '⚪' };
             perigoIncendioHTML = `🔥 <strong>Perigo Incêndio Rural:</strong> ${infoRcm.icone} <span class="badge-perigo" style="background-color: ${infoRcm.bg}; color: ${infoRcm.color};">${infoRcm.texto}</span>`;
           }
         }
@@ -226,217 +417,6 @@
 
       } catch (err) {
         containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
-      }
-    }
-
-    function parseCSV(text) {
-      const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
-      if (linhas.length < 2) return [];
-
-      const parseLinha = (linha) => {
-        const res = [];
-        let cur = '';
-        let dentroAspas = false;
-        for (let i = 0; i < linha.length; i++) {
-          const c = linha[i];
-          if (c === '"') dentroAspas = !dentroAspas;
-          else if (c === ',' && !dentroAspas) {
-            res.push(cur.trim().replace(/^"|"$/g, ''));
-            cur = '';
-          } else {
-            cur += c;
-          }
-        }
-        res.push(cur.trim().replace(/^"|"$/g, ''));
-        return res;
-      };
-
-      const cabecalhos = parseLinha(linhas[0]).map(c => c.trim().toLowerCase());
-      return linhas.slice(1).map(linha => {
-        const valores = parseLinha(linha);
-        const obj = {};
-        cabecalhos.forEach((cabecalho, idx) => {
-          obj[cabecalho] = valores[idx] || '';
-        });
-        return obj;
-      });
-    }
-
-    function obterValorCampo(item, chaves) {
-      for (const k of chaves) {
-        if (item[k] !== undefined && item[k] !== '') {
-          return item[k];
-        }
-      }
-      return '';
-    }
-
-    // 1. TEATRO DE OPERAÇÕES / CANAIS
-    async function carregarTeatroOperacoes() {
-      try {
-        const res = await fetch(obterUrlGviz(GID_TO));
-        const csvTexto = await res.text();
-        const dados = parseCSV(csvTexto);
-
-        const container = document.getElementById('container-to');
-        container.innerHTML = '';
-
-        const valoresIgnorados = ['INOP', 'INOPERACIONAL', 'DISPONIVEL', 'DISPONÍVEL', 'OPERACIONAL', '-', 'N/A', ''];
-
-        const dadosComCanal = dados.filter(item => {
-          const canal = obterValorCampo(item, ['canais', 'canal', 'siresp', 'bsb', 'frequencia', 'rádio', 'radio']).trim();
-          return canal !== '' && !valoresIgnorados.includes(canal.toUpperCase());
-        });
-
-        if (dadosComCanal.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
-          return;
-        }
-
-        dadosComCanal.forEach(item => {
-          const evento = obterValorCampo(item, ['evento', 'ocorrência', 'ocorrencia', 'teatro de operações', 'to', 'veículo', 'veiculo', 'viatura', 'nome']) || 'Rádio / Canal';
-          const local = obterValorCampo(item, ['local', 'localização', 'localizacao', 'sitio']);
-          const canais = obterValorCampo(item, ['canais', 'canal', 'siresp', 'bsb', 'frequencia', 'rádio', 'radio']);
-
-          const div = document.createElement('div');
-          div.className = 'card card-to';
-          div.innerHTML = `
-            <div class="to-nome">${evento}</div>
-            <div class="to-detalhes">
-              ${local ? `<div>📍 <strong>Local:</strong> ${local}</div>` : ''}
-              <div>📻 <strong>Canal:</strong> <span class="badge-canal">${canais}</span></div>
-            </div>
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        console.error("Erro TO:", err);
-      }
-    }
-
-    // 2. VIATURAS INOP
-    async function carregarViaturasINOP() {
-      try {
-        const res = await fetch(obterUrlGviz(GID_VIATURAS));
-        const csvTexto = await res.text();
-        const dados = parseCSV(csvTexto);
-
-        const container = document.getElementById('container-inop');
-        container.innerHTML = '';
-
-        const viaturasInop = dados.filter(v => {
-          const estado = obterValorCampo(v, ['estado operacional', 'estado', 'status', 'situacao']).toUpperCase();
-          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
-        });
-
-        if (viaturasInop.length === 0) {
-          container.innerHTML = `<div class="card sem-registos" style="color: var(--accent-green);">✓ Todas as viaturas estão operacionais.</div>`;
-          return;
-        }
-
-        viaturasInop.forEach(v => {
-          const nome = obterValorCampo(v, ['viatura', 'veículo', 'veiculo', 'nome']) || 'N/A';
-          const motivo = obterValorCampo(v, ['motivo', 'avaria', 'observações', 'observacoes', 'obs']) || 'Avaria Registada';
-
-          const div = document.createElement('div');
-          div.className = 'card card-inop';
-          div.innerHTML = `
-            <div class="inop-info">
-              <h4>${nome}</h4>
-              <p>${motivo}</p>
-            </div>
-            <span class="badge-inop">INOP</span>
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        console.error("Erro INOP:", err);
-      }
-    }
-
-    // 3. AGENDAMENTOS (Mostra todos os registos ativos da tabela)
-    async function carregarAgendamentos() {
-      try {
-        const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
-        const csvTexto = await res.text();
-        const dados = parseCSV(csvTexto);
-
-        const container = document.getElementById('container-agendamentos');
-        container.innerHTML = '';
-
-        const agendamentosValidos = dados.filter(item => {
-          const desc = obterValorCampo(item, ['descrição', 'descricao', 'evento', 'serviço', 'servico', 'agendamento', 'titulo']);
-          const data = obterValorCampo(item, ['data', 'data/hora', 'dia']);
-          return desc !== '' || data !== '';
-        });
-
-        if (agendamentosValidos.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos registados.</div>`;
-          return;
-        }
-
-        agendamentosValidos.forEach(item => {
-          const dataRaw = obterValorCampo(item, ['data', 'data/hora', 'dia']);
-          const horaRaw = obterValorCampo(item, ['hora', 'horario']);
-          const descricao = obterValorCampo(item, ['descrição', 'descricao', 'evento', 'serviço', 'servico', 'agendamento', 'titulo']) || 'Serviço Agendado';
-          const meios = obterValorCampo(item, ['meios', 'meios alocados', 'recursos', 'viatura']);
-
-          let dataFormatada = dataRaw;
-          if (horaRaw) dataFormatada += ` às ${horaRaw}`;
-
-          const div = document.createElement('div');
-          div.className = 'card card-agendamento';
-          div.innerHTML = `
-            ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
-            <div class="agendamento-desc">${descricao}</div>
-            ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        console.error("Erro Agendamentos:", err);
-      }
-    }
-
-    // 4. OBSERVAÇÕES
-    async function carregarObservacoes() {
-      try {
-        const res = await fetch(obterUrlGviz(GID_OBSERVACOES));
-        const csvTexto = await res.text();
-        const dados = parseCSV(csvTexto);
-
-        const container = document.getElementById('container-observacoes');
-        container.innerHTML = '';
-
-        const listaObs = dados.filter(item => {
-          const obs = obterValorCampo(item, ['observações', 'observacoes', 'observação', 'observacao', 'obs', 'informação', 'informacao']).trim();
-          const estado = obterValorCampo(item, ['estado', 'status']).toUpperCase();
-          return obs !== '' && obs !== '-' && !estado.includes('INATIVO');
-        });
-
-        if (listaObs.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
-          return;
-        }
-
-        listaObs.forEach(item => {
-          const titulo = obterValorCampo(item, ['título', 'titulo', 'assunto']);
-          const obsTexto = obterValorCampo(item, ['observações', 'observacoes', 'observação', 'observacao', 'obs', 'informação', 'informacao']);
-
-          const div = document.createElement('div');
-          div.className = 'card card-observacao';
-          div.innerHTML = `
-            ${titulo ? `<div class="obs-titulo">📌 ${titulo}</div>` : ''}
-            <div class="obs-texto">${obsTexto}</div>
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        console.error("Erro Observações:", err);
       }
     }
 
