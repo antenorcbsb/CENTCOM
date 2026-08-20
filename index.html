@@ -40,6 +40,9 @@
       text-transform: uppercase;
       margin-bottom: 4px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .grid-cards {
@@ -74,9 +77,11 @@
       padding: 2px 6px; 
       border-radius: 4px; 
       font-size: clamp(0.65rem, 0.9vh, 0.75rem); 
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     
-    /* Cores personalizadas por tipo de rádio */
     .badge-bsb { background-color: #0284c7; }
     .badge-rob { background-color: #10b981; }
     .badge-repc { background-color: #f97316; }
@@ -84,9 +89,10 @@
     .badge-dmo { background-color: #e11d48; }
 
     .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
-    .inop-info { overflow: hidden; }
-    .inop-info h4 { font-size: clamp(0.85rem, 1.3vh, 1rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .inop-info p { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inop-info { overflow: hidden; display: flex; align-items: center; gap: 10px; }
+    .inop-icone { font-size: 1.4rem; color: #f87171; flex-shrink: 0; width: 30px; text-align: center; }
+    .inop-texto h4 { font-size: clamp(0.85rem, 1.3vh, 1rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inop-texto p { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-inop { background-color: var(--accent-red); color: #ffffff; font-weight: 800; font-size: clamp(0.65rem, 1vh, 0.75rem); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
 
     .card-agendamento { border-left: 4px solid var(--accent-orange); }
@@ -129,28 +135,28 @@
 <body>
 
   <section>
-    <div class="seccao-titulo">Teatro de Operações / Canais</div>
+    <div class="seccao-titulo"><i class="fa-solid fa-walkie-talkie"></i> Teatro de Operações / Canais</div>
     <div class="grid-cards" id="container-to">
       <div class="card sem-registos">A carregar Teatro de Operações...</div>
     </div>
   </section>
 
   <section>
-    <div class="seccao-titulo" style="color: #f87171;">Veículos Inoperacionais (INOP)</div>
+    <div class="seccao-titulo" style="color: #f87171;"><i class="fa-solid fa-truck-triangle-unhandled"></i> Veículos Inoperacionais (INOP)</div>
     <div class="grid-cards" id="container-inop">
       <div class="card sem-registos">A carregar viaturas INOP...</div>
     </div>
   </section>
 
   <section>
-    <div class="seccao-titulo" style="color: var(--accent-orange);">Agendamentos</div>
+    <div class="seccao-titulo" style="color: var(--accent-orange);"><i class="fa-solid fa-calendar-days"></i> Agendamentos</div>
     <div class="grid-cards" id="container-agendamentos">
       <div class="card sem-registos">A carregar agendamentos...</div>
     </div>
   </section>
 
   <section>
-    <div class="seccao-titulo" style="color: var(--accent-purple);">Observações</div>
+    <div class="seccao-titulo" style="color: var(--accent-purple);"><i class="fa-solid fa-bullhorn"></i> Observações</div>
     <div class="grid-cards" id="container-observacoes">
       <div class="card sem-registos">A carregar observações...</div>
     </div>
@@ -181,15 +187,26 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
+    // Mapeamento de Ícones por Tipologia de Veículo
+    function obterIconeVeiculo(nomeVeiculo) {
+      const nome = (nomeVeiculo || '').toUpperCase();
+      if (nome.startsWith('ABSC')) return 'fa-solid fa-ambulance'; // Ambulância
+      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE')) return 'fa-solid fa-car-side'; // Comando / Ops
+      if (nome.startsWith('VFCI') || nome.startsWith('VECI') || nome.startsWith('VLCI')) return 'fa-solid fa-fire-truck'; // Combate a Incêndios
+      if (nome.startsWith('VE30') || nome.startsWith('VPMA')) return 'fa-solid fa-truck-field-unpaved'; // Escada / Meios Especiais
+      if (nome.startsWith('VTTU') || nome.startsWith('VTTP')) return 'fa-solid fa-truck-droplet'; // Tanques
+      return 'fa-solid fa-truck-fast'; // Padrão
+    }
+
     // Utilitários de Datas
     function converterDataTimestamp(dataStr) {
       if (!dataStr || !dataStr.trim()) return null;
       const partes = dataStr.trim().split(/[\/\.-]/);
       if (partes.length === 3) {
         let d, m, a;
-        if (partes[0].length === 4) { // Formato AAAA-MM-DD
+        if (partes[0].length === 4) {
           a = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; d = parseInt(partes[2], 10);
-        } else { // Formato DD/MM/AAAA
+        } else {
           d = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; a = parseInt(partes[2], 10);
         }
         return new Date(a, m, d).setHours(0,0,0,0);
@@ -198,7 +215,7 @@
     }
 
     function eHoje(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true; // Se não tem data definida, assume permanente
+      if (!dataStr || !dataStr.trim()) return true;
       const tsData = converterDataTimestamp(dataStr);
       if (!tsData) return true;
       const hoje = new Date().setHours(0,0,0,0);
@@ -255,8 +272,6 @@
           const eventoVal = row[1] || '';
           
           if (!eventoVal) return;
-
-          // Filtro: Apenas mostra eventos sem data (permanentes) ou com a data de HOJE
           if (!eHoje(dataVal)) return;
 
           const canais = [];
@@ -271,7 +286,9 @@
             const div = document.createElement('div');
             div.className = 'card card-to';
             
-            const badgesHTML = canais.map(c => `<span class="badge-canal ${c.classe}">${c.texto}</span>`).join('');
+            const badgesHTML = canais.map(c => 
+              `<span class="badge-canal ${c.classe}"><i class="fa-solid fa-walkie-talkie"></i> ${c.texto}</span>`
+            ).join('');
             
             div.innerHTML = `
               <div class="to-nome">${eventoVal}</div>
@@ -316,13 +333,17 @@
         viaturasInop.forEach(row => {
           const nome = row[0] || 'Viatura';
           const motivo = row[3] || row[2] || 'Avaria Registada';
+          const iconeVeiculo = obterIconeVeiculo(nome);
 
           const div = document.createElement('div');
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-info">
-              <h4>${nome}</h4>
-              <p>${motivo}</p>
+              <i class="${iconeVeiculo} inop-icone"></i>
+              <div class="inop-texto">
+                <h4>${nome}</h4>
+                <p>${motivo}</p>
+              </div>
             </div>
             <span class="badge-inop">INOP</span>
           `;
@@ -344,7 +365,6 @@
 
         container.innerHTML = '';
         
-        // Filtro: ignora vazios e datas passadas
         const agendamentosValidos = linhas.filter(row => {
           const dataRaw = row[0] || '';
           const descricao = row[2] || '';
