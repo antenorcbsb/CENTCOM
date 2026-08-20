@@ -27,6 +27,7 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
+    /* Trava o ecrã para evitar qualquer barra de scroll */
     html, body {
       width: 100vw;
       height: 100vh;
@@ -43,6 +44,7 @@
       gap: clamp(6px, 1vh, 12px);
     }
 
+    /* Cada secção divide a altura do ecrã proporcionalmente */
     section {
       flex: 1;
       display: flex;
@@ -103,23 +105,15 @@
       color: var(--text-muted);
     }
 
-    /* BADGES INDIVIDUAIS COM CORES POR CANAL */
     .badge-canal {
       display: inline-block;
-      color: #ffffff;
+      background-color: var(--accent-blue);
+      color: #fff;
       font-weight: 700;
-      padding: 2px 7px;
+      padding: 1px 6px;
       border-radius: 4px;
       font-size: clamp(0.7rem, 1vh, 0.8rem);
-      margin-right: 4px;
-      margin-bottom: 2px;
     }
-
-    .badge-bsb    { background-color: #0284c7; } /* Azul */
-    .badge-rob    { background-color: #f97316; } /* Laranja */
-    .badge-repc   { background-color: #10b981; } /* Verde */
-    .badge-siresp { background-color: #a855f7; } /* Roxo */
-    .badge-dmo    { background-color: #eab308; color: #000000; } /* Amarelo */
 
     /* CARD VIATURAS INOP */
     .card-inop {
@@ -218,7 +212,7 @@
       font-size: clamp(0.75rem, 1.1vh, 0.85rem);
     }
 
-    /* BARRA RODAPÉ IPMA */
+    /* BARRA RODAPÉ IPMA (TICKER) */
     .rodape-ticker {
       height: clamp(36px, 5vh, 44px);
       background-color: #0f172a;
@@ -338,25 +332,24 @@
   </footer>
 
   <script>
+    // ID da folha de cálculo
     const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
     
-    // GIDs atualizados das abas do Google Sheets
-    const GID_VIATURAS = '1032427330';     // Aba "Veículos"
-    const GID_TO = '881712175';            // Aba "Canais Radio"
-    const GID_AGENDAMENTOS = '959314983';   // Aba "Agendamento"
-    const GID_OBSERVACOES = '1196343008';   // Aba "Comunicações"
+    // GIDs das abas do Google Sheets
+    const GID_VIATURAS = '0';               // Aba principal / Viaturas INOP
+    const GID_TO = '1346973124';             // Aba Teatro de Operações / Canais
+    const GID_AGENDAMENTOS = '1209384525';     // Aba Agendamentos
+    const GID_OBSERVACOES = '1563121154';      // Aba Observações
 
-    // URLs de exportação em CSV
-    const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_VIATURAS}`;
-    const URL_TO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_TO}`;
-    const URL_AGENDAMENTOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_AGENDAMENTOS}`;
-    const URL_OBSERVACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_OBSERVACOES}`;
+    // Endpoint GViz com prevenção de cache do navegador/servidor
+    const obterUrlGviz = (gid) => 
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
 
-    // ENDPOINTS IPMA
-    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json';
-    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';
-    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
-    const DICO_BRAGA = '0303';
+    // API ENDPOINTS DO IPMA
+    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json'; // Braga
+    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';                      // Tipos de tempo
+    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';          // Perigo de Incêndio Rural
+    const DICO_BRAGA = '0303'; // Código DICO do Concelho de Braga
 
     function obterNivelPerigoIncendio(rcmVal) {
       const niveis = {
@@ -380,7 +373,7 @@
           fetch(URL_IPMA_RCM).catch(() => null)
         ]);
 
-        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro ao consultar IPMA");
+        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro ao consultar a API do IPMA");
 
         const dataMeteo = await resMeteo.json();
         const dataTipos = await resTipos.json();
@@ -418,7 +411,7 @@
 
       } catch (err) {
         console.error("Erro ao carregar IPMA:", err);
-        containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter dados do IPMA de momento.</span>`;
+        containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
       }
     }
 
@@ -506,63 +499,41 @@
       return 'Sem Data/Hora';
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (COM BADGES DE COR POR REDE)
+    // 1. TEATRO DE OPERAÇÕES / CANAIS (Com filtro para ignorar estados operacionais)
     async function carregarTeatroOperacoes() {
       try {
-        const res = await fetch(`${URL_TO}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_TO));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
         const container = document.getElementById('container-to');
         container.innerHTML = '';
 
-        const dadosProcessados = [];
+        // Valores que NÃO devem ser lidos como canal de rádio
+        const valoresIgnorados = ['INOP', 'INOPERACIONAL', 'DISPONIVEL', 'DISPONÍVEL', 'OPERACIONAL', '-', 'N/A', ''];
 
-        const mapeamentoCanais = [
-          { coluna: 'Canal BSB', classe: 'badge-bsb' },
-          { coluna: 'Canal ROB', classe: 'badge-rob' },
-          { coluna: 'Canal REPC', classe: 'badge-repc' },
-          { coluna: 'Canal SIRESP', classe: 'badge-siresp' },
-          { coluna: 'DMO', classe: 'badge-dmo' }
-        ];
-
-        dados.forEach(item => {
-          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || '';
-          const local = item['Local'] || item['Localização'] || '';
-
-          const badgesHTML = [];
-
-          mapeamentoCanais.forEach(rede => {
-            if (item[rede.coluna]) {
-              const val = item[rede.coluna].trim();
-              if (val && val !== '-' && val.toUpperCase() !== 'N/A' && !val.toUpperCase().includes('INOP')) {
-                badgesHTML.push(`<span class="badge-canal ${rede.classe}">${val}</span>`);
-              }
-            }
-          });
-
-          if (evento && badgesHTML.length > 0) {
-            dadosProcessados.push({
-              evento: evento,
-              local: local,
-              canaisHTML: badgesHTML.join('')
-            });
-          }
+        const dadosComCanal = dados.filter(item => {
+          const canal = (item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || '').trim();
+          return canal !== '' && !valoresIgnorados.includes(canal.toUpperCase());
         });
 
-        if (dadosProcessados.length === 0) {
+        if (dadosComCanal.length === 0) {
           container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
           return;
         }
 
-        dadosProcessados.forEach(item => {
+        dadosComCanal.forEach(item => {
+          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || item['Veículo'] || item['Viatura'] || 'Rádio / Canal';
+          const local = item['Local'] || item['Localização'] || '';
+          const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || '';
+
           const div = document.createElement('div');
           div.className = 'card card-to';
           div.innerHTML = `
-            <div class="to-nome">${item.evento}</div>
+            <div class="to-nome">${evento}</div>
             <div class="to-detalhes">
-              ${item.local ? `<div>📍 <strong>Local:</strong> ${item.local}</div>` : ''}
-              <div style="margin-top: 4px;">📻 <strong>Canais:</strong> ${item.canaisHTML}</div>
+              ${local ? `<div>📍 <strong>Local:</strong> ${local}</div>` : ''}
+              <div>📻 <strong>Canal:</strong> <span class="badge-canal">${canais}</span></div>
             </div>
           `;
           container.appendChild(div);
@@ -576,7 +547,7 @@
     // 2. VIATURAS INOP
     async function carregarViaturasINOP() {
       try {
-        const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_VIATURAS));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
@@ -594,8 +565,8 @@
         }
 
         viaturasInop.forEach(v => {
-          const nome = v['Veículo'] || v['Viatura'] || 'N/A';
-          const motivo = v['Observações'] || v['Motivo'] || v['Avaria'] || 'Avaria Registada';
+          const nome = v['Viatura'] || v['Veículo'] || 'N/A';
+          const motivo = v['Motivo'] || v['Avaria'] || v['Observações'] || 'Avaria Registada';
 
           const div = document.createElement('div');
           div.className = 'card card-inop';
@@ -614,10 +585,10 @@
       }
     }
 
-    // 3. AGENDAMENTOS
+    // 3. AGENDAMENTOS (Exibe APENAS no próprio dia)
     async function carregarAgendamentos() {
       try {
-        const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
@@ -649,7 +620,7 @@
           const dataHoraFormatada = formatarDataHora(dataRaw, horaRaw);
 
           const descricao = item['Descrição'] || item['Descricao'] || item['Evento'] || item['Serviço'] || 'Agendamento / Prevenção';
-          const meios = item['Meios Alocados'] || item['Meios'] || item['Meios alocados'] || item['Recursos'] || '';
+          const meios = item['Meios'] || item['Meios Alocados'] || item['Meios alocados'] || item['Recursos'] || '';
 
           const div = document.createElement('div');
           div.className = 'card card-agendamento';
@@ -669,7 +640,7 @@
     // 4. OBSERVAÇÕES
     async function carregarObservacoes() {
       try {
-        const res = await fetch(`${URL_OBSERVACOES}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_OBSERVACOES));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
