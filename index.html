@@ -67,7 +67,21 @@
     .to-nome { font-size: clamp(0.85rem, 1.3vh, 1.05rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .to-detalhes { display: flex; flex-direction: column; gap: 4px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); margin-top: 2px; }
     .canais-lista { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
-    .badge-canal { background-color: var(--accent-blue); color: #fff; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: clamp(0.65rem, 0.9vh, 0.75rem); }
+    
+    .badge-canal { 
+      color: #fff; 
+      font-weight: 700; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-size: clamp(0.65rem, 0.9vh, 0.75rem); 
+    }
+    
+    /* Cores personalizadas por tipo de rádio */
+    .badge-bsb { background-color: #0284c7; }
+    .badge-rob { background-color: #10b981; }
+    .badge-repc { background-color: #f97316; }
+    .badge-siresp { background-color: #8b5cf6; }
+    .badge-dmo { background-color: #e11d48; }
 
     .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
     .inop-info { overflow: hidden; }
@@ -154,7 +168,6 @@
   <script>
     const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
     
-    // GIDs exatos correspondentes às abas da folha de cálculo
     const GID_VIATURAS = '1032427330'; 
     const GID_CANAIS = '881712175'; 
     const GID_AGENDAMENTOS = '959314983'; 
@@ -167,6 +180,38 @@
     const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
+
+    // Utilitários de Datas
+    function converterDataTimestamp(dataStr) {
+      if (!dataStr || !dataStr.trim()) return null;
+      const partes = dataStr.trim().split(/[\/\.-]/);
+      if (partes.length === 3) {
+        let d, m, a;
+        if (partes[0].length === 4) { // Formato AAAA-MM-DD
+          a = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; d = parseInt(partes[2], 10);
+        } else { // Formato DD/MM/AAAA
+          d = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; a = parseInt(partes[2], 10);
+        }
+        return new Date(a, m, d).setHours(0,0,0,0);
+      }
+      return null;
+    }
+
+    function eHoje(dataStr) {
+      if (!dataStr || !dataStr.trim()) return true; // Se não tem data definida, assume permanente
+      const tsData = converterDataTimestamp(dataStr);
+      if (!tsData) return true;
+      const hoje = new Date().setHours(0,0,0,0);
+      return tsData === hoje;
+    }
+
+    function eHojeOuFuturo(dataStr) {
+      if (!dataStr || !dataStr.trim()) return true;
+      const tsData = converterDataTimestamp(dataStr);
+      if (!tsData) return true;
+      const hoje = new Date().setHours(0,0,0,0);
+      return tsData >= hoje;
+    }
 
     function parseCSV(text) {
       if (!text || text.includes('<!DOCTYPE html>')) return [];
@@ -211,19 +256,22 @@
           
           if (!eventoVal) return;
 
+          // Filtro: Apenas mostra eventos sem data (permanentes) ou com a data de HOJE
+          if (!eHoje(dataVal)) return;
+
           const canais = [];
-          if (row[2]) canais.push(`BSB: ${row[2]}`);
-          if (row[3]) canais.push(`ROB: ${row[3]}`);
-          if (row[4]) canais.push(`REPC: ${row[4]}`);
-          if (row[5]) canais.push(`SIRESP: ${row[5]}`);
-          if (row[6]) canais.push(`DMO: ${row[6]}`);
+          if (row[2]) canais.push({ texto: `BSB: ${row[2]}`, classe: 'badge-bsb' });
+          if (row[3]) canais.push({ texto: `ROB: ${row[3]}`, classe: 'badge-rob' });
+          if (row[4]) canais.push({ texto: `REPC: ${row[4]}`, classe: 'badge-repc' });
+          if (row[5]) canais.push({ texto: `SIRESP: ${row[5]}`, classe: 'badge-siresp' });
+          if (row[6]) canais.push({ texto: `DMO: ${row[6]}`, classe: 'badge-dmo' });
 
           if (canais.length > 0) {
             encontrou = true;
             const div = document.createElement('div');
             div.className = 'card card-to';
             
-            const badgesHTML = canais.map(c => `<span class="badge-canal">${c}</span>`).join('');
+            const badgesHTML = canais.map(c => `<span class="badge-canal ${c.classe}">${c.texto}</span>`).join('');
             
             div.innerHTML = `
               <div class="to-nome">${eventoVal}</div>
@@ -237,11 +285,11 @@
         });
 
         if (!encontrou) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
+          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
         }
 
       } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
+        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
       }
     }
 
@@ -295,10 +343,16 @@
         const linhas = parseCSV(csvTexto);
 
         container.innerHTML = '';
-        const agendamentosValidos = linhas.filter(row => row[2] && row[2].trim() !== '');
+        
+        // Filtro: ignora vazios e datas passadas
+        const agendamentosValidos = linhas.filter(row => {
+          const dataRaw = row[0] || '';
+          const descricao = row[2] || '';
+          return descricao.trim() !== '' && eHojeOuFuturo(dataRaw);
+        });
 
         if (agendamentosValidos.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos registados.</div>`;
+          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
           return;
         }
 
@@ -322,7 +376,7 @@
         });
 
       } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem agendamentos registados.</div>`;
+        container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
       }
     }
 
