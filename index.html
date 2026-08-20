@@ -49,7 +49,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      min-height: 0; /* Essencial para permitir o encolhimento flex no CSS */
+      min-height: 0;
     }
 
     .seccao-titulo {
@@ -303,7 +303,7 @@
     </div>
   </section>
 
-  <!-- SECCAO 3: AGENDAMENTOS (GID: 1209384525) -->
+  <!-- SECCAO 3: AGENDAMENTOS -->
   <section>
     <div class="seccao-titulo" style="color: var(--accent-orange);">Agendamentos</div>
     <div class="grid-cards" id="container-agendamentos">
@@ -311,7 +311,7 @@
     </div>
   </section>
 
-  <!-- SECCAO 4: OBSERVAÇÕES (GID: 1563121154) -->
+  <!-- SECCAO 4: OBSERVAÇÕES -->
   <section>
     <div class="seccao-titulo" style="color: var(--accent-purple);">Observações</div>
     <div class="grid-cards" id="container-observacoes">
@@ -332,19 +332,18 @@
   </footer>
 
   <script>
-    const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
+    // ID da folha de cálculo
+    const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
     
     // GIDs das abas do Google Sheets
-    const GID_TO = '1346973124';                 // Aba Teatro de Operações / Canais principal
-    const GID_CANAIS_PROGRAMADOS = '881712175'; // Aba Canais Programados por Data
-    const GID_AGENDAMENTOS = '1209384525';       // Aba Agendamentos
-    const GID_OBSERVACOES = '1563121154';        // Aba Observações
+    const GID_VIATURAS = '0';               // Aba principal / Viaturas INOP
+    const GID_TO = '1346973124';             // Aba Teatro de Operações / Canais
+    const GID_AGENDAMENTOS = '1209384525';     // Aba Agendamentos
+    const GID_OBSERVACOES = '1563121154';      // Aba Observações
 
-    const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-    const URL_TO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_TO}`;
-    const URL_CANAIS_PROGRAMADOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_CANAIS_PROGRAMADOS}`;
-    const URL_AGENDAMENTOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_AGENDAMENTOS}`;
-    const URL_OBSERVACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_OBSERVACOES}`;
+    // Endpoint GViz com prevenção de cache do navegador/servidor
+    const obterUrlGviz = (gid) => 
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
 
     // API ENDPOINTS DO IPMA
     const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json'; // Braga
@@ -352,7 +351,6 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';          // Perigo de Incêndio Rural
     const DICO_BRAGA = '0303'; // Código DICO do Concelho de Braga
 
-    // Mapeamento dos níveis de Risco de Incêndio Rural (RCM)
     function obterNivelPerigoIncendio(rcmVal) {
       const niveis = {
         1: { texto: 'Reduzido', bg: '#10b981', color: '#ffffff', icone: '🟢' },
@@ -380,7 +378,6 @@
         const dataMeteo = await resMeteo.json();
         const dataTipos = await resTipos.json();
 
-        // 1. Dados de temperatura e estado do tempo de hoje
         const previsaoHoje = dataMeteo.data[0];
         const tMin = Math.round(previsaoHoje.tMin);
         const tMax = Math.round(previsaoHoje.tMax);
@@ -390,7 +387,6 @@
         const tipoObjeto = dataTipos.data.find(t => t.idWeatherType === idTipoTempo);
         const descTempo = tipoObjeto ? tipoObjeto.descWeatherTypePT : 'Tempo Variável';
 
-        // 2. Dados de Perigo de Incêndio Rural (RCM) para o concelho de Braga
         let perigoIncendioHTML = '🔥 <strong>Perigo Incêndio Rural:</strong> N/A';
         if (resRcm && resRcm.ok) {
           const dataRcm = await resRcm.json();
@@ -402,7 +398,6 @@
           }
         }
 
-        // 3. Montar barra de informações
         const mensagens = [
           `📍 <strong>Braga (IPMA):</strong> ${descTempo}`,
           `🌡️ <strong>Máx / Mín Hoje:</strong> ${tMax}°C / ${tMin}°C`,
@@ -504,65 +499,28 @@
       return 'Sem Data/Hora';
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (Lê da aba TO e da aba GID: 881712175)
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarTeatroOperacoes() {
       try {
-        const [resTO, resProg] = await Promise.all([
-          fetch(`${URL_TO}&_t=${Date.now()}`),
-          fetch(`${URL_CANAIS_PROGRAMADOS}&_t=${Date.now()}`).catch(() => null)
-        ]);
-
-        const csvTextoTO = await resTO.text();
-        const dadosTO = parseCSV(csvTextoTO);
-
-        let dadosProg = [];
-        if (resProg && resProg.ok) {
-          const csvTextoProg = await resProg.text();
-          dadosProg = parseCSV(csvTextoProg);
-        }
-
-        // Unifica os registos das duas fontes
-        const todosDados = [...dadosTO, ...dadosProg];
-
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-
-        // Filtra os canais de acordo com as regras de data
-        const canaisVisiveis = todosDados.filter(item => {
-          const canal = (item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '').trim();
-          
-          // Ignora registos sem canal especificado
-          if (canal === '' || canal === '-' || canal.toUpperCase() === 'N/A') {
-            return false;
-          }
-
-          const dataRaw = item['Data'] || item['Data/Hora'] || item['Agendamento'] || '';
-
-          // REGRA 1: Sem data preenchida = aparece SEMPRE
-          if (!dataRaw || dataRaw.trim() === '' || dataRaw === '-') {
-            return true;
-          }
-
-          // REGRA 2: Com data preenchida = aparece APENAS no dia agendado
-          const dataCanal = extrairObjetoData(dataRaw);
-          if (dataCanal) {
-            dataCanal.setHours(0, 0, 0, 0);
-            return dataCanal.getTime() === hoje.getTime();
-          }
-
-          return true;
-        });
+        const res = await fetch(obterUrlGviz(GID_TO));
+        const csvTexto = await res.text();
+        const dados = parseCSV(csvTexto);
 
         const container = document.getElementById('container-to');
         container.innerHTML = '';
 
-        if (canaisVisiveis.length === 0) {
+        const dadosComCanal = dados.filter(item => {
+          const canal = (item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '').trim();
+          return canal !== '' && canal !== '-' && canal.toUpperCase() !== 'N/A';
+        });
+
+        if (dadosComCanal.length === 0) {
           container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
           return;
         }
 
-        canaisVisiveis.forEach(item => {
-          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || item['Veículo'] || item['Viatura'] || item['Serviço'] || 'Rádio / Canal';
+        dadosComCanal.forEach(item => {
+          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || item['Veículo'] || item['Viatura'] || 'Rádio / Canal';
           const local = item['Local'] || item['Localização'] || '';
           const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '';
 
@@ -579,14 +537,14 @@
         });
 
       } catch (err) {
-        console.error("Erro ao carregar Teatro de Operações / Canais:", err);
+        console.error("Erro ao carregar Teatro de Operações:", err);
       }
     }
 
     // 2. VIATURAS INOP
     async function carregarViaturasINOP() {
       try {
-        const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_VIATURAS));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
@@ -627,7 +585,7 @@
     // 3. AGENDAMENTOS (Exibe APENAS no próprio dia)
     async function carregarAgendamentos() {
       try {
-        const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
@@ -679,7 +637,7 @@
     // 4. OBSERVAÇÕES
     async function carregarObservacoes() {
       try {
-        const res = await fetch(`${URL_OBSERVACOES}&_t=${Date.now()}`);
+        const res = await fetch(obterUrlGviz(GID_OBSERVACOES));
         const csvTexto = await res.text();
         const dados = parseCSV(csvTexto);
 
