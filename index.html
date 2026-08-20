@@ -90,7 +90,18 @@
 
     .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
     .inop-info { overflow: hidden; display: flex; align-items: center; gap: 10px; }
-    .inop-icone { font-size: 1.4rem; color: #f87171; flex-shrink: 0; width: 30px; text-align: center; }
+    .inop-icone-box { 
+      width: 38px; 
+      height: 38px; 
+      background-color: rgba(239, 68, 68, 0.15); 
+      border: 1px solid rgba(239, 68, 68, 0.4); 
+      border-radius: 6px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      flex-shrink: 0; 
+    }
+    .inop-icone { font-size: 1.2rem; color: #f87171; }
     .inop-texto h4 { font-size: clamp(0.85rem, 1.3vh, 1rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .inop-texto p { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-inop { background-color: var(--accent-red); color: #ffffff; font-weight: 800; font-size: clamp(0.65rem, 1vh, 0.75rem); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
@@ -187,15 +198,24 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    // Mapeamento de Ícones por Tipologia de Veículo
+    // Mapeamento completo das Tipologias de Veículos
     function obterIconeVeiculo(nomeVeiculo) {
-      const nome = (nomeVeiculo || '').toUpperCase();
-      if (nome.startsWith('ABSC')) return 'fa-solid fa-ambulance'; // Ambulância
-      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE')) return 'fa-solid fa-car-side'; // Comando / Ops
-      if (nome.startsWith('VFCI') || nome.startsWith('VECI') || nome.startsWith('VLCI')) return 'fa-solid fa-fire-truck'; // Combate a Incêndios
-      if (nome.startsWith('VE30') || nome.startsWith('VPMA')) return 'fa-solid fa-truck-field-unpaved'; // Escada / Meios Especiais
-      if (nome.startsWith('VTTU') || nome.startsWith('VTTP')) return 'fa-solid fa-truck-droplet'; // Tanques
-      return 'fa-solid fa-truck-fast'; // Padrão
+      const nome = (nomeVeiculo || '').toUpperCase().trim();
+      
+      if (nome.startsWith('ABSC')) return 'fa-solid fa-ambulance';               // Ambulância de Socorro
+      if (nome.startsWith('VCOT')) return 'fa-solid fa-car-side';                 // Comando Operacional Tático
+      if (nome.startsWith('VCOC')) return 'fa-solid fa-truck-field';              // Comando e Operações
+      if (nome.startsWith('VFCI')) return 'fa-solid fa-fire-truck';               // Florestal Combate Incêndios
+      if (nome.startsWith('VECI')) return 'fa-solid fa-truck-fast';               // Especial Combate Incêndios
+      if (nome.startsWith('VLCI')) return 'fa-solid fa-truck-pickup';             // Ligeira Combate Incêndios
+      if (nome.startsWith('VE30')) return 'fa-solid fa-truck-ramp-box';           // Autoescada / Plataforma 30m
+      if (nome.startsWith('VPMA')) return 'fa-solid fa-biohazard';                // Proteção Matérias Ambientais
+      if (nome.startsWith('VOPE')) return 'fa-solid fa-truck-gear';               // Operações Especiais
+      if (nome.startsWith('VTTU')) return 'fa-solid fa-truck-droplet';            // Tanque Tático Urbano
+      if (nome.startsWith('VTTP')) return 'fa-solid fa-faucet-drip';              // Tanque Tático Pesado
+      if (nome.startsWith('BRTP') || nome.startsWith('BOT')) return 'fa-solid fa-sailboat'; // Bote / Embarcação
+      
+      return 'fa-solid fa-truck'; // Ícone padrão para outras tipologias
     }
 
     // Utilitários de Datas
@@ -339,7 +359,9 @@
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-info">
-              <i class="${iconeVeiculo} inop-icone"></i>
+              <div class="inop-icone-box">
+                <i class="${iconeVeiculo} inop-icone"></i>
+              </div>
               <div class="inop-texto">
                 <h4>${nome}</h4>
                 <p>${motivo}</p>
