@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Batalhão Sapadores Bombeiros de Braga - Situação Operacional</title>
-  <!-- Ícones Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -20,20 +19,8 @@
       --text-muted: #94a3b8;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-
-    /* Trava o ecrã para evitar qualquer barra de scroll */
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    html, body { width: 100vw; height: 100vh; overflow: hidden; }
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
@@ -44,14 +31,7 @@
       gap: clamp(6px, 1vh, 12px);
     }
 
-    /* Cada secção divide a altura do ecrã proporcionalmente */
-    section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
+    section { flex: 1; display: flex; flex-direction: column; min-height: 0; }
     .seccao-titulo {
       font-size: clamp(0.75rem, 1.2vh, 0.95rem);
       font-weight: 800;
@@ -83,136 +63,28 @@
       overflow: hidden;
     }
 
-    /* CARD TEATRO DE OPERACOES / CANAIS */
-    .card-to {
-      border-left: 4px solid var(--accent-green);
-    }
+    .card-to { border-left: 4px solid var(--accent-green); }
+    .to-nome { font-size: clamp(0.85rem, 1.3vh, 1.05rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .to-detalhes { display: flex; flex-direction: column; gap: 2px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); }
+    .badge-canal { display: inline-block; background-color: var(--accent-blue); color: #fff; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-size: clamp(0.7rem, 1vh, 0.8rem); }
 
-    .to-nome {
-      font-size: clamp(0.85rem, 1.3vh, 1.05rem);
-      font-weight: 700;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
+    .inop-info { overflow: hidden; }
+    .inop-info h4 { font-size: clamp(0.85rem, 1.3vh, 1rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inop-info p { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge-inop { background-color: var(--accent-red); color: #ffffff; font-weight: 800; font-size: clamp(0.65rem, 1vh, 0.75rem); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
 
-    .to-detalhes {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
-      color: var(--text-muted);
-    }
+    .card-agendamento { border-left: 4px solid var(--accent-orange); }
+    .agendamento-data { color: var(--accent-orange); font-weight: 700; font-size: clamp(0.75rem, 1.1vh, 0.85rem); }
+    .agendamento-desc { font-size: clamp(0.85rem, 1.2vh, 0.95rem); font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .agendamento-meios { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: #38bdf8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .badge-canal {
-      display: inline-block;
-      background-color: var(--accent-blue);
-      color: #fff;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-size: clamp(0.7rem, 1vh, 0.8rem);
-    }
+    .card-observacao { border-left: 4px solid var(--accent-purple); }
+    .obs-titulo { font-weight: 700; color: #c084fc; font-size: clamp(0.7rem, 1vh, 0.8rem); text-transform: uppercase; }
+    .obs-texto { font-size: clamp(0.8rem, 1.2vh, 0.95rem); font-weight: 600; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* CARD VIATURAS INOP */
-    .card-inop {
-      border-left: 4px solid var(--accent-red);
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .sem-registos { color: var(--text-muted); font-style: italic; padding: 6px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); }
 
-    .inop-info {
-      overflow: hidden;
-    }
-
-    .inop-info h4 {
-      font-size: clamp(0.85rem, 1.3vh, 1rem);
-      font-weight: 700;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .inop-info p {
-      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .badge-inop {
-      background-color: var(--accent-red);
-      color: #ffffff;
-      font-weight: 800;
-      font-size: clamp(0.65rem, 1vh, 0.75rem);
-      padding: 2px 6px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
-
-    /* CARD AGENDAMENTOS */
-    .card-agendamento {
-      border-left: 4px solid var(--accent-orange);
-    }
-
-    .agendamento-data {
-      color: var(--accent-orange);
-      font-weight: 700;
-      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
-    }
-
-    .agendamento-desc {
-      font-size: clamp(0.85rem, 1.2vh, 0.95rem);
-      font-weight: 600;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .agendamento-meios {
-      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
-      color: #38bdf8;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* CARD OBSERVAÇÕES */
-    .card-observacao {
-      border-left: 4px solid var(--accent-purple);
-    }
-
-    .obs-titulo {
-      font-weight: 700;
-      color: #c084fc;
-      font-size: clamp(0.7rem, 1vh, 0.8rem);
-      text-transform: uppercase;
-    }
-
-    .obs-texto {
-      font-size: clamp(0.8rem, 1.2vh, 0.95rem);
-      font-weight: 600;
-      color: #ffffff;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .sem-registos {
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 6px;
-      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
-    }
-
-    /* BARRA RODAPÉ IPMA (TICKER) */
     .rodape-ticker {
       height: clamp(36px, 5vh, 44px);
       background-color: #0f172a;
@@ -229,65 +101,18 @@
       margin-left: calc(-1 * clamp(8px, 1.2vh, 16px));
       margin-right: calc(-1 * clamp(8px, 1.2vh, 16px));
     }
+    .ticker-label { background-color: var(--accent-blue); color: #ffffff; padding: 0 12px; height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; z-index: 2; font-size: clamp(0.7rem, 1vh, 0.8rem); letter-spacing: 0.5px; }
+    .ticker-conteudo { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+    .ticker-texto { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker-animacao 25s linear infinite; }
+    .ticker-item { display: inline-flex; align-items: center; margin-right: 30px; }
+    .ticker-separador { margin-left: 30px; color: #38bdf8; opacity: 0.7; }
+    .badge-perigo { padding: 2px 6px; border-radius: 4px; font-weight: 800; margin-left: 6px; text-transform: uppercase; font-size: 0.75rem; }
 
-    .ticker-label {
-      background-color: var(--accent-blue);
-      color: #ffffff;
-      padding: 0 12px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      z-index: 2;
-      font-size: clamp(0.7rem, 1vh, 0.8rem);
-      letter-spacing: 0.5px;
-    }
-
-    .ticker-conteudo {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      position: relative;
-    }
-
-    .ticker-texto {
-      display: inline-block;
-      white-space: nowrap;
-      padding-left: 100%;
-      animation: ticker-animacao 25s linear infinite;
-    }
-
-    .ticker-item {
-      display: inline-flex;
-      align-items: center;
-      margin-right: 30px;
-    }
-
-    .ticker-separador {
-      margin-left: 30px;
-      color: #38bdf8;
-      opacity: 0.7;
-    }
-
-    .badge-perigo {
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 800;
-      margin-left: 6px;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-    }
-
-    @keyframes ticker-animacao {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
-    }
+    @keyframes ticker-animacao { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
   </style>
 </head>
 <body>
 
-  <!-- SECCAO 1: TEATRO DE OPERAÇÕES / CANAIS -->
   <section>
     <div class="seccao-titulo">Teatro de Operações / Canais</div>
     <div class="grid-cards" id="container-to">
@@ -295,7 +120,6 @@
     </div>
   </section>
 
-  <!-- SECCAO 2: VEÍCULOS INOPERACIONAIS (INOP) -->
   <section>
     <div class="seccao-titulo" style="color: #f87171;">Veículos Inoperacionais (INOP)</div>
     <div class="grid-cards" id="container-inop">
@@ -303,7 +127,6 @@
     </div>
   </section>
 
-  <!-- SECCAO 3: AGENDAMENTOS -->
   <section>
     <div class="seccao-titulo" style="color: var(--accent-orange);">Agendamentos</div>
     <div class="grid-cards" id="container-agendamentos">
@@ -311,7 +134,6 @@
     </div>
   </section>
 
-  <!-- SECCAO 4: OBSERVAÇÕES -->
   <section>
     <div class="seccao-titulo" style="color: var(--accent-purple);">Observações</div>
     <div class="grid-cards" id="container-observacoes">
@@ -319,11 +141,8 @@
     </div>
   </section>
 
-  <!-- RODAPÉ METEOROLÓGICO IPMA -->
   <footer class="rodape-ticker">
-    <div class="ticker-label">
-      <i class="fa-solid fa-cloud-sun"></i> IPMA BRAGA
-    </div>
+    <div class="ticker-label"><i class="fa-solid fa-cloud-sun"></i> IPMA BRAGA</div>
     <div class="ticker-conteudo">
       <div class="ticker-texto" id="ticker-texto">
         <span class="ticker-item">A obter dados oficiais do IPMA...</span>
@@ -332,24 +151,20 @@
   </footer>
 
   <script>
-    // ID da folha de cálculo
     const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
     
-    // GIDs das abas do Google Sheets
-    const GID_VIATURAS = '0';               // Aba principal / Viaturas INOP
-    const GID_TO = '1346973124';             // Aba Teatro de Operações / Canais
-    const GID_AGENDAMENTOS = '1209384525';     // Aba Agendamentos
-    const GID_OBSERVACOES = '1563121154';      // Aba Observações
+    const GID_VIATURAS = '0'; 
+    const GID_TO = '1346973124'; 
+    const GID_AGENDAMENTOS = '1209384525'; 
+    const GID_OBSERVACOES = '1563121154'; 
 
-    // Endpoint GViz com prevenção de cache do navegador/servidor
     const obterUrlGviz = (gid) => 
       `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
 
-    // API ENDPOINTS DO IPMA
-    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json'; // Braga
-    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';                      // Tipos de tempo
-    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';          // Perigo de Incêndio Rural
-    const DICO_BRAGA = '0303'; // Código DICO do Concelho de Braga
+    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json';
+    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';
+    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
+    const DICO_BRAGA = '0303';
 
     function obterNivelPerigoIncendio(rcmVal) {
       const niveis = {
@@ -373,7 +188,7 @@
           fetch(URL_IPMA_RCM).catch(() => null)
         ]);
 
-        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro ao consultar a API do IPMA");
+        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro IPMA");
 
         const dataMeteo = await resMeteo.json();
         const dataTipos = await resTipos.json();
@@ -410,7 +225,6 @@
           .join('<span class="ticker-separador">✦</span>');
 
       } catch (err) {
-        console.error("Erro ao carregar IPMA:", err);
         containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
       }
     }
@@ -437,69 +251,27 @@
         return res;
       };
 
-      const cabecalhos = parseLinha(linhas[0]);
+      const cabecalhos = parseLinha(linhas[0]).map(c => c.trim().toLowerCase());
       return linhas.slice(1).map(linha => {
         const valores = parseLinha(linha);
         const obj = {};
         cabecalhos.forEach((cabecalho, idx) => {
-          obj[cabecalho.trim()] = valores[idx] || '';
+          obj[cabecalho] = valores[idx] || '';
         });
         return obj;
       });
     }
 
-    function extrairObjetoData(str) {
-      if (!str) return null;
-      const match = str.match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/i);
-      if (match) {
-        return new Date(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]));
-      }
-      const partes = str.split('/');
-      if (partes.length === 3) {
-        return new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
-      }
-      return null;
-    }
-
-    function formatarDataHora(dataValor, horaValor) {
-      function extrairComponentes(str) {
-        if (!str) return null;
-        const match = str.match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/i);
-        if (match) {
-          const ano = parseInt(match[1]);
-          const mes = parseInt(match[2]) + 1;
-          const dia = parseInt(match[3]);
-          const hora = match[4] !== undefined ? parseInt(match[4]) : null;
-          const min = match[5] !== undefined ? parseInt(match[5]) : null;
-          return { ano, mes, dia, hora, min };
+    function obterValorCampo(item, chaves) {
+      for (const k of chaves) {
+        if (item[k] !== undefined && item[k] !== '') {
+          return item[k];
         }
-        return null;
       }
-
-      let dataTexto = '';
-      let horaTexto = '';
-
-      const dObj = extrairComponentes(dataValor);
-      if (dObj && dObj.ano > 1900) {
-        dataTexto = `${String(dObj.dia).padStart(2, '0')}/${String(dObj.mes).padStart(2, '0')}/${dObj.ano}`;
-      } else if (dataValor && !dataValor.includes('Date(')) {
-        dataTexto = dataValor;
-      }
-
-      const hObj = extrairComponentes(horaValor) || extrairComponentes(dataValor);
-      if (hObj && hObj.hora !== null) {
-        horaTexto = `${String(hObj.hora).padStart(2, '0')}:${String(hObj.min).padStart(2, '0')}`;
-      } else if (horaValor && !horaValor.includes('Date(')) {
-        horaTexto = horaValor;
-      }
-
-      if (dataTexto && horaTexto) return `${dataTexto} às ${horaTexto}`;
-      if (dataTexto) return dataTexto;
-      if (horaTexto) return horaTexto;
-      return 'Sem Data/Hora';
+      return '';
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (Com filtro para ignorar estados operacionais)
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarTeatroOperacoes() {
       try {
         const res = await fetch(obterUrlGviz(GID_TO));
@@ -509,11 +281,10 @@
         const container = document.getElementById('container-to');
         container.innerHTML = '';
 
-        // Valores que NÃO devem ser lidos como canal de rádio
         const valoresIgnorados = ['INOP', 'INOPERACIONAL', 'DISPONIVEL', 'DISPONÍVEL', 'OPERACIONAL', '-', 'N/A', ''];
 
         const dadosComCanal = dados.filter(item => {
-          const canal = (item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || '').trim();
+          const canal = obterValorCampo(item, ['canais', 'canal', 'siresp', 'bsb', 'frequencia', 'rádio', 'radio']).trim();
           return canal !== '' && !valoresIgnorados.includes(canal.toUpperCase());
         });
 
@@ -523,9 +294,9 @@
         }
 
         dadosComCanal.forEach(item => {
-          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || item['Veículo'] || item['Viatura'] || 'Rádio / Canal';
-          const local = item['Local'] || item['Localização'] || '';
-          const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || '';
+          const evento = obterValorCampo(item, ['evento', 'ocorrência', 'ocorrencia', 'teatro de operações', 'to', 'veículo', 'veiculo', 'viatura', 'nome']) || 'Rádio / Canal';
+          const local = obterValorCampo(item, ['local', 'localização', 'localizacao', 'sitio']);
+          const canais = obterValorCampo(item, ['canais', 'canal', 'siresp', 'bsb', 'frequencia', 'rádio', 'radio']);
 
           const div = document.createElement('div');
           div.className = 'card card-to';
@@ -540,7 +311,7 @@
         });
 
       } catch (err) {
-        console.error("Erro ao carregar Teatro de Operações:", err);
+        console.error("Erro TO:", err);
       }
     }
 
@@ -555,7 +326,7 @@
         container.innerHTML = '';
 
         const viaturasInop = dados.filter(v => {
-          const estado = (v['Estado Operacional'] || v['Estado'] || '').toUpperCase();
+          const estado = obterValorCampo(v, ['estado operacional', 'estado', 'status', 'situacao']).toUpperCase();
           return estado.includes('INOP') || estado.includes('INOPERACIONAL');
         });
 
@@ -565,8 +336,8 @@
         }
 
         viaturasInop.forEach(v => {
-          const nome = v['Viatura'] || v['Veículo'] || 'N/A';
-          const motivo = v['Motivo'] || v['Avaria'] || v['Observações'] || 'Avaria Registada';
+          const nome = obterValorCampo(v, ['viatura', 'veículo', 'veiculo', 'nome']) || 'N/A';
+          const motivo = obterValorCampo(v, ['motivo', 'avaria', 'observações', 'observacoes', 'obs']) || 'Avaria Registada';
 
           const div = document.createElement('div');
           div.className = 'card card-inop';
@@ -581,11 +352,11 @@
         });
 
       } catch (err) {
-        console.error("Erro ao carregar viaturas INOP:", err);
+        console.error("Erro INOP:", err);
       }
     }
 
-    // 3. AGENDAMENTOS (Exibe APENAS no próprio dia)
+    // 3. AGENDAMENTOS (Mostra todos os registos ativos da tabela)
     async function carregarAgendamentos() {
       try {
         const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
@@ -595,37 +366,30 @@
         const container = document.getElementById('container-agendamentos');
         container.innerHTML = '';
 
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-
-        const agendamentosAtivos = dados.filter(item => {
-          const dataRaw = item['Data'] || item['Data/Hora'] || '';
-          if (!dataRaw) return false;
-
-          const dataEvento = extrairObjetoData(dataRaw);
-          if (!dataEvento) return false;
-
-          dataEvento.setHours(0, 0, 0, 0);
-          return dataEvento.getTime() === hoje.getTime(); 
+        const agendamentosValidos = dados.filter(item => {
+          const desc = obterValorCampo(item, ['descrição', 'descricao', 'evento', 'serviço', 'servico', 'agendamento', 'titulo']);
+          const data = obterValorCampo(item, ['data', 'data/hora', 'dia']);
+          return desc !== '' || data !== '';
         });
 
-        if (agendamentosAtivos.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos para hoje.</div>`;
+        if (agendamentosValidos.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem agendamentos registados.</div>`;
           return;
         }
 
-        agendamentosAtivos.forEach(item => {
-          const dataRaw = item['Data'] || item['Data/Hora'] || '';
-          const horaRaw = item['Hora'] || '';
-          const dataHoraFormatada = formatarDataHora(dataRaw, horaRaw);
+        agendamentosValidos.forEach(item => {
+          const dataRaw = obterValorCampo(item, ['data', 'data/hora', 'dia']);
+          const horaRaw = obterValorCampo(item, ['hora', 'horario']);
+          const descricao = obterValorCampo(item, ['descrição', 'descricao', 'evento', 'serviço', 'servico', 'agendamento', 'titulo']) || 'Serviço Agendado';
+          const meios = obterValorCampo(item, ['meios', 'meios alocados', 'recursos', 'viatura']);
 
-          const descricao = item['Descrição'] || item['Descricao'] || item['Evento'] || item['Serviço'] || 'Agendamento / Prevenção';
-          const meios = item['Meios'] || item['Meios Alocados'] || item['Meios alocados'] || item['Recursos'] || '';
+          let dataFormatada = dataRaw;
+          if (horaRaw) dataFormatada += ` às ${horaRaw}`;
 
           const div = document.createElement('div');
           div.className = 'card card-agendamento';
           div.innerHTML = `
-            <div class="agendamento-data">📅 ${dataHoraFormatada}</div>
+            ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
             <div class="agendamento-desc">${descricao}</div>
             ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
           `;
@@ -633,7 +397,7 @@
         });
 
       } catch (err) {
-        console.error("Erro ao carregar agendamentos:", err);
+        console.error("Erro Agendamentos:", err);
       }
     }
 
@@ -648,8 +412,8 @@
         container.innerHTML = '';
 
         const listaObs = dados.filter(item => {
-          const obs = (item['Observações'] || item['Observação'] || item['Obs'] || '').trim();
-          const estado = (item['Estado'] || 'Ativo').toUpperCase();
+          const obs = obterValorCampo(item, ['observações', 'observacoes', 'observação', 'observacao', 'obs', 'informação', 'informacao']).trim();
+          const estado = obterValorCampo(item, ['estado', 'status']).toUpperCase();
           return obs !== '' && obs !== '-' && !estado.includes('INATIVO');
         });
 
@@ -659,8 +423,8 @@
         }
 
         listaObs.forEach(item => {
-          const titulo = item['Título'] || item['Titulo'] || '';
-          const obsTexto = item['Observações'] || item['Observação'] || item['Obs'] || '';
+          const titulo = obterValorCampo(item, ['título', 'titulo', 'assunto']);
+          const obsTexto = obterValorCampo(item, ['observações', 'observacoes', 'observação', 'observacao', 'obs', 'informação', 'informacao']);
 
           const div = document.createElement('div');
           div.className = 'card card-observacao';
@@ -672,7 +436,7 @@
         });
 
       } catch (err) {
-        console.error("Erro ao carregar observações:", err);
+        console.error("Erro Observações:", err);
       }
     }
 
