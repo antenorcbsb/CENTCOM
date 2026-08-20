@@ -103,15 +103,23 @@
       color: var(--text-muted);
     }
 
+    /* BADGES INDIVIDUAIS COM CORES POR CANAL */
     .badge-canal {
       display: inline-block;
-      background-color: var(--accent-blue);
-      color: #fff;
+      color: #ffffff;
       font-weight: 700;
-      padding: 1px 6px;
+      padding: 2px 7px;
       border-radius: 4px;
       font-size: clamp(0.7rem, 1vh, 0.8rem);
+      margin-right: 4px;
+      margin-bottom: 2px;
     }
+
+    .badge-bsb    { background-color: #0284c7; } /* Azul */
+    .badge-rob    { background-color: #f97316; } /* Laranja */
+    .badge-repc   { background-color: #10b981; } /* Verde */
+    .badge-siresp { background-color: #a855f7; } /* Roxo */
+    .badge-dmo    { background-color: #eab308; color: #000000; } /* Amarelo */
 
     /* CARD VIATURAS INOP */
     .card-inop {
@@ -332,7 +340,7 @@
   <script>
     const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
     
-    // GIDs das abas do Google Sheets
+    // GIDs atualizados das abas do Google Sheets
     const GID_VIATURAS = '1032427330';     // Aba "Veículos"
     const GID_TO = '881712175';            // Aba "Canais Radio"
     const GID_AGENDAMENTOS = '959314983';   // Aba "Agendamento"
@@ -498,7 +506,7 @@
       return 'Sem Data/Hora';
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS
+    // 1. TEATRO DE OPERAÇÕES / CANAIS (COM BADGES DE COR POR REDE)
     async function carregarTeatroOperacoes() {
       try {
         const res = await fetch(`${URL_TO}&_t=${Date.now()}`);
@@ -510,27 +518,34 @@
 
         const dadosProcessados = [];
 
+        const mapeamentoCanais = [
+          { coluna: 'Canal BSB', classe: 'badge-bsb' },
+          { coluna: 'Canal ROB', classe: 'badge-rob' },
+          { coluna: 'Canal REPC', classe: 'badge-repc' },
+          { coluna: 'Canal SIRESP', classe: 'badge-siresp' },
+          { coluna: 'DMO', classe: 'badge-dmo' }
+        ];
+
         dados.forEach(item => {
           const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || '';
           const local = item['Local'] || item['Localização'] || '';
 
-          const colunasCanais = ['Canal BSB', 'Canal ROB', 'Canal REPC', 'Canal SIRESP', 'DMO', 'Canais', 'Canal', 'SIRESP', 'BSB'];
-          const canaisEncontrados = [];
+          const badgesHTML = [];
 
-          colunasCanais.forEach(col => {
-            if (item[col]) {
-              const val = item[col].trim();
+          mapeamentoCanais.forEach(rede => {
+            if (item[rede.coluna]) {
+              const val = item[rede.coluna].trim();
               if (val && val !== '-' && val.toUpperCase() !== 'N/A' && !val.toUpperCase().includes('INOP')) {
-                canaisEncontrados.push(val);
+                badgesHTML.push(`<span class="badge-canal ${rede.classe}">${val}</span>`);
               }
             }
           });
 
-          if (evento && canaisEncontrados.length > 0) {
+          if (evento && badgesHTML.length > 0) {
             dadosProcessados.push({
               evento: evento,
               local: local,
-              canaisTexto: canaisEncontrados.join(' | ')
+              canaisHTML: badgesHTML.join('')
             });
           }
         });
@@ -547,7 +562,7 @@
             <div class="to-nome">${item.evento}</div>
             <div class="to-detalhes">
               ${item.local ? `<div>📍 <strong>Local:</strong> ${item.local}</div>` : ''}
-              <div>📻 <strong>Canal:</strong> <span class="badge-canal">${item.canaisTexto}</span></div>
+              <div style="margin-top: 4px;">📻 <strong>Canais:</strong> ${item.canaisHTML}</div>
             </div>
           `;
           container.appendChild(div);
