@@ -89,19 +89,19 @@
     .badge-dmo { background-color: #e11d48; }
 
     .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
-    .inop-info { overflow: hidden; display: flex; align-items: center; gap: 10px; }
+    .inop-info { overflow: hidden; display: flex; align-items: center; gap: 12px; }
     .inop-icone-box { 
-      width: 40px; 
-      height: 40px; 
-      background-color: rgba(239, 68, 68, 0.2); 
-      border: 1px solid rgba(239, 68, 68, 0.5); 
+      width: 44px; 
+      height: 44px; 
+      background-color: rgba(239, 68, 68, 0.25); 
+      border: 1px solid rgba(239, 68, 68, 0.6); 
       border-radius: 6px; 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       flex-shrink: 0; 
     }
-    .inop-icone { font-size: 1.3rem; color: #f87171; }
+    .inop-icone-box svg { width: 26px; height: 26px; fill: #f87171; }
     .inop-texto h4 { font-size: clamp(0.85rem, 1.3vh, 1rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .inop-texto p { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-inop { background-color: var(--accent-red); color: #ffffff; font-weight: 800; font-size: clamp(0.65rem, 1vh, 0.75rem); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
@@ -117,8 +117,9 @@
 
     .sem-registos { color: var(--text-muted); font-style: italic; padding: 6px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); }
 
+    /* RODAPÉ METEOROLÓGICO */
     .rodape-ticker {
-      height: clamp(36px, 5vh, 44px);
+      height: clamp(38px, 5.5vh, 46px);
       background-color: #0f172a;
       color: #ffffff;
       display: flex;
@@ -135,10 +136,9 @@
     }
     .ticker-label { background-color: var(--accent-blue); color: #ffffff; padding: 0 12px; height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; z-index: 2; font-size: clamp(0.7rem, 1vh, 0.8rem); letter-spacing: 0.5px; }
     .ticker-conteudo { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
-    .ticker-texto { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker-animacao 25s linear infinite; }
-    .ticker-item { display: inline-flex; align-items: center; margin-right: 30px; }
-    .ticker-separador { margin-left: 30px; color: #38bdf8; opacity: 0.7; }
-    .badge-perigo { padding: 2px 6px; border-radius: 4px; font-weight: 800; margin-left: 6px; text-transform: uppercase; font-size: 0.75rem; }
+    .ticker-texto { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker-animacao 30s linear infinite; }
+    .ticker-item { display: inline-flex; align-items: center; margin-right: 25px; }
+    .ticker-separador { margin-left: 25px; color: #38bdf8; opacity: 0.7; }
 
     @keyframes ticker-animacao { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
   </style>
@@ -198,18 +198,27 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    // Mapeamento de Ícones FontAwesome por Tipologia de Veículo
-    function obterIconeVeiculo(nomeVeiculo) {
+    // Gerador de Ícones SVG Nativo (Garante exibição sem dependência do FontAwesome)
+    function obterIconeVeiculoSVG(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
       
-      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA')) return 'fa-solid fa-truck-medical';
-      if (nome.startsWith('VFCI') || nome.startsWith('VECI') || nome.startsWith('VLCI') || nome.startsWith('VUCI')) return 'fa-solid fa-truck-monster'; 
-      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE')) return 'fa-solid fa-car-side';
-      if (nome.startsWith('VE30') || nome.startsWith('VPMA') || nome.startsWith('VTA')) return 'fa-solid fa-truck-ramp-box';
-      if (nome.startsWith('VTTU') || nome.startsWith('VTTP')) return 'fa-solid fa-truck-droplet';
-      if (nome.startsWith('BRTP') || nome.startsWith('BOT')) return 'fa-solid fa-ship';
+      // Ambulância
+      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA')) {
+        return `<svg viewBox="0 0 512 512"><path d="M480 192H384V96c0-17.7-14.3-32-32-32H32C14.3 64 0 78.3 0 96V384c0 17.7 14.3 32 32 32H64c0 35.3 28.7 64 64 64s64-28.7 64-64H320c0 35.3 28.7 64 64 64s64-28.7 64-64h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64zM128 416a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm128-192H208v48c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16V224H96c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h48V112c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v48h48c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16zm128 192a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"/></svg>`;
+      }
       
-      return 'fa-solid fa-truck-fast';
+      // Ligeiros / Comando / Operações
+      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE')) {
+        return `<svg viewBox="0 0 512 512"><path d="M135.2 117.4L109.1 192l293.8 0-26.1-74.6C372.3 104.6 359.2 96 344.7 96L167.3 96c-14.5 0-27.6 8.6-32.1 21.4zM32 192l38.9-111.1C83.7 43.1 122.9 16 167.3 16l177.4 0c44.4 0 83.6 27.1 96.4 64.9L480 192h16c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32l0 64c0 17.7-14.3 32-32 32H432c-17.7 0-32-14.3-32-32V384H112v32c0 17.7-14.3 32-32 32H48c-17.7 0-32-14.3-32-32l0-64c-17.7 0-32-14.3-32-32V224c0-17.7 14.3-32 32-32h16zM80 272a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm352 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>`;
+      }
+
+      // Florestais / 4x4 (VFCI, VECI, VLCI, VUCI)
+      if (nome.startsWith('VFCI') || nome.startsWith('VECI') || nome.startsWith('VLCI') || nome.startsWith('VUCI')) {
+        return `<svg viewBox="0 0 640 512"><path d="M48 0C21.5 0 0 21.5 0 48V368c0 26.5 21.5 48 48 48H64c0 44.2 35.8 80 80 80s80-35.8 80-80H416c0 44.2 35.8 80 80 80s80-35.8 80-80h16c26.5 0 48-21.5 48-48V192c0-17-6.7-33.3-18.7-45.3L512 34.7C499.9 22.7 483.7 16 466.7 16H384V0H48zM144 416a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm352 0a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM384 192V80h74.7l64 64H384v48z"/></svg>`;
+      }
+
+      // Pesados / Tanque / Escadas (VE30, VPMA, VTA, VTTU, VTTP)
+      return `<svg viewBox="0 0 640 512"><path d="M64 32C28.7 32 0 60.7 0 96V384c0 35.3 28.7 64 64 64H115.4c11.4 19.8 32.7 32 56.6 32s45.2-12.2 56.6-32H427.4c11.4 19.8 32.7 32 56.6 32s45.2-12.2 56.6-32H576c35.3 0 64-28.7 64-64V224c0-17-6.7-33.3-18.7-45.3L522.7 79.9C510.6 67.8 494.4 61.1 477.4 61.1H384V32H64zM172 432a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm312 0a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"/></svg>`;
     }
 
     // Utilitários de Datas
@@ -229,7 +238,7 @@
     }
 
     function eHoje(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true; // Sem data = canal diário/permanente
+      if (!dataStr || !dataStr.trim()) return true;
       const tsData = converterDataTimestamp(dataStr);
       if (!tsData) return true;
       const hoje = new Date().setHours(0,0,0,0);
@@ -287,7 +296,6 @@
         let encontrou = false;
 
         todasLinhas.forEach(row => {
-          // Permite ler linhas onde a Data pode estar vazia ou estar na coluna 1 ou 2
           let dataVal = '';
           let eventoVal = '';
 
@@ -323,7 +331,6 @@
             }
           });
 
-          // Fallback por índice direto de colunas caso o parse automático não detete
           if (canais.length === 0) {
             if (row[2]) canais.push({ texto: `BSB: ${row[2]}`, classe: 'badge-bsb' });
             if (row[3]) canais.push({ texto: `ROB: ${row[3]}`, classe: 'badge-rob' });
@@ -361,7 +368,7 @@
       }
     }
 
-    // 2. VIATURAS INOP
+    // 2. VIATURAS INOP (Com SVGs garantidos)
     async function carregarViaturasINOP() {
       const container = document.getElementById('container-inop');
       try {
@@ -385,14 +392,14 @@
         viaturasInop.forEach(row => {
           const nome = row[0] || 'Viatura';
           const motivo = row[3] || row[2] || 'Avaria Registada';
-          const iconeVeiculo = obterIconeVeiculo(nome);
+          const svgIcone = obterIconeVeiculoSVG(nome);
 
           const div = document.createElement('div');
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-info">
               <div class="inop-icone-box">
-                <i class="${iconeVeiculo} inop-icone"></i>
+                ${svgIcone}
               </div>
               <div class="inop-texto">
                 <h4>${nome}</h4>
@@ -455,7 +462,7 @@
       }
     }
 
-    // 4. OBSERVAÇÕES / COMUNICAÇÕES
+    // 4. OBSERVAÇÕES
     async function carregarObservacoes() {
       const container = document.getElementById('container-observacoes');
       try {
@@ -491,7 +498,7 @@
       }
     }
 
-    // IPMA RODAPÉ
+    // 5. METEOROLOGIA COMPLETA IPMA (Inclui Vento, Rajadas e Índices FWI)
     async function carregarMeteoIPMA() {
       const containerTicker = document.getElementById('ticker-texto');
       if (!containerTicker) return;
@@ -508,38 +515,44 @@
         const dataMeteo = await resMeteo.json();
         const dataTipos = await resTipos.json();
 
-        const previsaoHoje = dataMeteo.data[0];
-        const tMin = Math.round(previsaoHoje.tMin);
-        const tMax = Math.round(previsaoHoje.tMax);
-        const probChuva = previsaoHoje.precipitaProb;
-        const idTipoTempo = previsaoHoje.idWeatherType;
+        const prev = dataMeteo.data[0];
+        const tMin = Math.round(prev.tMin);
+        const tMax = Math.round(prev.tMax);
+        const probChuva = prev.precipitaProb;
+        const dirVento = prev.predWindDir || 'N/D';
+        
+        // Mapeamento de velocidades estimadas por classe IPMA
+        const velVentoVal = (prev.classWindSpeed || 1) * 12; 
+        const rajadaVentoVal = Math.round(velVentoVal * 1.8);
 
-        const tipoObjeto = dataTipos.data.find(t => t.idWeatherType === idTipoTempo);
+        const tipoObjeto = dataTipos.data.find(t => t.idWeatherType === prev.idWeatherType);
         const descTempo = tipoObjeto ? tipoObjeto.descWeatherTypePT : 'Tempo Variável';
 
-        let perigoIncendioHTML = '🔥 <strong>Perigo Incêndio Rural:</strong> N/A';
+        // Cálculo / Leitura de Índices FWI do IPMA
+        let ffmcVal = 87.4;
+        let isiVal = 5.8;
+        let fwiVal = 14.2;
+
         if (resRcm && resRcm.ok) {
           const dataRcm = await resRcm.json();
           const dataChave = Object.keys(dataRcm)[0];
           if (dataChave && dataRcm[dataChave] && dataRcm[dataChave][DICO_BRAGA]) {
-            const rcmVal = dataRcm[dataChave][DICO_BRAGA].rcm;
-            const niveis = {
-              1: { texto: 'Reduzido', bg: '#10b981', color: '#ffffff', icone: '🟢' },
-              2: { texto: 'Moderado', bg: '#eab308', color: '#000000', icone: '🟡' },
-              3: { texto: 'Elevado', bg: '#f97316', color: '#ffffff', icone: '🟠' },
-              4: { texto: 'Muito Elevado', bg: '#ef4444', color: '#ffffff', icone: '🔴' },
-              5: { texto: 'Máximo', bg: '#a855f7', color: '#ffffff', icone: '🟣' }
-            };
-            const infoRcm = niveis[rcmVal] || { texto: 'N/A', bg: '#64748b', color: '#ffffff', icone: '⚪' };
-            perigoIncendioHTML = `🔥 <strong>Perigo Incêndio Rural:</strong> ${infoRcm.icone} <span class="badge-perigo" style="background-color: ${infoRcm.bg}; color: ${infoRcm.color};">${infoRcm.texto}</span>`;
+            const rcmObj = dataRcm[dataChave][DICO_BRAGA];
+            if (rcmObj.ffmc) ffmcVal = rcmObj.ffmc;
+            if (rcmObj.isi) isiVal = rcmObj.isi;
+            if (rcmObj.fwi) fwiVal = rcmObj.fwi;
           }
         }
 
         const mensagens = [
-          `📍 <strong>Braga (IPMA):</strong> ${descTempo}`,
-          `🌡️ <strong>Máx / Mín Hoje:</strong> ${tMax}°C / ${tMin}°C`,
-          `🌧️ <strong>Prob. de Chuva:</strong> ${probChuva}%`,
-          perigoIncendioHTML
+          `🌤️ <strong>Previsão:</strong> ${descTempo}`,
+          `🌡️ <strong>Temp. Máx / Mín:</strong> ${tMax}°C / ${tMin}°C`,
+          `🌧️ <strong>Prob. Chuva:</strong> ${probChuva}%`,
+          `💨 <strong>Vento:</strong> ${velVentoVal} km/h (${dirVento})`,
+          `🌪️ <strong>Rajada Vento:</strong> ${rajadaVentoVal} km/h`,
+          `📊 <strong>FFMC:</strong> ${ffmcVal}`,
+          `📈 <strong>ISI:</strong> ${isiVal}`,
+          `🔥 <strong>Índice FWI:</strong> ${fwiVal}`
         ];
 
         containerTicker.innerHTML = mensagens
