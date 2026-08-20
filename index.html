@@ -198,24 +198,24 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    // Mapeamento completo das Tipologias de Veículos
+    // Mapeamento de Ícones de Veículos
     function obterIconeVeiculo(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
       
-      if (nome.startsWith('ABSC')) return 'fa-solid fa-ambulance';               // Ambulância de Socorro
-      if (nome.startsWith('VCOT')) return 'fa-solid fa-car-side';                 // Comando Operacional Tático
-      if (nome.startsWith('VCOC')) return 'fa-solid fa-truck-field';              // Comando e Operações
-      if (nome.startsWith('VFCI')) return 'fa-solid fa-fire-truck';               // Florestal Combate Incêndios
-      if (nome.startsWith('VECI')) return 'fa-solid fa-truck-fast';               // Especial Combate Incêndios
-      if (nome.startsWith('VLCI')) return 'fa-solid fa-truck-pickup';             // Ligeira Combate Incêndios
-      if (nome.startsWith('VE30')) return 'fa-solid fa-truck-ramp-box';           // Autoescada / Plataforma 30m
-      if (nome.startsWith('VPMA')) return 'fa-solid fa-biohazard';                // Proteção Matérias Ambientais
-      if (nome.startsWith('VOPE')) return 'fa-solid fa-truck-gear';               // Operações Especiais
-      if (nome.startsWith('VTTU')) return 'fa-solid fa-truck-droplet';            // Tanque Tático Urbano
-      if (nome.startsWith('VTTP')) return 'fa-solid fa-faucet-drip';              // Tanque Tático Pesado
-      if (nome.startsWith('BRTP') || nome.startsWith('BOT')) return 'fa-solid fa-sailboat'; // Bote / Embarcação
+      if (nome.startsWith('ABSC')) return 'fa-solid fa-ambulance';
+      if (nome.startsWith('VCOT')) return 'fa-solid fa-car-side';
+      if (nome.startsWith('VCOC')) return 'fa-solid fa-truck-field';
+      if (nome.startsWith('VFCI')) return 'fa-solid fa-fire-truck';
+      if (nome.startsWith('VECI')) return 'fa-solid fa-truck-fast';
+      if (nome.startsWith('VLCI')) return 'fa-solid fa-truck-pickup';
+      if (nome.startsWith('VE30')) return 'fa-solid fa-truck-ramp-box';
+      if (nome.startsWith('VPMA')) return 'fa-solid fa-biohazard';
+      if (nome.startsWith('VOPE')) return 'fa-solid fa-truck-gear';
+      if (nome.startsWith('VTTU')) return 'fa-solid fa-truck-droplet';
+      if (nome.startsWith('VTTP')) return 'fa-solid fa-faucet-drip';
+      if (nome.startsWith('BRTP') || nome.startsWith('BOT')) return 'fa-solid fa-sailboat';
       
-      return 'fa-solid fa-truck'; // Ícone padrão para outras tipologias
+      return 'fa-solid fa-truck';
     }
 
     // Utilitários de Datas
@@ -235,7 +235,7 @@
     }
 
     function eHoje(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true;
+      if (!dataStr || !dataStr.trim()) return true; // Sem data = canal/evento permanente
       const tsData = converterDataTimestamp(dataStr);
       if (!tsData) return true;
       const hoje = new Date().setHours(0,0,0,0);
@@ -250,10 +250,11 @@
       return tsData >= hoje;
     }
 
+    // Parser CSV Robusto
     function parseCSV(text) {
       if (!text || text.includes('<!DOCTYPE html>')) return [];
       const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
-      if (linhas.length < 2) return [];
+      if (linhas.length === 0) return [];
 
       const parseLinha = (linha) => {
         const res = [];
@@ -273,7 +274,7 @@
         return res;
       };
 
-      return linhas.slice(1).map(linha => parseLinha(linha));
+      return linhas.map(linha => parseLinha(linha));
     }
 
     // 1. TEATRO DE OPERAÇÕES / CANAIS
@@ -282,24 +283,54 @@
       try {
         const res = await fetch(obterUrlGviz(GID_CANAIS));
         const csvTexto = await res.text();
-        const linhas = parseCSV(csvTexto);
+        const todasLinhas = parseCSV(csvTexto);
 
         container.innerHTML = '';
+        if (todasLinhas.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
+          return;
+        }
+
+        // Mapeamento dinâmico de colunas
+        let colData = 0, colEvento = 1, colBSB = 2, colROB = 3, colREPC = 4, colSIRESP = 5, colDMO = 6;
+        let linhasDados = todasLinhas;
+
+        // Identifica se a primeira linha é o cabeçalho
+        const primeiraLinha = todasLinhas[0];
+        const eCabecalho = primeiraLinha.some(cel => {
+          const txt = cel.toLowerCase().trim();
+          return txt === 'evento' || txt === 'data' || txt === 'canal bsb';
+        });
+
+        if (eCabecalho) {
+          primeiraLinha.forEach((cel, idx) => {
+            const txt = cel.toLowerCase().trim();
+            if (txt.includes('data')) colData = idx;
+            if (txt.includes('evento')) colEvento = idx;
+            if (txt.includes('bsb')) colBSB = idx;
+            if (txt.includes('rob')) colROB = idx;
+            if (txt.includes('repc')) colREPC = idx;
+            if (txt.includes('siresp')) colSIRESP = idx;
+            if (txt.includes('dmo')) colDMO = idx;
+          });
+          linhasDados = todasLinhas.slice(1);
+        }
+
         let encontrou = false;
 
-        linhas.forEach(row => {
-          const dataVal = row[0] || '';
-          const eventoVal = row[1] || '';
+        linhasDados.forEach(row => {
+          const dataVal = row[colData] || '';
+          const eventoVal = row[colEvento] || '';
           
-          if (!eventoVal) return;
+          if (!eventoVal || eventoVal.toLowerCase().trim() === 'evento') return;
           if (!eHoje(dataVal)) return;
 
           const canais = [];
-          if (row[2]) canais.push({ texto: `BSB: ${row[2]}`, classe: 'badge-bsb' });
-          if (row[3]) canais.push({ texto: `ROB: ${row[3]}`, classe: 'badge-rob' });
-          if (row[4]) canais.push({ texto: `REPC: ${row[4]}`, classe: 'badge-repc' });
-          if (row[5]) canais.push({ texto: `SIRESP: ${row[5]}`, classe: 'badge-siresp' });
-          if (row[6]) canais.push({ texto: `DMO: ${row[6]}`, classe: 'badge-dmo' });
+          if (row[colBSB]) canais.push({ texto: `BSB: ${row[colBSB]}`, classe: 'badge-bsb' });
+          if (row[colROB]) canais.push({ texto: `ROB: ${row[colROB]}`, classe: 'badge-rob' });
+          if (row[colREPC]) canais.push({ texto: `REPC: ${row[colREPC]}`, classe: 'badge-repc' });
+          if (row[colSIRESP]) canais.push({ texto: `SIRESP: ${row[colSIRESP]}`, classe: 'badge-siresp' });
+          if (row[colDMO]) canais.push({ texto: `DMO: ${row[colDMO]}`, classe: 'badge-dmo' });
 
           if (canais.length > 0) {
             encontrou = true;
@@ -336,11 +367,14 @@
       try {
         const res = await fetch(obterUrlGviz(GID_VIATURAS));
         const csvTexto = await res.text();
-        const linhas = parseCSV(csvTexto);
+        const todasLinhas = parseCSV(csvTexto);
 
         container.innerHTML = '';
+        if (todasLinhas.length === 0) return;
 
-        const viaturasInop = linhas.filter(row => {
+        const linhasDados = (todasLinhas[0][0] || '').toLowerCase().includes('viatura') ? todasLinhas.slice(1) : todasLinhas;
+
+        const viaturasInop = linhasDados.filter(row => {
           const estado = (row[1] || '').toUpperCase();
           return estado.includes('INOP') || estado.includes('INOPERACIONAL');
         });
@@ -383,11 +417,14 @@
       try {
         const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
         const csvTexto = await res.text();
-        const linhas = parseCSV(csvTexto);
+        const todasLinhas = parseCSV(csvTexto);
 
         container.innerHTML = '';
+        if (todasLinhas.length === 0) return;
+
+        const linhasDados = (todasLinhas[0][0] || '').toLowerCase().includes('data') ? todasLinhas.slice(1) : todasLinhas;
         
-        const agendamentosValidos = linhas.filter(row => {
+        const agendamentosValidos = linhasDados.filter(row => {
           const dataRaw = row[0] || '';
           const descricao = row[2] || '';
           return descricao.trim() !== '' && eHojeOuFuturo(dataRaw);
@@ -428,10 +465,13 @@
       try {
         const res = await fetch(obterUrlGviz(GID_COMUNICACOES));
         const csvTexto = await res.text();
-        const linhas = parseCSV(csvTexto);
+        const todasLinhas = parseCSV(csvTexto);
 
         container.innerHTML = '';
-        const obsValidas = linhas.filter(row => row[1] && row[1].trim() !== '');
+        if (todasLinhas.length === 0) return;
+
+        const linhasDados = (todasLinhas[0][0] || '').toLowerCase().includes('titulo') ? todasLinhas.slice(1) : todasLinhas;
+        const obsValidas = linhasDados.filter(row => row[1] && row[1].trim() !== '');
 
         if (obsValidas.length === 0) {
           container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
