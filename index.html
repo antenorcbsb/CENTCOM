@@ -144,16 +144,21 @@
       overflow: hidden; 
     }
     
-    .inop-icone-box { 
+    .veiculo-icone-box { 
       width: clamp(36px, 4vh, 52px); 
       height: clamp(36px, 4vh, 52px); 
-      background-color: rgba(239, 68, 68, 0.25); 
-      border: 1px solid rgba(239, 68, 68, 0.6); 
+      background-color: rgba(249, 115, 22, 0.2); 
+      border: 1px solid rgba(249, 115, 22, 0.5); 
       border-radius: 6px; 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       flex-shrink: 0; 
+    }
+    
+    .inop-icone-box {
+      background-color: rgba(239, 68, 68, 0.25); 
+      border-color: rgba(239, 68, 68, 0.6); 
     }
     
     .inop-icone-box svg { width: 26px; height: 26px; fill: #f87171; }
@@ -180,7 +185,22 @@
       flex-shrink: 0; 
     }
 
-    .card-agendamento { border-left: 4px solid var(--accent-orange); }
+    /* Agendamentos */
+    .card-agendamento { 
+      border-left: 4px solid var(--accent-orange); 
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .agendamento-conteudo {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      overflow: hidden;
+    }
+
     .agendamento-data { 
       color: var(--accent-orange); 
       font-weight: 700; 
@@ -202,6 +222,7 @@
       word-break: break-word;
     }
 
+    /* Observações */
     .card-observacao { border-left: 4px solid var(--accent-purple); }
     .obs-titulo { 
       font-weight: 700; 
@@ -345,14 +366,11 @@
       const nome = (nomeVeiculo || '').toUpperCase().trim();
       const style = 'style="width: 100%; height: 100%; object-fit: contain;"';
       
-      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA')) {
+      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
         return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X05nEiZz1ujeGojWBrUwgwKEQu9l8jIZLMSk5hegmJynRKblkEE_crAC0BFAMSxQnziNIHnM9k_Sl9Wqx43FCJUiCeeR587EgTV4uAgfmsQ2yFQAnUFwjeBGq_zhk2vtDy0cUzCO6lxxht5qvUSjqeuWW6_c0fjbD4BjxvQ0ixADivtv_RkJDbXE14u2Tq_mwtA9bHMMm8xyVvcgS6bVCBQWuYvkJz3NbVZTyHb3qiKNmcqXchU9I0vzor" ${style}>`;
       }
-      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE')) {
+      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('VCOT') || nome.includes('VOPE')) {
         return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1WHcN6GtjV6nPRpCYTUPT1M4EbplSOATAh3sral_FBqU_98kQs8K3UQ3Cu0CYeAkYj7GhZC0rm1sEL_MRmmVvUgM1yWaxzmBqtT-er4jn-QnAThQ-tLWAddgIRQ1s3iooGNGlzJL6rWDZ78jWile2aJ7oPComoo4QeY6HoGCA2ciFh3fCzRadnKq450mdovH8vHBxTOXFyfHbmGKrmheJsywBv6IE_d5GYSg4nz96G5B0Z9xNSH-iZY9dXi" ${style}>`;
-      }
-      if (nome.startsWith('VFCI') || nome.startsWith('VECI') || nome.startsWith('VLCI') || nome.startsWith('VUCI')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X9o9T1-ySyJOt4RGo5aAVBYMpp8ArbUwI6JkYyVUJYJQ0e--u63OJ4UNrf0RBdwkiAaXpd4yRchxIfK87N6NAzkeq-zOFfuFnc74uFsbju2GfQnx0uRry6HxLNw5CfqcXgSzdCzLsCDjZUb0MXbPDkgi4tNd40TPxZ82060N8ZyAfgpsw99RkY7gvWqXTkJrPa6HvUEbB8yUjTbWT6qeRvnpG2Zrv3vRY3Wg_PTDYp3iybN-drFPyS7iUC" ${style}>`;
       }
       return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X9o9T1-ySyJOt4RGo5aAVBYMpp8ArbUwI6JkYyVUJYJQ0e--u63OJ4UNrf0RBdwkiAaXpd4yRchxIfK87N6NAzkeq-zOFfuFnc74uFsbju2GfQnx0uRry6HxLNw5CfqcXgSzdCzLsCDjZUb0MXbPDkgi4tNd40TPxZ82060N8ZyAfgpsw99RkY7gvWqXTkJrPa6HvUEbB8yUjTbWT6qeRvnpG2Zrv3vRY3Wg_PTDYp3iybN-drFPyS7iUC" ${style}>`;
     }
@@ -558,7 +576,7 @@
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-info">
-              <div class="inop-icone-box">
+              <div class="veiculo-icone-box inop-icone-box">
                 ${svgIcone}
               </div>
               <div class="inop-texto">
@@ -576,7 +594,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS
+    // 3. AGENDAMENTOS (Com ícone da tipologia de veículo)
     async function carregarAgendamentos() {
       const container = document.getElementById('container-agendamentos');
       try {
@@ -607,12 +625,20 @@
           let dataFormatada = dataRaw;
           if (horaRaw) dataFormatada += ` às ${horaRaw}`;
 
+          // Obter ícone correspondente aos meios agendados
+          const svgIcone = obterIconeVeiculoSVG(meios || descricao);
+
           const div = document.createElement('div');
           div.className = 'card card-agendamento';
           div.innerHTML = `
-            ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
-            <div class="agendamento-desc">${descricao}</div>
-            ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
+            <div class="veiculo-icone-box">
+              ${svgIcone}
+            </div>
+            <div class="agendamento-conteudo">
+              ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
+              <div class="agendamento-desc">${descricao}</div>
+              ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
+            </div>
           `;
           container.appendChild(div);
         });
