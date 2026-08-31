@@ -397,9 +397,23 @@
       return tsData === hoje;
     }
 
-    function eHojeOuSemData(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true;
-      return eHoje(dataStr);
+    // Função para verificar se a data atual está dentro do intervalo programado
+    function estaNoIntervaloDatas(dataInicioStr, dataFimStr) {
+      const hoje = new Date().setHours(0, 0, 0, 0);
+      const tsInicio = converterDataTimestamp(dataInicioStr);
+      const tsFim = converterDataTimestamp(dataFimStr);
+
+      // Se não tiver data de início nem de fim, mostra sempre
+      if (!tsInicio && !tsFim) return true;
+
+      // Se tiver início mas não tiver fim, mostra a partir da data de início
+      if (tsInicio && !tsFim) return hoje >= tsInicio;
+
+      // Se tiver fim mas não tiver início, mostra até à data de fim
+      if (!tsInicio && tsFim) return hoje <= tsFim;
+
+      // Se tiver ambas as datas, verifica se está entre o início e o fim
+      return hoje >= tsInicio && hoje <= tsFim;
     }
 
     function parseCSV(text) {
@@ -445,20 +459,24 @@
         let encontrou = false;
 
         todasLinhas.forEach(row => {
-          // Mapeamento rígido pelas posições exatas da folha:
-          // Coluna A (0) = Data
-          // Coluna B (1) = Evento
-          // Coluna C (2) = Canal BSB
-          // Coluna D (3) = Canal ROB
-          // Coluna E (4) = Canal REPC
-          // Coluna F (5) = Canal SIRESP
-          // Coluna G (6) = BSB_DMO
+          // Mapeamento ajustado com Data de Início e Data de Fim:
+          // Coluna A (0) = Data Início
+          // Coluna B (1) = Data Fim
+          // Coluna C (2) = Evento
+          // Coluna D (3) = Canal BSB
+          // Coluna E (4) = Canal ROB
+          // Coluna F (5) = Canal REPC
+          // Coluna G (6) = Canal SIRESP
+          // Coluna H (7) = BSB_DMO
 
-          const dataVal = row[0] ? row[0].trim() : '';
-          const eventoVal = row[1] ? row[1].trim() : '';
+          const dataInicio = row[0] ? row[0].trim() : '';
+          const dataFim = row[1] ? row[1].trim() : '';
+          const eventoVal = row[2] ? row[2].trim() : '';
 
           if (!eventoVal || eventoVal.toLowerCase() === 'evento') return;
-          if (!eHojeOuSemData(dataVal)) return;
+          
+          // Validação do intervalo de datas
+          if (!estaNoIntervaloDatas(dataInicio, dataFim)) return;
 
           const canais = [];
 
@@ -481,11 +499,11 @@
           };
 
           // Atribuir cada coluna da folha ao seu respetivo canal
-          adicionarCanal(row[2], 'badge-bsb');    // Coluna C: Canal BSB
-          adicionarCanal(row[3], 'badge-rob');    // Coluna D: Canal ROB
-          adicionarCanal(row[4], 'badge-repc');   // Coluna E: Canal REPC
-          adicionarCanal(row[5], 'badge-siresp'); // Coluna F: Canal SIRESP
-          adicionarCanal(row[6], 'badge-dmo');    // Coluna G: BSB_DMO
+          adicionarCanal(row[3], 'badge-bsb');    // Coluna D: Canal BSB
+          adicionarCanal(row[4], 'badge-rob');    // Coluna E: Canal ROB
+          adicionarCanal(row[5], 'badge-repc');   // Coluna F: Canal REPC
+          adicionarCanal(row[6], 'badge-siresp'); // Coluna G: Canal SIRESP
+          adicionarCanal(row[7], 'badge-dmo');    // Coluna H: BSB_DMO
 
           if (canais.length > 0) {
             encontrou = true;
@@ -496,10 +514,19 @@
               `<span class="badge-canal ${c.classe}"><img src="https://lh3.googleusercontent.com/aida/AEtjO1Uigq01cgKGOR3dU2-oD_I07t90S4tBR68IktYDQgYegy2jRfja3Rr7FDIlOMF34tjIaD5fSL1IpKiNT2EauggtCl_5YHmLwzgFRPokHJVg3Gi3avYYQgHbZ3r0WTiH4qYJUbJpa4BAVwcboXiteeKKLzbBkv8BhvsJAzgNguKiAjkKSVKInO-jW7RW5RHzxHcEO-NleF64jG-JrVDBPz_dj8ZWQfGsYKo2tpui1uLz08tEPU5nOG5ZtAQl" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle; margin-right: 4px;"> ${c.texto}</span>`
             ).join('');
             
+            let textoData = '';
+            if (dataInicio && dataFim) {
+              textoData = `${dataInicio} até ${dataFim}`;
+            } else if (dataInicio) {
+              textoData = `A partir de ${dataInicio}`;
+            } else if (dataFim) {
+              textoData = `Até ${dataFim}`;
+            }
+
             div.innerHTML = `
               <div class="to-nome">${eventoVal}</div>
               <div class="to-detalhes">
-                ${dataVal ? `<div>📅 <strong>Data:</strong> ${dataVal}</div>` : ''}
+                ${textoData ? `<div>📅 <strong>Data:</strong> ${textoData}</div>` : ''}
                 <div class="canais-lista">${badgesHTML}</div>
               </div>
             `;
