@@ -398,7 +398,7 @@
     }
 
     function eHojeOuSemData(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true; // Se não tiver data, aceita (mostra sempre)
+      if (!dataStr || !dataStr.trim()) return true;
       return eHoje(dataStr);
     }
 
@@ -445,43 +445,47 @@
         let encontrou = false;
 
         todasLinhas.forEach(row => {
-          let dataVal = '';
-          let eventoVal = '';
+          // Mapeamento rígido pelas posições exatas da folha:
+          // Coluna A (0) = Data
+          // Coluna B (1) = Evento
+          // Coluna C (2) = Canal BSB
+          // Coluna D (3) = Canal ROB
+          // Coluna E (4) = Canal REPC
+          // Coluna F (5) = Canal SIRESP
+          // Coluna G (6) = BSB_DMO
 
-          // Mapeamento correto com base na folha (Coluna A: Data, Coluna B: Evento)
-          if (row[0] && row[0].includes('/')) {
-            dataVal = row[0].trim();
-            eventoVal = row[1] ? row[1].trim() : '';
-          } else {
-            eventoVal = row[1] ? row[1].trim() : (row[0] ? row[0].trim() : '');
-            dataVal = row[0] && row[0].includes('/') ? row[0].trim() : '';
-          }
+          const dataVal = row[0] ? row[0].trim() : '';
+          const eventoVal = row[1] ? row[1].trim() : '';
 
-          if (!eventoVal || eventoVal.toLowerCase() === 'evento' || eventoVal.toLowerCase() === 'data') return;
+          if (!eventoVal || eventoVal.toLowerCase() === 'evento') return;
           if (!eHojeOuSemData(dataVal)) return;
 
           const canais = [];
 
-          // Percorrer da coluna C em diante para recolher apenas os canais preenchidos
-          row.slice(2).forEach((celula) => {
-            if (!celula) return;
-            const val = celula.trim();
-            const valLower = val.toLowerCase();
+          const adicionarCanal = (val, classePadrao) => {
+            if (!val) return;
+            const valClean = val.trim();
+            const valLower = valClean.toLowerCase();
             
-            if (!val || valLower.includes('canal')) return;
+            if (!valClean || valLower === 'canal' || valLower.includes('canal ')) return;
 
-            if (valLower.includes('dmo')) {
-              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-dmo' });
-            } else if (valLower.includes('siresp') || valLower.includes('tat')) {
-              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-siresp' });
-            } else if (valLower.includes('repc') || valLower.includes('pc')) {
-              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-repc' });
-            } else if (valLower.includes('rob') || valLower.includes('man')) {
-              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-rob' });
-            } else {
-              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-bsb' });
+            let classe = classePadrao;
+            if (valLower.includes('dmo')) classe = 'badge-dmo';
+            else if (valLower.includes('siresp') || valLower.includes('tat')) classe = 'badge-siresp';
+            else if (valLower.includes('repc') || valLower.includes('pc')) classe = 'badge-repc';
+            else if (valLower.includes('rob') || valLower.includes('man')) classe = 'badge-rob';
+
+            if (!canais.some(c => c.texto === valClean)) {
+              canais.push({ texto: valClean, classe: classe });
             }
-          });
+          };
+
+          // Atribuir cada coluna da folha ao seu respetivo canal
+          adicionarCanal(row[2], 'badge-bsb');    // Coluna C: Canal BSB
+          adicionarCanal(row[3], 'badge-rob');    // Coluna D: Canal ROB
+          adicionarCanal(row[4], 'badge-repc');   // Coluna E: Canal REPC
+          adicionarCanal(row[5], 'badge-siresp'); // Coluna F: Canal SIRESP
+          adicionarCanal(row[6], 'badge-dmo');    // Coluna G: BSB_DMO
 
           if (canais.length > 0) {
             encontrou = true;
