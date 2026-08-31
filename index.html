@@ -397,6 +397,11 @@
       return tsData === hoje;
     }
 
+    function eHojeOuSemData(dataStr) {
+      if (!dataStr || !dataStr.trim()) return true; // Se não tiver data, aceita (mostra sempre)
+      return eHoje(dataStr);
+    }
+
     function parseCSV(text) {
       if (!text || text.includes('<!DOCTYPE html>')) return [];
       const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
@@ -433,7 +438,7 @@
 
         container.innerHTML = '';
         if (todasLinhas.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
+          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos.</div>`;
           return;
         }
 
@@ -443,29 +448,27 @@
           let dataVal = '';
           let eventoVal = '';
 
+          // Mapeamento correto com base na folha (Coluna A: Data, Coluna B: Evento)
           if (row[0] && row[0].includes('/')) {
             dataVal = row[0].trim();
             eventoVal = row[1] ? row[1].trim() : '';
-          } else if (row[0] && !row[0].includes('/') && row[0].toLowerCase() !== 'data') {
-            eventoVal = row[0].trim();
-            dataVal = row[1] && row[1].includes('/') ? row[1].trim() : '';
           } else {
-            eventoVal = row[1] ? row[1].trim() : '';
-            dataVal = row[0] ? row[0].trim() : '';
+            eventoVal = row[1] ? row[1].trim() : (row[0] ? row[0].trim() : '');
+            dataVal = row[0] && row[0].includes('/') ? row[0].trim() : '';
           }
 
           if (!eventoVal || eventoVal.toLowerCase() === 'evento' || eventoVal.toLowerCase() === 'data') return;
-          if (!eHoje(dataVal)) return;
+          if (!eHojeOuSemData(dataVal)) return;
 
           const canais = [];
 
-          row.forEach((celula) => {
+          // Percorrer da coluna C em diante para recolher apenas os canais preenchidos
+          row.slice(2).forEach((celula) => {
             if (!celula) return;
             const val = celula.trim();
             const valLower = val.toLowerCase();
             
-            // Ignorar dados de cabeçalho, datas, eventos ou placeholders genéricos
-            if (val === dataVal || val === eventoVal || val.includes('/') || valLower === 'evento' || valLower.includes('canal')) return;
+            if (!val || valLower.includes('canal')) return;
 
             if (valLower.includes('dmo')) {
               if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-dmo' });
@@ -475,7 +478,7 @@
               if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-repc' });
             } else if (valLower.includes('rob') || valLower.includes('man')) {
               if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-rob' });
-            } else if (valLower.includes('bsb') || valLower.includes('geral') || (val.match(/\d{4}/) && !val.includes('/'))) {
+            } else {
               if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-bsb' });
             }
           });
@@ -501,11 +504,11 @@
         });
 
         if (!encontrou) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
+          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos.</div>`;
         }
 
       } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
+        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos.</div>`;
       }
     }
 
@@ -557,7 +560,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS (Apenas os agendamentos do próprio dia)
+    // 3. AGENDAMENTOS
     async function carregarAgendamentos() {
       const container = document.getElementById('container-agendamentos');
       try {
