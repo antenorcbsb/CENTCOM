@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batalhão Sapadores Bombeiros de Braga - Situação Operacional</title>
+  <title>Batalhão Sapadores Bombeiros de Braga - Centro de Comando</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg-color: #060b17;
-      --card-bg: #0f172a;
-      --card-border: #1e293b;
+      --bg-color: #0e131f;
+      --card-bg: #161b28;
+      --card-border: #343947;
       --accent-green: #10b981;
-      --accent-blue: #0284c7;
+      --accent-blue: #0ea5e9;
       --accent-red: #ef4444;
       --accent-orange: #f97316;
       --accent-purple: #a855f7;
@@ -19,7 +19,7 @@
       --text-muted: #94a3b8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; }
     html, body { width: 100vw; height: 100vh; overflow: hidden; }
     body {
       background-color: var(--bg-color);
@@ -31,56 +31,55 @@
       gap: clamp(6px, 1vh, 12px);
     }
 
-    section { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-    .seccao-titulo {
-      font-size: clamp(0.75rem, 1.2vh, 0.95rem);
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #38bdf8;
-      text-transform: uppercase;
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
       margin-bottom: 4px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-container { width: 40px; height: 40px; background: rgba(14, 165, 233, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .logo-container i { color: var(--accent-blue); font-size: 24px; }
+    .brand-text h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .brand-text p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+    .live-indicator { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); padding: 4px 10px; border-radius: 20px; color: var(--accent-green); font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+    .pulse { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 2s infinite; }
 
-    .grid-cards {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-      gap: clamp(6px, 1vw, 10px);
-      min-height: 0;
-    }
+    @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: clamp(6px, 1vh, 10px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-      position: relative;
-      overflow: hidden;
-    }
+    /* Layout Principal */
+    main { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: clamp(10px, 1.5vw, 16px); min-height: 0; }
+    .main-column { display: flex; flex-direction: column; gap: clamp(10px, 1.5vw, 16px); min-height: 0; }
+    .side-column { display: flex; flex-direction: column; gap: clamp(10px, 1.5vw, 16px); min-height: 0; }
 
-    .card-to { border-left: 4px solid var(--accent-green); }
-    .to-nome { font-size: clamp(0.85rem, 1.3vh, 1.05rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .to-detalhes { display: flex; flex-direction: column; gap: 4px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); margin-top: 2px; }
-    .canais-lista { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
-    
+    section { flex: 1; display: flex; flex-direction: column; min-height: 0; background: rgba(255, 255, 255, 0.02); border-radius: 12px; padding: 12px; border: 1px solid var(--card-border); }
+    .seccao-titulo { font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 12px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+
+    .grid-cards { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; overflow-y: auto; padding-right: 4px; }
+    .grid-cards::-webkit-scrollbar { width: 4px; }
+    .grid-cards::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+
+    /* Cartões */
+    .card { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; position: relative; transition: transform 0.2s; }
+    .card:hover { border-color: rgba(14, 165, 233, 0.3); }
+
+    /* TO / Canais */
+    .card-to { border-left: 4px solid var(--accent-blue); }
+    .to-nome { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+    .canais-lista { display: flex; flex-wrap: wrap; gap: 6px; }
     .badge-canal { 
-      color: #fff; 
-      font-weight: 700; 
-      padding: 2px 6px; 
+      padding: 4px 8px; 
       border-radius: 4px; 
-      font-size: clamp(0.65rem, 0.9vh, 0.75rem); 
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      font-size: 0.75rem; 
+      font-weight: 700; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 6px; 
+      color: #fff;
     }
+    .badge-canal img { width: 14px; height: 14px; filter: brightness(0) invert(1); }
     
     .badge-bsb { background-color: #0284c7; }
     .badge-rob { background-color: #10b981; }
@@ -88,517 +87,298 @@
     .badge-siresp { background-color: #8b5cf6; }
     .badge-dmo { background-color: #e11d48; }
 
-    .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
-    .inop-info { overflow: hidden; display: flex; align-items: center; gap: 12px; }
-    .inop-icone-box { 
-      width: 44px; 
-      height: 44px; 
-      background-color: rgba(239, 68, 68, 0.25); 
-      border: 1px solid rgba(239, 68, 68, 0.6); 
-      border-radius: 6px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      flex-shrink: 0; 
-    }
-    .inop-icone-box svg { width: 26px; height: 26px; fill: #f87171; }
-    .inop-texto h4 { font-size: clamp(0.85rem, 1.3vh, 1rem); font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .inop-texto p { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge-inop { background-color: var(--accent-red); color: #ffffff; font-weight: 800; font-size: clamp(0.65rem, 1vh, 0.75rem); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+    /* INOP */
+    .card-inop { border-left: 4px solid var(--accent-red); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .inop-info { display: flex; align-items: center; gap: 14px; }
+    .inop-img { width: 56px; height: 56px; object-fit: contain; background: rgba(239, 68, 68, 0.1); border-radius: 8px; padding: 4px; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .inop-texto h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+    .inop-texto p { font-size: 0.8rem; color: var(--text-muted); }
+    .badge-inop { background: var(--accent-red); color: #fff; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
 
+    /* Agendamentos & Observações */
     .card-agendamento { border-left: 4px solid var(--accent-orange); }
-    .agendamento-data { color: var(--accent-orange); font-weight: 700; font-size: clamp(0.75rem, 1.1vh, 0.85rem); }
-    .agendamento-desc { font-size: clamp(0.85rem, 1.2vh, 0.95rem); font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .agendamento-meios { font-size: clamp(0.75rem, 1.1vh, 0.85rem); color: #38bdf8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .agendamento-data { color: var(--accent-orange); font-size: 0.75rem; font-weight: 800; margin-bottom: 4px; }
+    .agendamento-desc { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+    .agendamento-meios { font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; }
 
     .card-observacao { border-left: 4px solid var(--accent-purple); }
-    .obs-titulo { font-weight: 700; color: #c084fc; font-size: clamp(0.7rem, 1vh, 0.8rem); text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
-    .obs-texto { font-size: clamp(0.8rem, 1.2vh, 0.95rem); font-weight: 600; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; }
+    .obs-titulo { color: #c084fc; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .obs-texto { font-size: 0.85rem; font-weight: 500; line-height: 1.4; }
 
-    .sem-registos { color: var(--text-muted); font-style: italic; padding: 6px; font-size: clamp(0.75rem, 1.1vh, 0.85rem); }
+    .sem-registos { color: var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 10px; }
 
+    /* Ticker */
     .rodape-ticker {
-      height: clamp(38px, 5.5vh, 46px);
-      background-color: #0f172a;
-      color: #ffffff;
+      height: 40px;
+      background-color: #090e1a;
       display: flex;
       align-items: center;
-      overflow: hidden;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
-      z-index: 9999;
-      font-weight: 700;
-      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
       border-top: 2px solid var(--accent-blue);
       flex-shrink: 0;
-      margin-left: calc(-1 * clamp(8px, 1.2vh, 16px));
-      margin-right: calc(-1 * clamp(8px, 1.2vh, 16px));
+      margin: 0 -16px;
+      padding: 0 16px;
+      font-weight: 700;
+      font-size: 0.8rem;
     }
-    .ticker-label { background-color: var(--accent-blue); color: #ffffff; padding: 0 12px; height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; z-index: 2; font-size: clamp(0.7rem, 1vh, 0.8rem); letter-spacing: 0.5px; }
-    .ticker-conteudo { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
-    .ticker-texto { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker-animacao 30s linear infinite; }
-    .ticker-item { display: inline-flex; align-items: center; margin-right: 25px; }
-    .ticker-separador { margin-left: 25px; color: #38bdf8; opacity: 0.7; }
+    .ticker-label { background-color: var(--accent-blue); color: #fff; padding: 0 15px; height: 100%; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .ticker-conteudo { flex: 1; overflow: hidden; white-space: nowrap; }
+    .ticker-texto { display: inline-block; padding-left: 100%; animation: ticker-animacao 35s linear infinite; }
+    .ticker-item { display: inline-flex; align-items: center; margin-right: 40px; }
+    .ticker-separador { color: var(--accent-blue); opacity: 0.5; margin-right: 40px; }
 
-    @keyframes ticker-animacao { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+    @keyframes ticker-animacao { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
   </style>
 </head>
 <body>
 
-  <section>
-    <div class="seccao-titulo"><i class="fa-solid fa-walkie-talkie"></i> Teatro de Operações / Canais</div>
-    <div class="grid-cards" id="container-to">
-      <div class="card sem-registos">A carregar Teatro de Operações...</div>
+  <header>
+    <div class="brand">
+      <div class="logo-container"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="brand-text">
+        <h1>Sapadores Braga Ops</h1>
+        <p id="data-atual">Carregando dados...</p>
+      </div>
     </div>
-  </section>
+    <div class="live-indicator">
+      <div class="pulse"></div> LIVE FEED
+    </div>
+  </header>
 
-  <section>
-    <div class="seccao-titulo" style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> Veículos Inoperacionais (INOP)</div>
-    <div class="grid-cards" id="container-inop">
-      <div class="card sem-registos">A carregar viaturas INOP...</div>
+  <main>
+    <div class="main-column">
+      <section>
+        <div class="seccao-titulo"><i class="fa-solid fa-walkie-talkie"></i> Teatro de Operações / Canais</div>
+        <div class="grid-cards" id="container-to">
+          <div class="card sem-registos">A carregar...</div>
+        </div>
+      </section>
+      
+      <section style="flex: 0 0 auto; min-height: 200px;">
+        <div class="seccao-titulo" style="color: var(--accent-purple);"><i class="fa-solid fa-bullhorn"></i> Observações</div>
+        <div class="grid-cards" id="container-observacoes">
+          <div class="card sem-registos">A carregar...</div>
+        </div>
+      </section>
     </div>
-  </section>
 
-  <section>
-    <div class="seccao-titulo" style="color: var(--accent-orange);"><i class="fa-solid fa-calendar-days"></i> Agendamentos</div>
-    <div class="grid-cards" id="container-agendamentos">
-      <div class="card sem-registos">A carregar agendamentos...</div>
-    </div>
-  </section>
+    <div class="side-column">
+      <section style="flex: 2;">
+        <div class="seccao-titulo" style="color: var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> Veículos INOP</div>
+        <div class="grid-cards" style="grid-template-columns: 1fr;" id="container-inop">
+          <div class="card sem-registos">A carregar...</div>
+        </div>
+      </section>
 
-  <section>
-    <div class="seccao-titulo" style="color: var(--accent-purple);"><i class="fa-solid fa-bullhorn"></i> Observações</div>
-    <div class="grid-cards" id="container-observacoes">
-      <div class="card sem-registos">A carregar observações...</div>
+      <section style="flex: 1;">
+        <div class="seccao-titulo" style="color: var(--accent-orange);"><i class="fa-solid fa-calendar-days"></i> Agendamentos</div>
+        <div class="grid-cards" style="grid-template-columns: 1fr;" id="container-agendamentos">
+          <div class="card sem-registos">A carregar...</div>
+        </div>
+      </section>
     </div>
-  </section>
+  </main>
 
   <footer class="rodape-ticker">
     <div class="ticker-label"><i class="fa-solid fa-cloud-sun"></i> IPMA BRAGA</div>
     <div class="ticker-conteudo">
       <div class="ticker-texto" id="ticker-texto">
-        <span class="ticker-item">A obter dados oficiais do IPMA...</span>
+        <span class="ticker-item">A sincronizar com servidores IPMA...</span>
       </div>
     </div>
   </footer>
 
   <script>
+    // Configurações Google Sheets
     const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
-    
     const GID_VIATURAS = '1032427330'; 
     const GID_CANAIS = '881712175'; 
     const GID_AGENDAMENTOS = '959314983'; 
     const GID_COMUNICACOES = '1196343008'; 
 
-    const obterUrlGviz = (gid) => 
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
+    // Assets Visuais (DataStore Placeholders)
+    const ASSETS = {
+      RADIO: '{{DATA:IMAGE:IMAGE:IMAGE_6}}',
+      FIRE_TRUCK: '{{DATA:IMAGE:IMAGE:IMAGE_3}}',
+      COMMAND_SUV: '{{DATA:IMAGE:IMAGE:IMAGE_4}}',
+      AMBULANCE: '{{DATA:IMAGE:IMAGE:IMAGE_5}}'
+    };
 
-    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json';
-    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';
-    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
-    const DICO_BRAGA = '0303';
+    const obterUrlGviz = (gid) => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
 
-    function obterIconeVeiculoSVG(nomeVeiculo) {
-      const nome = (nomeVeiculo || '').toUpperCase().trim();
-      
-      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA')) {
-        return `<svg viewBox="0 0 512 512"><path d="M480 192H384V96c0-17.7-14.3-32-32-32H32C14.3 64 0 78.3 0 96V384c0 17.7 14.3 32 32 32H64c0 35.3 28.7 64 64 64s64-28.7 64-64H320c0 35.3 28.7 64 64 64s64-28.7 64-64h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64zM128 416a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm128-192H208v48c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16V224H96c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h48V112c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v48h48c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16zm128 192a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"/></svg>`;
-      }
-      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE')) {
-        return `<svg viewBox="0 0 512 512"><path d="M135.2 117.4L109.1 192l293.8 0-26.1-74.6C372.3 104.6 359.2 96 344.7 96L167.3 96c-14.5 0-27.6 8.6-32.1 21.4zM32 192l38.9-111.1C83.7 43.1 122.9 16 167.3 16l177.4 0c44.4 0 83.6 27.1 96.4 64.9L480 192h16c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32l0 64c0 17.7-14.3 32-32 32H432c-17.7 0-32-14.3-32-32V384H112v32c0 17.7-14.3 32-32 32H48c-17.7 0-32-14.3-32-32l0-64c-17.7 0-32-14.3-32-32V224c0-17.7 14.3-32 32-32h16zM80 272a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm352 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>`;
-      }
-      if (nome.startsWith('VFCI') || nome.startsWith('VECI') || nome.startsWith('VLCI') || nome.startsWith('VUCI')) {
-        return `<svg viewBox="0 0 640 512"><path d="M48 0C21.5 0 0 21.5 0 48V368c0 26.5 21.5 48 48 48H64c0 44.2 35.8 80 80 80s80-35.8 80-80H416c0 44.2 35.8 80 80 80s80-35.8 80-80h16c26.5 0 48-21.5 48-48V192c0-17-6.7-33.3-18.7-45.3L512 34.7C499.9 22.7 483.7 16 466.7 16H384V0H48zM144 416a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm352 0a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM384 192V80h74.7l64 64H384v48z"/></svg>`;
-      }
-      return `<svg viewBox="0 0 640 512"><path d="M64 32C28.7 32 0 60.7 0 96V384c0 35.3 28.7 64 64 64H115.4c11.4 19.8 32.7 32 56.6 32s45.2-12.2 56.6-32H427.4c11.4 19.8 32.7 32 56.6 32s45.2-12.2 56.6-32H576c35.3 0 64-28.7 64-64V224c0-17-6.7-33.3-18.7-45.3L522.7 79.9C510.6 67.8 494.4 61.1 477.4 61.1H384V32H64zM172 432a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm312 0a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"/></svg>`;
+    // Atualiza Relógio
+    function atualizarRelogio() {
+      const agora = new Date();
+      const dias = ['DOMINGO', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
+      const dataStr = `${dias[agora.getDay()]}, ${agora.toLocaleDateString('pt-PT')} | ${agora.toLocaleTimeString('pt-PT')}`;
+      document.getElementById('data-atual').innerText = dataStr.toUpperCase();
     }
+    setInterval(atualizarRelogio, 1000);
 
-    function converterDataTimestamp(dataStr) {
-      if (!dataStr || !dataStr.trim()) return null;
-      const partes = dataStr.trim().split(/[\/\.-]/);
-      if (partes.length === 3) {
-        let d, m, a;
-        if (partes[0].length === 4) {
-          a = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; d = parseInt(partes[2], 10);
-        } else {
-          d = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; a = parseInt(partes[2], 10);
-        }
-        return new Date(a, m, d).setHours(0,0,0,0);
-      }
-      return null;
-    }
-
-    function eHoje(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true;
-      const tsData = converterDataTimestamp(dataStr);
-      if (!tsData) return true;
-      const hoje = new Date().setHours(0,0,0,0);
-      return tsData === hoje;
-    }
-
-    function eHojeOuFuturo(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true;
-      const tsData = converterDataTimestamp(dataStr);
-      if (!tsData) return true;
-      const hoje = new Date().setHours(0,0,0,0);
-      return tsData >= hoje;
+    function obterImagemVeiculo(nome) {
+      const n = (nome || '').toUpperCase();
+      if (n.includes('ABSC') || n.includes('AMBUL')) return ASSETS.AMBULANCE;
+      if (n.includes('VCOT') || n.includes('VCOC') || n.includes('VOPE')) return ASSETS.COMMAND_SUV;
+      if (n.includes('VFCI') || n.includes('VUCI') || n.includes('VECI')) return ASSETS.FIRE_TRUCK;
+      return ASSETS.FIRE_TRUCK; // Default
     }
 
     function parseCSV(text) {
       if (!text || text.includes('<!DOCTYPE html>')) return [];
-      const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
-      if (linhas.length === 0) return [];
-
-      const parseLinha = (linha) => {
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      return lines.map(line => {
         const res = [];
-        let cur = '';
-        let dentroAspas = false;
-        for (let i = 0; i < linha.length; i++) {
-          const c = linha[i];
-          if (c === '"') dentroAspas = !dentroAspas;
-          else if (c === ',' && !dentroAspas) {
-            res.push(cur.trim().replace(/^"|"$/g, ''));
-            cur = '';
-          } else {
-            cur += c;
-          }
+        let cur = '', inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === '"') inQuotes = !inQuotes;
+          else if (line[i] === ',' && !inQuotes) { res.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+          else cur += line[i];
         }
         res.push(cur.trim().replace(/^"|"$/g, ''));
         return res;
-      };
-
-      return linhas.map(linha => parseLinha(linha));
+      });
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS
-    async function carregarTeatroOperacoes() {
+    async function carregarTO() {
       const container = document.getElementById('container-to');
       try {
         const res = await fetch(obterUrlGviz(GID_CANAIS));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
-
+        const rows = parseCSV(await res.text());
         container.innerHTML = '';
-        if (todasLinhas.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
+        
+        const hoje = new Date().toLocaleDateString('pt-PT');
+        const eventosHoje = rows.filter(r => r[0] === hoje || r[1] === hoje);
+
+        if (eventosHoje.length === 0) {
+          container.innerHTML = '<div class="sem-registos">Nenhum teatro de operações ativo hoje.</div>';
           return;
         }
 
-        let encontrou = false;
-
-        todasLinhas.forEach(row => {
-          let dataVal = '';
-          let eventoVal = '';
-
-          if (row[0] && row[0].includes('/')) {
-            dataVal = row[0].trim();
-            eventoVal = row[1] ? row[1].trim() : '';
-          } else if (row[0] && !row[0].includes('/') && row[0].toLowerCase() !== 'data') {
-            eventoVal = row[0].trim();
-            dataVal = row[1] && row[1].includes('/') ? row[1].trim() : '';
-          } else {
-            eventoVal = row[1] ? row[1].trim() : '';
-            dataVal = row[0] ? row[0].trim() : '';
-          }
-
-          if (!eventoVal || eventoVal.toLowerCase() === 'evento' || eventoVal.toLowerCase() === 'data') return;
-          if (!eHoje(dataVal)) return;
-
-          const canais = [];
-
-          const limparTextoCanal = (txt, prefixo) => {
-            if (!txt) return null;
-            let limpo = txt.trim();
+        eventosHoje.forEach(r => {
+          const evento = r[1] || r[0];
+          const div = document.createElement('div');
+          div.className = 'card card-to';
+          
+          let badgesHTML = '';
+          r.slice(2).forEach(val => {
+            if (!val || val.includes('/')) return;
+            let cls = 'badge-bsb';
+            if (val.includes('DMO')) cls = 'badge-dmo';
+            else if (val.includes('REPC')) cls = 'badge-repc';
+            else if (val.includes('ROB')) cls = 'badge-rob';
+            else if (val.includes('SIRESP')) cls = 'badge-siresp';
             
-            if (limpo.includes('/') || limpo.toLowerCase() === eventoVal.toLowerCase()) return null;
-            
-            const reg = new RegExp(`^${prefixo}:?\\s*`, 'i');
-            limpo = limpo.replace(reg, '');
-
-            if (limpo.toLowerCase() === 'bsb braga geral' || limpo.toLowerCase() === 'braga geral') {
-              limpo = '0301 Geral';
-            }
-
-            return limpo.trim() || null;
-          };
-
-          row.forEach((celula) => {
-            if (!celula) return;
-            const val = celula.trim();
-            
-            if (val === dataVal || val === eventoVal || val.includes('/') || val.toLowerCase() === 'evento') return;
-
-            const valLower = val.toLowerCase();
-
-            if (valLower.includes('dmo')) {
-              const txt = limparTextoCanal(val, 'DMO');
-              if (txt && !canais.some(c => c.texto === `DMO: ${txt}`)) canais.push({ texto: `DMO: ${txt}`, classe: 'badge-dmo' });
-            } else if (valLower.includes('siresp') || valLower.includes('tat')) {
-              const txt = limparTextoCanal(val, 'SIRESP');
-              if (txt && !canais.some(c => c.texto === `SIRESP: ${txt}`)) canais.push({ texto: `SIRESP: ${txt}`, classe: 'badge-siresp' });
-            } else if (valLower.includes('repc') || valLower.includes('pc')) {
-              const txt = limparTextoCanal(val, 'REPC');
-              if (txt && !canais.some(c => c.texto === `REPC: ${txt}`)) canais.push({ texto: `REPC: ${txt}`, classe: 'badge-repc' });
-            } else if (valLower.includes('rob') || valLower.includes('man')) {
-              const txt = limparTextoCanal(val, 'ROB');
-              if (txt && !canais.some(c => c.texto === `ROB: ${txt}`)) canais.push({ texto: `ROB: ${txt}`, classe: 'badge-rob' });
-            } else if (valLower.includes('bsb') || valLower.includes('geral') || (val.match(/\d{4}/) && !val.includes('/'))) {
-              const txt = limparTextoCanal(val, 'BSB');
-              if (txt && !canais.some(c => c.texto === `BSB: ${txt}`)) canais.push({ texto: `BSB: ${txt}`, classe: 'badge-bsb' });
-            }
+            badgesHTML += `<span class="badge-canal ${cls}"><img src="${ASSETS.RADIO}"> ${val}</span>`;
           });
 
-          if (canais.length === 0) {
-            if (row[2] && !row[2].includes('/')) {
-              const txt = limparTextoCanal(row[2], 'BSB') || '0301 Geral';
-              canais.push({ texto: `BSB: ${txt}`, classe: 'badge-bsb' });
-            }
-          }
-
-          if (canais.length > 0) {
-            encontrou = true;
-            const div = document.createElement('div');
-            div.className = 'card card-to';
-            
-            const badgesHTML = canais.map(c => 
-              `<span class="badge-canal ${c.classe}"><i class="fa-solid fa-walkie-talkie"></i> ${c.texto}</span>`
-            ).join('');
-            
-            div.innerHTML = `
-              <div class="to-nome">${eventoVal}</div>
-              <div class="to-detalhes">
-                ${dataVal ? `<div>📅 <strong>Data:</strong> ${dataVal}</div>` : ''}
-                <div class="canais-lista">${badgesHTML}</div>
-              </div>
-            `;
-            container.appendChild(div);
-          }
+          div.innerHTML = `<div class="to-nome">${evento}</div><div class="canais-lista">${badgesHTML}</div>`;
+          container.appendChild(div);
         });
-
-        if (!encontrou) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
-        }
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos para o dia de hoje.</div>`;
-      }
+      } catch (e) { container.innerHTML = '<div class="sem-registos">Erro na ligação de dados.</div>'; }
     }
 
-    // 2. VIATURAS INOP
-    async function carregarViaturasINOP() {
+    async function carregarINOP() {
       const container = document.getElementById('container-inop');
       try {
         const res = await fetch(obterUrlGviz(GID_VIATURAS));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
-
+        const rows = parseCSV(await res.text());
         container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const viaturasInop = todasLinhas.filter(row => {
-          const estado = (row[1] || '').toUpperCase();
-          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
-        });
-
-        if (viaturasInop.length === 0) {
-          container.innerHTML = `<div class="card sem-registos" style="color: var(--accent-green);">✓ Todas as viaturas estão operacionais.</div>`;
+        
+        const inops = rows.filter(r => (r[1] || '').toUpperCase().includes('INOP'));
+        if (inops.length === 0) {
+          container.innerHTML = '<div class="sem-registos" style="color: var(--accent-green);">✓ Todas as viaturas operacionais.</div>';
           return;
         }
 
-        viaturasInop.forEach(row => {
-          const nome = row[0] || 'Viatura';
-          const motivo = row[3] || row[2] || 'Avaria Registada';
-          const svgIcone = obterIconeVeiculoSVG(nome);
-
+        inops.forEach(r => {
           const div = document.createElement('div');
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-info">
-              <div class="inop-icone-box">
-                ${svgIcone}
-              </div>
-              <div class="inop-texto">
-                <h4>${nome}</h4>
-                <p>${motivo}</p>
-              </div>
+              <img src="${obterImagemVeiculo(r[0])}" class="inop-img">
+              <div class="inop-texto"><h4>${r[0]}</h4><p>${r[3] || 'Avaria Registada'}</p></div>
             </div>
             <span class="badge-inop">INOP</span>
           `;
           container.appendChild(div);
         });
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Erro ao carregar viaturas INOP.</div>`;
-      }
+      } catch (e) { container.innerHTML = '<div class="sem-registos">Erro nos dados de frotas.</div>'; }
     }
 
-    // 3. AGENDAMENTOS
     async function carregarAgendamentos() {
       const container = document.getElementById('container-agendamentos');
       try {
         const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
-
+        const rows = parseCSV(await res.text()).slice(1);
         container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const agendamentosValidos = todasLinhas.filter(row => {
-          const dataRaw = row[0] || '';
-          const descricao = row[2] || '';
-          return descricao.trim() !== '' && eHojeOuFuturo(dataRaw) && !dataRaw.toLowerCase().includes('data');
-        });
-
-        if (agendamentosValidos.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
+        
+        const validos = rows.filter(r => r[2] && r[2].trim() !== '');
+        if (validos.length === 0) {
+          container.innerHTML = '<div class="sem-registos">Sem serviços agendados.</div>';
           return;
         }
 
-        agendamentosValidos.forEach(row => {
-          const dataRaw = row[0] || '';
-          const horaRaw = row[1] || '';
-          const descricao = row[2] || 'Serviço Agendado';
-          const meios = row[3] || '';
-
-          let dataFormatada = dataRaw;
-          if (horaRaw) dataFormatada += ` às ${horaRaw}`;
-
+        validos.forEach(r => {
           const div = document.createElement('div');
           div.className = 'card card-agendamento';
           div.innerHTML = `
-            ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
-            <div class="agendamento-desc">${descricao}</div>
-            ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
+            <div class="agendamento-data">📅 ${r[0]} | ${r[1]}</div>
+            <div class="agendamento-desc">${r[2]}</div>
+            <div class="agendamento-meios">🚒 Meios: ${r[3] || 'Por definir'}</div>
           `;
           container.appendChild(div);
         });
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
-      }
+      } catch (e) { container.innerHTML = '<div class="sem-registos">Erro nos agendamentos.</div>'; }
     }
 
-    // 4. OBSERVAÇÕES (Filtragem estrita para remover cabeçalhos de tabela como "Título" / "Observações")
     async function carregarObservacoes() {
       const container = document.getElementById('container-observacoes');
       try {
         const res = await fetch(obterUrlGviz(GID_COMUNICACOES));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
-
+        const rows = parseCSV(await res.text()).slice(1);
         container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const obsValidas = todasLinhas.filter(row => {
-          if (!row[1] || row[1].trim() === '') return false;
-
-          // Normaliza texto para remover acentos e converter para minúsculas
-          const col0 = (row[0] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-          const col1 = (row[1] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-
-          // Ignora a linha de cabeçalho da tabela (ex: "titulo", "observacoes", "header")
-          if (col0.includes('titulo') || col0 === 'header' || col0 === 'data') return false;
-          if (col1 === 'observacoes' || col1 === 'observacao' || col1 === 'texto') return false;
-
-          return true;
-        });
-
-        if (obsValidas.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
+        
+        const validas = rows.filter(r => r[1] && r[1].trim() !== '');
+        if (validas.length === 0) {
+          container.innerHTML = '<div class="sem-registos">Sem observações táticas.</div>';
           return;
         }
 
-        obsValidas.forEach(row => {
-          const titulo = row[0] || '';
-          const obsTexto = row[1] || '';
-
+        validas.forEach(r => {
           const div = document.createElement('div');
           div.className = 'card card-observacao';
           div.innerHTML = `
-            ${titulo ? `<div class="obs-titulo"><i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b;"></i> ${titulo}</div>` : ''}
-            <div class="obs-texto">${obsTexto}</div>
+            <div class="obs-titulo"><i class="fa-solid fa-circle-info"></i> ${r[0] || 'INFORMAÇÃO'}</div>
+            <div class="obs-texto">${r[1]}</div>
           `;
           container.appendChild(div);
         });
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
-      }
+      } catch (e) { container.innerHTML = '<div class="sem-registos">Erro nas observações.</div>'; }
     }
 
-    // 5. METEOROLOGIA IPMA
-    async function carregarMeteoIPMA() {
-      const containerTicker = document.getElementById('ticker-texto');
-      if (!containerTicker) return;
-
+    async function carregarIPMA() {
+      const ticker = document.getElementById('ticker-texto');
       try {
-        const [resMeteo, resTipos, resRcm] = await Promise.all([
-          fetch(URL_IPMA_METEO),
-          fetch(URL_IPMA_TIPOS),
-          fetch(URL_IPMA_RCM).catch(() => null)
-        ]);
-
-        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro IPMA");
-
-        const dataMeteo = await resMeteo.json();
-        const dataTipos = await resTipos.json();
-
-        const prev = dataMeteo.data[0];
-        const tMin = Math.round(prev.tMin);
-        const tMax = Math.round(prev.tMax);
-        const probChuva = prev.precipitaProb;
-        const dirVento = prev.predWindDir || 'N/D';
+        const res = await fetch('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json');
+        const data = await res.json();
+        const p = data.data[0];
         
-        const velVentoVal = (prev.classWindSpeed || 1) * 12; 
-        const rajadaVentoVal = Math.round(velVentoVal * 1.8);
-
-        const tipoObjeto = dataTipos.data.find(t => t.idWeatherType === prev.idWeatherType);
-        const descTempo = tipoObjeto ? tipoObjeto.descWeatherTypePT : 'Tempo Variável';
-
-        let ffmcVal = 87.4;
-        let isiVal = 5.8;
-        let fwiVal = 14.2;
-
-        if (resRcm && resRcm.ok) {
-          const dataRcm = await resRcm.json();
-          const dataChave = Object.keys(dataRcm)[0];
-          if (dataChave && dataRcm[dataChave] && dataRcm[dataChave][DICO_BRAGA]) {
-            const rcmObj = dataRcm[dataChave][DICO_BRAGA];
-            if (rcmObj.ffmc) ffmcVal = rcmObj.ffmc;
-            if (rcmObj.isi) isiVal = rcmObj.isi;
-            if (rcmObj.fwi) fwiVal = rcmObj.fwi;
-          }
-        }
-
-        const mensagens = [
-          `🌤️ <strong>Previsão:</strong> ${descTempo}`,
-          `🌡️ <strong>Temp. Máx / Mín:</strong> ${tMax}°C / ${tMin}°C`,
-          `🌧️ <strong>Prob. Chuva:</strong> ${probChuva}%`,
-          `💨 <strong>Vento:</strong> ${velVentoVal} km/h (${dirVento})`,
-          `🌪️ <strong>Rajada Vento:</strong> ${rajadaVentoVal} km/h`,
-          `📊 <strong>FFMC:</strong> ${ffmcVal}`,
-          `📈 <strong>ISI:</strong> ${isiVal}`,
-          `🔥 <strong>Índice FWI:</strong> ${fwiVal}`
+        const msg = [
+          `🌡️ <strong>Máx:</strong> ${p.tMax}°C`,
+          `🌡️ <strong>Mín:</strong> ${p.tMin}°C`,
+          `🌧️ <strong>Chuva:</strong> ${p.precipitaProb}%`,
+          `💨 <strong>Vento:</strong> ${p.predWindDir}`
         ];
 
-        containerTicker.innerHTML = mensagens
-          .map(msg => `<span class="ticker-item">${msg}</span>`)
-          .join('<span class="ticker-separador">✦</span>');
-
-      } catch (err) {
-        containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
-      }
+        ticker.innerHTML = msg.map(m => `<span class="ticker-item">${m}</span>`).join('<span class="ticker-separador">✦</span>');
+      } catch (e) { ticker.innerHTML = '⚠️ Erro ao obter dados IPMA.'; }
     }
 
-    function carregarTodosOsDados() {
-      carregarTeatroOperacoes();
-      carregarViaturasINOP();
-      carregarAgendamentos();
-      carregarObservacoes();
-      carregarMeteoIPMA();
+    function init() {
+      carregarTO(); carregarINOP(); carregarAgendamentos(); carregarObservacoes(); carregarIPMA();
     }
 
-    setInterval(carregarTodosOsDados, 10000);
-    carregarTodosOsDados();
+    setInterval(init, 30000); // Sincroniza a cada 30s
+    init();
   </script>
 </body>
 </html>
