@@ -161,7 +161,6 @@
       border-color: rgba(239, 68, 68, 0.6); 
     }
     
-    .inop-icone-box svg { width: 26px; height: 26px; fill: #f87171; }
     .inop-texto h4 { 
       font-size: clamp(0.85rem, 1.4vh, 1.2rem); 
       font-weight: 700; 
@@ -391,19 +390,11 @@
     }
 
     function eHoje(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true;
+      if (!dataStr || !dataStr.trim()) return false;
       const tsData = converterDataTimestamp(dataStr);
-      if (!tsData) return true;
+      if (!tsData) return false;
       const hoje = new Date().setHours(0,0,0,0);
       return tsData === hoje;
-    }
-
-    function eHojeOuFuturo(dataStr) {
-      if (!dataStr || !dataStr.trim()) return true;
-      const tsData = converterDataTimestamp(dataStr);
-      if (!tsData) return true;
-      const hoje = new Date().setHours(0,0,0,0);
-      return tsData >= hoje;
     }
 
     function parseCSV(text) {
@@ -468,54 +459,26 @@
 
           const canais = [];
 
-          const limparTextoCanal = (txt, prefixo) => {
-            if (!txt) return null;
-            let limpo = txt.trim();
-            
-            if (limpo.includes('/') || limpo.toLowerCase() === eventoVal.toLowerCase()) return null;
-            
-            const reg = new RegExp(`^${prefixo}:?\\s*`, 'i');
-            limpo = limpo.replace(reg, '');
-
-            if (limpo.toLowerCase() === 'bsb braga geral' || limpo.toLowerCase() === 'braga geral') {
-              limpo = '0301 Geral';
-            }
-
-            return limpo.trim() || null;
-          };
-
           row.forEach((celula) => {
             if (!celula) return;
             const val = celula.trim();
-            
-            if (val === dataVal || val === eventoVal || val.includes('/') || val.toLowerCase() === 'evento') return;
-
             const valLower = val.toLowerCase();
+            
+            // Ignorar dados de cabeçalho, datas, eventos ou placeholders genéricos
+            if (val === dataVal || val === eventoVal || val.includes('/') || valLower === 'evento' || valLower.includes('canal')) return;
 
             if (valLower.includes('dmo')) {
-              const txt = limparTextoCanal(val, 'DMO');
-              if (txt && !canais.some(c => c.texto === `DMO: ${txt}`)) canais.push({ texto: `DMO: ${txt}`, classe: 'badge-dmo' });
+              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-dmo' });
             } else if (valLower.includes('siresp') || valLower.includes('tat')) {
-              const txt = limparTextoCanal(val, 'SIRESP');
-              if (txt && !canais.some(c => c.texto === `SIRESP: ${txt}`)) canais.push({ texto: `SIRESP: ${txt}`, classe: 'badge-siresp' });
+              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-siresp' });
             } else if (valLower.includes('repc') || valLower.includes('pc')) {
-              const txt = limparTextoCanal(val, 'REPC');
-              if (txt && !canais.some(c => c.texto === `REPC: ${txt}`)) canais.push({ texto: `REPC: ${txt}`, classe: 'badge-repc' });
+              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-repc' });
             } else if (valLower.includes('rob') || valLower.includes('man')) {
-              const txt = limparTextoCanal(val, 'ROB');
-              if (txt && !canais.some(c => c.texto === `ROB: ${txt}`)) canais.push({ texto: `ROB: ${txt}`, classe: 'badge-rob' });
+              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-rob' });
             } else if (valLower.includes('bsb') || valLower.includes('geral') || (val.match(/\d{4}/) && !val.includes('/'))) {
-              const txt = limparTextoCanal(val, 'BSB');
-              if (txt && !canais.some(c => c.texto === `BSB: ${txt}`)) canais.push({ texto: `BSB: ${txt}`, classe: 'badge-bsb' });
+              if (!canais.some(c => c.texto === val)) canais.push({ texto: val, classe: 'badge-bsb' });
             }
           });
-
-          if (canais.length === 0) {
-            if (row[2] && !row[2].includes('/')) {
-              const txt = limparTextoCanal(row[2], 'BSB') || '0301 Geral';
-              canais.push({ texto: `BSB: ${txt}`, classe: 'badge-bsb' });
-            }
-          }
 
           if (canais.length > 0) {
             encontrou = true;
@@ -594,7 +557,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS (Com ícone da tipologia de veículo)
+    // 3. AGENDAMENTOS (Apenas os agendamentos do próprio dia)
     async function carregarAgendamentos() {
       const container = document.getElementById('container-agendamentos');
       try {
@@ -608,11 +571,11 @@
         const agendamentosValidos = todasLinhas.filter(row => {
           const dataRaw = row[0] || '';
           const descricao = row[2] || '';
-          return descricao.trim() !== '' && eHojeOuFuturo(dataRaw) && !dataRaw.toLowerCase().includes('data');
+          return descricao.trim() !== '' && eHoje(dataRaw) && !dataRaw.toLowerCase().includes('data');
         });
 
         if (agendamentosValidos.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
+          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos para hoje.</div>`;
           return;
         }
 
@@ -625,7 +588,6 @@
           let dataFormatada = dataRaw;
           if (horaRaw) dataFormatada += ` às ${horaRaw}`;
 
-          // Obter ícone correspondente aos meios agendados
           const svgIcone = obterIconeVeiculoSVG(meios || descricao);
 
           const div = document.createElement('div');
@@ -644,7 +606,7 @@
         });
 
       } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
+        container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos para hoje.</div>`;
       }
     }
 
