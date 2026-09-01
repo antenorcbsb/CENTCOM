@@ -397,22 +397,14 @@
       return tsData === hoje;
     }
 
-    // Função para verificar se a data atual está dentro do intervalo programado
     function estaNoIntervaloDatas(dataInicioStr, dataFimStr) {
       const hoje = new Date().setHours(0, 0, 0, 0);
       const tsInicio = converterDataTimestamp(dataInicioStr);
       const tsFim = converterDataTimestamp(dataFimStr);
 
-      // Se não tiver data de início nem de fim, mostra sempre
       if (!tsInicio && !tsFim) return true;
-
-      // Se tiver início mas não tiver fim, mostra a partir da data de início
       if (tsInicio && !tsFim) return hoje >= tsInicio;
-
-      // Se tiver fim mas não tiver início, mostra até à data de fim
       if (!tsInicio && tsFim) return hoje <= tsFim;
-
-      // Se tiver ambas as datas, verifica se está entre o início e o fim
       return hoje >= tsInicio && hoje <= tsFim;
     }
 
@@ -442,7 +434,7 @@
       return linhas.map(linha => parseLinha(linha));
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS
+    // 1. TEATRO DE OPERAÇÕES / CANAIS (ATUALIZADO PARA MÚLTIPLOS CANAIS)
     async function carregarTeatroOperacoes() {
       const container = document.getElementById('container-to');
       try {
@@ -459,46 +451,40 @@
         let encontrou = false;
 
         todasLinhas.forEach(row => {
-          // Mapeamento ajustado com Data de Início e Data de Fim:
-          // Coluna A (0) = Data Início
-          // Coluna B (1) = Data Fim
-          // Coluna C (2) = Evento
-          // Coluna D (3) = Canal BSB
-          // Coluna E (4) = Canal ROB
-          // Coluna F (5) = Canal REPC
-          // Coluna G (6) = Canal SIRESP
-          // Coluna H (7) = BSB_DMO
-
           const dataInicio = row[0] ? row[0].trim() : '';
           const dataFim = row[1] ? row[1].trim() : '';
           const eventoVal = row[2] ? row[2].trim() : '';
 
           if (!eventoVal || eventoVal.toLowerCase() === 'evento') return;
           
-          // Validação do intervalo de datas
           if (!estaNoIntervaloDatas(dataInicio, dataFim)) return;
 
           const canais = [];
 
           const adicionarCanal = (val, classePadrao) => {
             if (!val) return;
-            const valClean = val.trim();
-            const valLower = valClean.toLowerCase();
-            
-            if (!valClean || valLower === 'canal' || valLower.includes('canal ')) return;
 
-            let classe = classePadrao;
-            if (valLower.includes('dmo')) classe = 'badge-dmo';
-            else if (valLower.includes('siresp') || valLower.includes('tat')) classe = 'badge-siresp';
-            else if (valLower.includes('repc') || valLower.includes('pc')) classe = 'badge-repc';
-            else if (valLower.includes('rob') || valLower.includes('man')) classe = 'badge-rob';
+            // Divide múltiplos canais na mesma célula por vírgula, barra ou hífen
+            const subCanais = val.split(/[,/\-]+/);
 
-            if (!canais.some(c => c.texto === valClean)) {
-              canais.push({ texto: valClean, classe: classe });
-            }
+            subCanais.forEach(item => {
+              const valClean = item.trim();
+              const valLower = valClean.toLowerCase();
+              
+              if (!valClean || valLower === 'canal' || valLower.includes('canal ')) return;
+
+              let classe = classePadrao;
+              if (valLower.includes('dmo')) classe = 'badge-dmo';
+              else if (valLower.includes('siresp') || valLower.includes('tat')) classe = 'badge-siresp';
+              else if (valLower.includes('repc') || valLower.includes('pc')) classe = 'badge-repc';
+              else if (valLower.includes('rob') || valLower.includes('man')) classe = 'badge-rob';
+
+              if (!canais.some(c => c.texto === valClean)) {
+                canais.push({ texto: valClean, classe: classe });
+              }
+            });
           };
 
-          // Atribuir cada coluna da folha ao seu respetivo canal
           adicionarCanal(row[3], 'badge-bsb');    // Coluna D: Canal BSB
           adicionarCanal(row[4], 'badge-rob');    // Coluna E: Canal ROB
           adicionarCanal(row[5], 'badge-repc');   // Coluna F: Canal REPC
