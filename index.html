@@ -26,7 +26,7 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
     }
     
-html { 
+    html { 
       width: 100vw; 
       height: 100vh; 
       overflow: hidden; 
@@ -42,24 +42,17 @@ html {
       width: 100vw;
       box-sizing: border-box;
 
-      /* SOLUÇÃO DEFINITIVA EM GRID */
+      /* ESTRUTURA GRID PARA OCUPAR A TELA INTEIRA */
       display: grid;
-      /* As 4 secções ganham proporções dinâmicas (1fr) e a de Observações ganha o dobro (2fr) */
-      grid-template-rows: 1fr 1fr 1fr 2fr auto; 
+      grid-template-rows: 1fr 1fr 1fr 2fr auto;
     }
 
-    /* As secções agora preenchem obrigatoriamente a linha do Grid onde estão salvas */
     section { 
       display: flex; 
       flex-direction: column; 
       min-height: 0; 
       height: 100%;
       overflow: hidden;
-    }
-
-    /* Secção de Observações com maior relevância visual */
-    section:nth-of-type(4) {
-      flex: 2 1 auto; 
     }
 
     .seccao-titulo {
@@ -76,26 +69,33 @@ html {
     }
 
     .grid-cards {
-      flex: 1 1 auto;
+      flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
       gap: clamp(6px, 0.8vw, 12px);
       min-height: 0;
       overflow-y: auto;
+      
+      /* ALINHA OS CARDS AO TOPO PARA NÃO ESTICAREM VERTICALMENTE */
+      align-content: start;
+      align-items: start;
     }
 
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: clamp(6px, 1vh, 12px);
+      padding: clamp(8px, 1.2vh, 14px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 4px;
       position: relative;
       overflow: hidden;
-      height: 100%;
+      
+      /* ALTURA AJUSTADA AO CONTEÚDO */
+      height: auto;
+      min-height: max-content;
     }
 
     .card-to { 
