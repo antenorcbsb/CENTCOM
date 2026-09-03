@@ -26,7 +26,7 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
     }
     
-    html, body { 
+    html { 
       width: 100vw; 
       height: 100vh; 
       overflow: hidden; 
@@ -39,21 +39,24 @@
       padding-bottom: 0;
       display: flex;
       flex-direction: column;
+      justify-content: space-between; /* Empurra o rodapé para o fundo e distribui as secções */
       gap: clamp(6px, 1vh, 12px);
-      height: 100vh; /* Garante ocupação de 100% do ecrã */
+      height: 100vh;
+      min-height: 100vh;
+      width: 100vw;
     }
 
-    /* Distribui o espaço vertical para ocupar a ecrã toda */
+    /* Distribui o espaço vertical proporcionalmente */
     section { 
       display: flex; 
       flex-direction: column; 
       min-height: 0; 
-      flex: 1; /* Força as secções a esticarem */
+      flex: 1 1 auto; /* Força cada secção a crescer no espaço livre */
     }
 
-    /* Secção de Observações com maior destaque proporcional */
+    /* Secção de Observações com maior relevância visual */
     section:nth-of-type(4) {
-      flex: 1.8; 
+      flex: 2 1 auto; 
     }
 
     .seccao-titulo {
@@ -70,7 +73,7 @@
     }
 
     .grid-cards {
-      flex: 1;
+      flex: 1 1 auto;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
       gap: clamp(6px, 0.8vw, 12px);
@@ -89,7 +92,7 @@
       gap: 4px;
       position: relative;
       overflow: hidden;
-      height: 100%; /* Ocupa a altura da secção */
+      height: 100%;
     }
 
     .card-to { 
@@ -375,9 +378,7 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    // Coleção de Ilustrações de Viaturas de Bombeiros em SVG
     const ILUSTRACOES_VEICULOS = {
-      // Camião Pesado (VUCI, VFCI, VTTU, VABTR, etc.)
       camiaoPesado: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
         <rect x="10" y="22" width="60" height="30" rx="3" fill="#dc2626"/>
         <rect x="12" y="25" width="25" height="12" rx="1" fill="#cbd5e1" opacity="0.3"/>
@@ -396,7 +397,6 @@
         <rect x="2" y="32" width="8" height="16" fill="#94a3b8"/>
       </svg>`,
 
-      // Veículo Ligeiro de Combate (VLCI, Pick-up 4x4)
       veiculoLigeiroCombate: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
         <path d="M 15 32 L 45 32 L 60 22 L 85 22 L 105 35 L 105 50 L 15 50 Z" fill="#dc2626"/>
         <path d="M 48 33 L 62 25 L 82 25 L 82 33 Z" fill="#38bdf8" opacity="0.85"/>
@@ -409,7 +409,6 @@
         <circle cx="88" cy="50" r="4" fill="#94a3b8"/>
       </svg>`,
 
-      // Veículo Ligeiro de Comando / Operações (VCOT, VCOC, VOPE)
       veiculoComando: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
         <path d="M 12 38 L 30 38 L 48 24 L 80 24 L 98 38 L 108 38 L 108 52 L 12 52 Z" fill="#dc2626"/>
         <path d="M 32 37 L 48 27 L 62 27 L 62 37 Z" fill="#38bdf8" opacity="0.85"/>
@@ -422,7 +421,6 @@
         <circle cx="88" cy="52" r="3.5" fill="#cbd5e1"/>
       </svg>`,
 
-      // Ambulância de Socorro (ABSC / Emergência)
       ambulancia: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
         <rect x="10" y="22" width="62" height="30" rx="2" fill="#dc2626"/>
         <path d="M 72 22 L 96 22 L 106 34 L 106 52 L 72 52 Z" fill="#dc2626"/>
@@ -441,7 +439,7 @@
     function obterIconeVeiculoSVG(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
 
-      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
+      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA')) {
         return ILUSTRACOES_VEICULOS.ambulancia;
       }
       if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('VCOT') || nome.includes('VOPE')) {
@@ -449,9 +447,6 @@
       }
       if (nome.startsWith('VLCI') || nome.includes('VLCI') || nome.startsWith('VTTG')) {
         return ILUSTRACOES_VEICULOS.veiculoLigeiroCombate;
-      }
-      if (nome.startsWith('VUCI') || nome.startsWith('VFCI') || nome.startsWith('VTTU') || nome.startsWith('VABTR') || nome.includes('VUCI') || nome.includes('COMBATE') || nome.includes('CAMIAO')) {
-        return ILUSTRACOES_VEICULOS.camiaoPesado;
       }
 
       return ILUSTRACOES_VEICULOS.camiaoPesado;
@@ -517,7 +512,6 @@
       return linhas.map(linha => parseLinha(linha));
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarTeatroOperacoes() {
       const container = document.getElementById('container-to');
       try {
@@ -539,14 +533,12 @@
           const eventoVal = row[2] ? row[2].trim() : '';
 
           if (!eventoVal || eventoVal.toLowerCase() === 'evento') return;
-          
           if (!estaNoIntervaloDatas(dataInicio, dataFim)) return;
 
           const canais = [];
 
           const adicionarCanal = (val, classePadrao) => {
             if (!val) return;
-
             const subCanais = val.split(/[,/\-]+/);
 
             subCanais.forEach(item => {
@@ -611,7 +603,6 @@
       }
     }
 
-    // 2. VIATURAS INOP
     async function carregarViaturasINOP() {
       const container = document.getElementById('container-inop');
       try {
@@ -659,7 +650,6 @@
       }
     }
 
-    // 3. AGENDAMENTOS
     async function carregarAgendamentos() {
       const container = document.getElementById('container-agendamentos');
       try {
@@ -712,7 +702,6 @@
       }
     }
 
-    // 4. OBSERVAÇÕES
     async function carregarObservacoes() {
       const container = document.getElementById('container-observacoes');
       try {
@@ -758,7 +747,6 @@
       }
     }
 
-    // 5. METEOROLOGIA IPMA
     async function carregarMeteoIPMA() {
       const containerTicker = document.getElementById('ticker-texto');
       if (!containerTicker) return;
