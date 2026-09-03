@@ -42,21 +42,18 @@
       gap: clamp(6px, 1vh, 12px);
     }
 
-    /* Ajuste proporcional de cada secção */
     section { 
       display: flex; 
       flex-direction: column; 
       min-height: 0; 
     }
 
-    /* As 3 primeiras secções mantêm a proporção padrão (1x) */
     section:nth-of-type(1),
     section:nth-of-type(2),
     section:nth-of-type(3) {
       flex: 1;
     }
 
-    /* A secção de Observações recebe mais de o dobro do espaço vertical (2.2x) */
     section:nth-of-type(4) {
       flex: 2.2;
     }
@@ -157,20 +154,22 @@
     }
     
     .veiculo-icone-box { 
-      width: clamp(36px, 4vh, 52px); 
-      height: clamp(36px, 4vh, 52px); 
-      background-color: rgba(249, 115, 22, 0.2); 
-      border: 1px solid rgba(249, 115, 22, 0.5); 
+      width: clamp(48px, 5.5vh, 68px); 
+      height: clamp(44px, 5vh, 60px); 
+      background-color: rgba(15, 23, 42, 0.8); 
+      border: 1px solid rgba(255, 255, 255, 0.15); 
       border-radius: 6px; 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       flex-shrink: 0; 
+      padding: 4px;
     }
-    
-    .inop-icone-box {
-      background-color: rgba(239, 68, 68, 0.25); 
-      border-color: rgba(239, 68, 68, 0.6); 
+
+    .veiculo-icone-box svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
     
     .inop-texto h4 { 
@@ -196,7 +195,6 @@
       flex-shrink: 0; 
     }
 
-    /* Agendamentos */
     .card-agendamento { 
       border-left: 4px solid var(--accent-orange); 
       flex-direction: row;
@@ -233,7 +231,6 @@
       word-break: break-word;
     }
 
-    /* Observações Otimizadas */
     .card-observacao { 
       border-left: 4px solid var(--accent-purple); 
       justify-content: flex-start;
@@ -379,28 +376,96 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    /* Função de Ícones de Viaturas Atualizada com FontAwesome */
+    // Coleção de Desenhos de Viaturas de Bombeiros em Vector SVG
+    const ILUSTRACOES_VEICULOS = {
+      // Camião Pesado de Combate (VUCI, VFCI, VTTU, VABTR, etc.)
+      camiaoPesado: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="22" width="60" height="30" rx="3" fill="#dc2626"/>
+        <rect x="12" y="25" width="25" height="12" rx="1" fill="#cbd5e1" opacity="0.3"/>
+        <rect x="40" y="25" width="28" height="12" rx="1" fill="#cbd5e1" opacity="0.3"/>
+        <path d="M 70 22 L 98 22 L 108 36 L 108 52 L 70 52 Z" fill="#dc2626"/>
+        <path d="M 72 25 L 94 25 L 100 35 L 72 35 Z" fill="#38bdf8" opacity="0.8"/>
+        <rect x="10" y="42" width="98" height="5" fill="#facc15"/>
+        <rect x="15" y="18" width="12" height="4" rx="1" fill="#2563eb"/>
+        <rect x="85" y="18" width="12" height="4" rx="1" fill="#2563eb"/>
+        <circle cx="28" cy="53" r="8" fill="#1e293b"/>
+        <circle cx="28" cy="53" r="4" fill="#94a3b8"/>
+        <circle cx="52" cy="53" r="8" fill="#1e293b"/>
+        <circle cx="52" cy="53" r="4" fill="#94a3b8"/>
+        <circle cx="88" cy="53" r="8" fill="#1e293b"/>
+        <circle cx="88" cy="53" r="4" fill="#94a3b8"/>
+        <rect x="2" y="32" width="8" height="16" fill="#94a3b8"/>
+      </svg>`,
+
+      // Veículo Ligeiro de Combate (VLCI, Pick-up 4x4)
+      veiculoLigeiroCombate: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 15 32 L 45 32 L 60 22 L 85 22 L 105 35 L 105 50 L 15 50 Z" fill="#dc2626"/>
+        <path d="M 48 33 L 62 25 L 82 25 L 82 33 Z" fill="#38bdf8" opacity="0.85"/>
+        <rect x="15" y="40" width="90" height="4" fill="#facc15"/>
+        <rect x="18" y="32" width="24" height="12" fill="#64748b" rx="1"/>
+        <rect x="66" y="18" width="10" height="4" rx="1" fill="#2563eb"/>
+        <circle cx="32" cy="50" r="8" fill="#1e293b"/>
+        <circle cx="32" cy="50" r="4" fill="#94a3b8"/>
+        <circle cx="88" cy="50" r="8" fill="#1e293b"/>
+        <circle cx="88" cy="50" r="4" fill="#94a3b8"/>
+      </svg>`,
+
+      // Veículo Ligeiro de Comando / Operações (VCOT, VCOC, VOPE, Ligeiro)
+      veiculoComando: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 12 38 L 30 38 L 48 24 L 80 24 L 98 38 L 108 38 L 108 52 L 12 52 Z" fill="#dc2626"/>
+        <path d="M 32 37 L 48 27 L 62 27 L 62 37 Z" fill="#38bdf8" opacity="0.85"/>
+        <path d="M 66 27 L 78 27 L 90 37 L 66 37 Z" fill="#38bdf8" opacity="0.85"/>
+        <rect x="12" y="43" width="96" height="4" fill="#ffffff"/>
+        <rect x="54" y="20" width="12" height="4" rx="1" fill="#2563eb"/>
+        <circle cx="30" cy="52" r="7.5" fill="#1e293b"/>
+        <circle cx="30" cy="52" r="3.5" fill="#cbd5e1"/>
+        <circle cx="88" cy="52" r="7.5" fill="#1e293b"/>
+        <circle cx="88" cy="52" r="3.5" fill="#cbd5e1"/>
+      </svg>`,
+
+      // Ambulância de Socorro (ABSC / Emergência)
+      ambulancia: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="22" width="62" height="30" rx="2" fill="#dc2626"/>
+        <path d="M 72 22 L 96 22 L 106 34 L 106 52 L 72 52 Z" fill="#dc2626"/>
+        <path d="M 75 25 L 92 25 L 98 33 L 75 33 Z" fill="#38bdf8" opacity="0.85"/>
+        <rect x="10" y="38" width="96" height="5" fill="#facc15"/>
+        <!-- Cruz Amarela -->
+        <rect x="34" y="28" width="12" height="4" fill="#facc15"/>
+        <rect x="38" y="24" width="4" height="12" fill="#facc15"/>
+        <rect x="80" y="18" width="10" height="4" rx="1" fill="#2563eb"/>
+        <circle cx="28" cy="52" r="7.5" fill="#1e293b"/>
+        <circle cx="28" cy="52" r="3.5" fill="#cbd5e1"/>
+        <circle cx="86" cy="52" r="7.5" fill="#1e293b"/>
+        <circle cx="86" cy="52" r="3.5" fill="#cbd5e1"/>
+      </svg>`
+    };
+
+    /* Função que Seleciona a Imagem da Viatura conforme a Tipologia */
     function obterIconeVeiculoSVG(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
-      const style = 'style="font-size: clamp(1.4rem, 2.2vh, 2rem);"';
 
-      // Ambulâncias / ABSC
+      // 1. Ambulâncias
       if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
-        return `<i class="fa-solid fa-truck-medical" style="color: #ef4444; ${style}"></i>`;
+        return ILUSTRACOES_VEICULOS.ambulancia;
       }
       
-      // Viaturas de Comando / Operacionais (VCOT, VCOC, VOPE)
+      // 2. Viaturas de Comando / Apoio / Ligeiro Operacional (VCOT, VCOC, VOPE)
       if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('VCOT') || nome.includes('VOPE')) {
-        return `<i class="fa-solid fa-car-side" style="color: #38bdf8; ${style}"></i>`;
-      }
-      
-      // Viaturas Urbanas / Florestais / Tanques (VFCI, VTTU, VLCI, etc.)
-      if (nome.startsWith('VFCI') || nome.startsWith('VTTU') || nome.startsWith('VLCI') || nome.startsWith('VTPT') || nome.includes('COMBATE')) {
-        return `<i class="fa-solid fa-fire-extinguisher" style="color: #f97316; ${style}"></i>`;
+        return ILUSTRACOES_VEICULOS.veiculoComando;
       }
 
-      // Ícone padrão para outros veículos de Bombeiros (Camião)
-      return `<i class="fa-solid fa-truck-droplet" style="color: #f59e0b; ${style}"></i>`;
+      // 3. Veículos Ligeiros de Combate (VLCI, Pick-up, VTTG)
+      if (nome.startsWith('VLCI') || nome.includes('VLCI') || nome.startsWith('VTTG')) {
+        return ILUSTRACOES_VEICULOS.veiculoLigeiroCombate;
+      }
+
+      // 4. Camiões Pesados / Tanques / Urbana / Florestal (VUCI, VFCI, VTTU, VABTR, etc.)
+      if (nome.startsWith('VUCI') || nome.startsWith('VFCI') || nome.startsWith('VTTU') || nome.startsWith('VABTR') || nome.includes('VUCI') || nome.includes('COMBATE') || nome.includes('CAMIAO')) {
+        return ILUSTRACOES_VEICULOS.camiaoPesado;
+      }
+
+      // Imagem Padrão (Camião Pesado de Bombeiros)
+      return ILUSTRACOES_VEICULOS.camiaoPesado;
     }
 
     function converterDataTimestamp(dataStr) {
@@ -513,11 +578,11 @@
             });
           };
 
-          adicionarCanal(row[3], 'badge-bsb');    // Coluna D: Canal BSB
-          adicionarCanal(row[4], 'badge-rob');    // Coluna E: Canal ROB
-          adicionarCanal(row[5], 'badge-repc');   // Coluna F: Canal REPC
-          adicionarCanal(row[6], 'badge-siresp'); // Coluna G: Canal SIRESP
-          adicionarCanal(row[7], 'badge-dmo');    // Coluna H: BSB_DMO
+          adicionarCanal(row[3], 'badge-bsb');    
+          adicionarCanal(row[4], 'badge-rob');    
+          adicionarCanal(row[5], 'badge-repc');   
+          adicionarCanal(row[6], 'badge-siresp'); 
+          adicionarCanal(row[7], 'badge-dmo');    
 
           if (canais.length > 0) {
             encontrou = true;
@@ -587,7 +652,7 @@
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-info">
-              <div class="veiculo-icone-box inop-icone-box">
+              <div class="veiculo-icone-box">
                 ${svgIcone}
               </div>
               <div class="inop-texto">
