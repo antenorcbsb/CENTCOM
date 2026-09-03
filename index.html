@@ -1,755 +1,562 @@
 <BSB Braga html>
 <html lang="pt">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Batalhão Sapadores Bombeiros de Braga - Situação Operacional</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<style>
-    :root {
-      --bg-color: #060b17;
-      --card-bg: #0f172a;
-      --card-border: #1e293b;
-      --accent-green: #10b981;
-      --accent-blue: #0284c7;
-      --accent-red: #ef4444;
-      --accent-orange: #f97316;
-      --accent-purple: #a855f7;
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-    }
-
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-    }
-    
-    html, body { 
-      width: 100vw; 
-      height: 100vh; 
-      overflow: hidden; 
-    }
-    
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      padding: clamp(6px, 1vh, 14px);
-      padding-bottom: 0;
-      display: flex;
-      flex-direction: column;
-      gap: clamp(6px, 1vh, 12px);
-    }
-
-    section { 
-      flex: 1; 
-      display: flex; 
-      flex-direction: column; 
-      min-height: 0; 
-    }
-
-    .seccao-titulo {
-      font-size: clamp(0.75rem, 1.4vh, 1.2rem);
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #38bdf8;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .grid-cards {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-      gap: clamp(6px, 0.8vw, 12px);
-      min-height: 0;
-      overflow-y: auto;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: clamp(6px, 1vh, 12px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card-to { 
-      border-left: 4px solid var(--accent-green); 
-    }
-    
-    .to-nome { 
-      font-size: clamp(0.85rem, 1.5vh, 1.3rem); 
-      font-weight: 700; 
-      color: #ffffff; 
-      word-break: break-word;
-      line-height: 1.2;
-    }
-    
-    .to-detalhes { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 4px; 
-      font-size: clamp(0.75rem, 1.2vh, 1rem); 
-      color: var(--text-muted); 
-      margin-top: 2px; 
-    }
-    
-    .canais-lista { 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 4px; 
-      margin-top: 4px; 
-    }
-    
-    .badge-canal { 
-      color: #fff; 
-      font-weight: 700; 
-      padding: 3px 8px; 
-      border-radius: 4px; 
-      font-size: clamp(0.65rem, 1.1vh, 0.9rem); 
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      word-break: break-word;
-    }
-    
-    .badge-bsb { background-color: #0284c7; }
-    .badge-rob { background-color: #10b981; }
-    .badge-repc { background-color: #f97316; }
-    .badge-siresp { background-color: #8b5cf6; }
-    .badge-dmo { background-color: #e11d48; }
-
-    .card-inop { 
-      border-left: 4px solid var(--accent-red); 
-      flex-direction: row; 
-      justify-content: space-between; 
-      align-items: center; 
-    }
-    
-    .inop-info { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px;
-      overflow: hidden; 
-    }
-    
-    .veiculo-icone-box { 
-      width: clamp(36px, 4vh, 52px); 
-      height: clamp(36px, 4vh, 52px); 
-      background-color: rgba(249, 115, 22, 0.2); 
-      border: 1px solid rgba(249, 115, 22, 0.5); 
-      border-radius: 6px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      flex-shrink: 0; 
-    }
-    
-    .inop-icone-box {
-      background-color: rgba(239, 68, 68, 0.25); 
-      border-color: rgba(239, 68, 68, 0.6); 
-    }
-    
-    .inop-texto h4 { 
-      font-size: clamp(0.85rem, 1.4vh, 1.2rem); 
-      font-weight: 700; 
-      color: #ffffff; 
-      word-break: break-word;
-    }
-    
-    .inop-texto p { 
-      font-size: clamp(0.75rem, 1.2vh, 1rem); 
-      color: var(--text-muted); 
-      word-break: break-word;
-    }
-    
-    .badge-inop { 
-      background-color: var(--accent-red); 
-      color: #ffffff; 
-      font-weight: 800; 
-      font-size: clamp(0.65rem, 1.1vh, 0.9rem); 
-      padding: 3px 8px; 
-      border-radius: 4px; 
-      flex-shrink: 0; 
-    }
-
-    /* Agendamentos */
-    .card-agendamento { 
-      border-left: 4px solid var(--accent-orange); 
-      flex-direction: row;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .agendamento-conteudo {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .agendamento-data { 
-      color: var(--accent-orange); 
-      font-weight: 700; 
-      font-size: clamp(0.75rem, 1.2vh, 1rem); 
-    }
-    
-    .agendamento-desc { 
-      font-size: clamp(0.85rem, 1.4vh, 1.15rem); 
-      font-weight: 600; 
-      color: #ffffff; 
-      word-break: break-word;
-      line-height: 1.25;
-    }
-    
-    .agendamento-meios { 
-      font-size: clamp(0.75rem, 1.2vh, 1rem); 
-      color: #38bdf8; 
-      font-weight: 600; 
-      word-break: break-word;
-    }
-
-    /* Observações */
-    .card-observacao { border-left: 4px solid var(--accent-purple); }
-    .obs-titulo { 
-      font-weight: 700; 
-      color: #c084fc; 
-      font-size: clamp(0.7rem, 1.1vh, 0.95rem); 
-      text-transform: uppercase; 
-      display: flex; 
-      align-items: center; 
-      gap: 5px; 
-    }
-    
-    .obs-texto { 
-      font-size: clamp(0.8rem, 1.3vh, 1.1rem); 
-      font-weight: 600; 
-      color: #ffffff; 
-      word-break: break-word;
-      line-height: 1.3;
-      margin-top: 2px; 
-    }
-
-    .sem-registos { 
-      color: var(--text-muted); 
-      font-style: italic; 
-      padding: 6px; 
-      font-size: clamp(0.75rem, 1.2vh, 1rem); 
-    }
-
-    .rodape-ticker {
-      height: clamp(34px, 4.5vh, 50px);
-      background-color: #0f172a;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
-      z-index: 9999;
-      font-weight: 700;
-      font-size: clamp(0.75rem, 1.2vh, 1rem);
-      border-top: 2px solid var(--accent-blue);
-      flex-shrink: 0;
-      margin-left: calc(-1 * clamp(6px, 1vh, 14px));
-      margin-right: calc(-1 * clamp(6px, 1vh, 14px));
-    }
-    
-    .ticker-label { 
-      background-color: var(--accent-blue); 
-      color: #ffffff; 
-      padding: 0 14px; 
-      height: 100%; 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
-      white-space: nowrap; 
-      z-index: 2; 
-      font-size: clamp(0.7rem, 1.1vh, 0.95rem); 
-      letter-spacing: 0.5px; 
-    }
-    
-    .ticker-conteudo { 
-      flex: 1; 
-      overflow: hidden; 
-      white-space: nowrap; 
-      position: relative; 
-    }
-    
-    .ticker-texto { 
-      display: inline-block; 
-      white-space: nowrap; 
-      padding-left: 100%; 
-      animation: ticker-animacao 30s linear infinite; 
-    }
-    
-    .ticker-item { 
-      display: inline-flex; 
-      align-items: center; 
-      margin-right: 25px; 
-    }
-    
-    .ticker-separador { 
-      margin-left: 25px; 
-      color: #38bdf8; 
-      opacity: 0.7; 
-    }
-
-    @keyframes ticker-animacao { 
-      0% { transform: translate3d(0, 0, 0); } 
-      100% { transform: translate3d(-100%, 0, 0); } 
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BSB Braga CENTCOM - Situação Operacional</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fontes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Chakra Petch', sans-serif; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
   </style>
 </head>
-<body>
-<section>
-<div class="seccao-titulo"><i class="fa-solid fa-walkie-talkie"></i> Teatro de Operações / Canais</div>
-<div class="grid-cards" id="container-to">
-<div class="card sem-registos">A carregar Teatro de Operações...</div>
-</div>
-</section>
-<section>
-<div class="seccao-titulo" style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> Veículos Inoperacionais (INOP)</div>
-<div class="grid-cards" id="container-inop">
-<div class="card sem-registos">A carregar viaturas INOP...</div>
-</div>
-</section>
-<section>
-<div class="seccao-titulo" style="color: var(--accent-orange);"><i class="fa-solid fa-calendar-days"></i> Agendamentos</div>
-<div class="grid-cards" id="container-agendamentos">
-<div class="card sem-registos">A carregar agendamentos...</div>
-</div>
-</section>
-<section>
-<div class="seccao-titulo" style="color: var(--accent-purple);"><i class="fa-solid fa-bullhorn"></i> Observações</div>
-<div class="grid-cards" id="container-observacoes">
-<div class="card sem-registos">A carregar observações...</div>
-</div>
-</section>
-<footer class="rodape-ticker">
-<div class="ticker-label"><i class="fa-solid fa-cloud-sun"></i> IPMA BRAGA</div>
-<div class="ticker-conteudo">
-<div class="ticker-texto" id="ticker-texto">
-<span class="ticker-item">A obter dados oficiais do IPMA...</span>
-</div>
-</div>
-</footer>
-<script>
-    const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
+<body class="bg-[#060b17] text-white antialiased overflow-hidden select-none h-screen flex flex-col">
+
+  <!-- CABEÇALHO DO VIDEOWALL -->
+  <header class="bg-[#0a1124] border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shadow-lg flex-shrink-0 z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 font-bold font-display text-base tracking-wider shadow-inner">
+        BSB
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm sm:text-base font-extrabold text-slate-100 tracking-wide font-display uppercase">
+            Batalhão de Sapadores Bombeiros de Braga
+          </h1>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-red-950 text-red-300 border border-red-800">
+            CENTCOM
+          </span>
+        </div>
+        <div class="flex items-center gap-2 text-[10px] sm:text-xs text-slate-400 font-medium">
+          <span class="text-sky-400 font-semibold">SITUAÇÃO OPERACIONAL</span>
+          <span class="text-slate-600">•</span>
+          <span>Centro de Comunicações & Gestão de Meios</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <!-- Indicador Live Update -->
+      <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-slate-900/90 rounded border border-slate-800 text-[10px] font-mono text-slate-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="sync-status">EM DIRETO (10s)</span>
+      </div>
+
+      <!-- Relógio Digital -->
+      <div class="text-right">
+        <div id="clock-time" class="text-lg sm:text-xl font-extrabold font-mono text-amber-400 tracking-wider">
+          --:--:--
+        </div>
+        <div id="clock-date" class="text-[10px] text-slate-400 font-mono capitalize">
+          Carregando data...
+        </div>
+      </div>
+
+      <!-- Botão Fullscreen -->
+      <button onclick="toggleFullscreen()" class="p-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors" title="Ecrã Inteiro">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0 0l-5-5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- BARRA METEOROLÓGICA IPMA -->
+  <div id="ipma-bar" class="bg-[#080e1e] border-b border-slate-800/80 px-4 py-1.5 flex items-center justify-between text-xs text-slate-300 flex-shrink-0 overflow-x-auto">
+    <div class="flex items-center gap-3">
+      <span class="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-800">
+        IPMA BRAGA
+      </span>
+      <span id="ipma-temp" class="font-mono text-slate-200">A obter meteorologia...</span>
+      <span class="text-slate-600 hidden sm:inline">•</span>
+      <span id="ipma-vento" class="text-slate-400 hidden sm:inline"></span>
+      <span class="text-slate-600 hidden md:inline">•</span>
+      <span id="ipma-precip" class="text-slate-400 hidden md:inline"></span>
+    </div>
+    <div id="ipma-aviso" class="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+      <span>●</span> Sem Avisos Meteorológicos Ativos
+    </div>
+  </div>
+
+  <!-- GRELHA QUADRANTE DO VIDEOWALL -->
+  <main class="flex-1 p-2.5 sm:p-3 overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
     
-    const GID_VIATURAS = '1032427330'; 
-    const GID_CANAIS = '881712175'; 
-    const GID_AGENDAMENTOS = '959314983'; 
-    const GID_COMUNICACOES = '1196343008'; 
+    <!-- QUADRO 1: TEATROS DE OPERAÇÕES & CANAIS RÁDIO -->
+    <div class="flex flex-col h-full bg-[#0a1124] border border-slate-800/90 rounded-lg p-2.5 sm:p-3 shadow-md overflow-hidden">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/80 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs">
+            📻
+          </div>
+          <div>
+            <h2 class="text-xs sm:text-sm font-extrabold text-sky-400 uppercase tracking-wider font-mono">
+              Teatros de Operações & Canais
+            </h2>
+            <p class="text-[10px] text-slate-400">Atribuição de canais táticos SIRESP / Rádio</p>
+          </div>
+        </div>
+        <span id="badge-teatros" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-sky-950 text-sky-300 border border-sky-800">
+          0 CANAIS
+        </span>
+      </div>
+      <div id="lista-teatros" class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <div class="text-xs text-slate-500 italic p-3 text-center">A carregar teatros de operações...</div>
+      </div>
+    </div>
 
-    const obterUrlGviz = (gid) => 
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&_cacheBust=${Date.now()}`;
+    <!-- QUADRO 2: VIATURAS INOPERACIONAIS -->
+    <div class="flex flex-col h-full bg-[#0a1124] border border-slate-800/90 rounded-lg p-2.5 sm:p-3 shadow-md overflow-hidden">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/80 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-xs">
+            🚒
+          </div>
+          <div>
+            <h2 class="text-xs sm:text-sm font-extrabold text-red-400 uppercase tracking-wider font-mono">
+              Viaturas Inoperacionais (INOP)
+            </h2>
+            <p class="text-[10px] text-slate-400">Meios fora de serviço por avaria ou manutenção</p>
+          </div>
+        </div>
+        <span id="badge-viaturas" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-red-950 text-red-300 border border-red-800">
+          0 INOP
+        </span>
+      </div>
+      <div id="lista-viaturas" class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <div class="text-xs text-slate-500 italic p-3 text-center">A verificar estado da frota...</div>
+      </div>
+    </div>
 
-    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json';
-    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';
-    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
-    const DICO_BRAGA = '0303';
+    <!-- QUADRO 3: AGENDAMENTOS DO DIA (COM MEIOS E EQUIPAS OPERACIONAIS) -->
+    <div class="flex flex-col h-full bg-[#0a1124] border border-slate-800/90 rounded-lg p-2.5 sm:p-3 shadow-md overflow-hidden">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/80 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+            📅
+          </div>
+          <div>
+            <h2 id="agend-title" class="text-xs sm:text-sm font-extrabold text-amber-400 uppercase tracking-wider font-mono">
+              Agendamentos do Dia
+            </h2>
+            <p id="agend-subtitle" class="text-[10px] text-slate-400">Serviços programados para hoje</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="toggleFiltroHoje()" id="btn-toggle-hoje" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30">
+            Só Hoje
+          </button>
+          <span id="badge-agendamentos" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-950 text-amber-300 border border-amber-800">
+            0 SERVIÇOS
+          </span>
+        </div>
+      </div>
+      <div id="lista-agendamentos" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
+        <div class="text-xs text-slate-500 italic p-3 text-center">A carregar agendamentos...</div>
+      </div>
+    </div>
 
-    function obterIconeVeiculoSVG(nomeVeiculo) {
-      const nome = (nomeVeiculo || '').toUpperCase().trim();
-      const style = 'style="width: 100%; height: 100%; object-fit: contain;"';
-      
-      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X05nEiZz1ujeGojWBrUwgwKEQu9l8jIZLMSk5hegmJynRKblkEE_crAC0BFAMSxQnziNIHnM9k_Sl9Wqx43FCJUiCeeR587EgTV4uAgfmsQ2yFQAnUFwjeBGq_zhk2vtDy0cUzCO6lxxht5qvUSjqeuWW6_c0fjbD4BjxvQ0ixADivtv_RkJDbXE14u2Tq_mwtA9bHMMm8xyVvcgS6bVCBQWuYvkJz3NbVZTyHb3qiKNmcqXchU9I0vzor" ${style}>`;
+    <!-- QUADRO 4: COMUNICAÇÕES & OBSERVAÇÕES -->
+    <div class="flex flex-col h-full bg-[#0a1124] border border-slate-800/90 rounded-lg p-2.5 sm:p-3 shadow-md overflow-hidden">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/80 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+            💬
+          </div>
+          <div>
+            <h2 class="text-xs sm:text-sm font-extrabold text-emerald-400 uppercase tracking-wider font-mono">
+              Comunicações & Avisos Internos
+            </h2>
+            <p class="text-[10px] text-slate-400">Ordens de serviço e notas do CENTCOM</p>
+          </div>
+        </div>
+        <span id="badge-observacoes" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
+          0 NOTAS
+        </span>
+      </div>
+      <div id="lista-observacoes" class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <div class="text-xs text-slate-500 italic p-3 text-center">A carregar comunicações...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MOTOR JAVASCRIPT: GOOGLE SHEETS + REFRESH A CADA 10S -->
+  <script>
+    const SHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
+    const GID_CANAIS = '0';
+    const GID_VIATURAS = '474776100';
+    const GID_AGENDAMENTOS = '959314983';
+    const GID_COMUNICACOES = '1551061922';
+
+    let apenasHoje = true;
+    let todosAgendamentos = [];
+
+    // Tipologia e ícones de Viaturas
+    function getVehicleMeta(sigla) {
+      const s = (sigla || '').toUpperCase();
+      if (s.startsWith('ABSC') || s.startsWith('ABST') || s.startsWith('ABAM')) {
+        return { label: 'Socorro / Saúde', color: 'text-rose-400 bg-rose-950/40 border-rose-800/50', icon: '🚑' };
       }
-      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('VCOT') || nome.includes('VOPE')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1WHcN6GtjV6nPRpCYTUPT1M4EbplSOATAh3sral_FBqU_98kQs8K3UQ3Cu0CYeAkYj7GhZC0rm1sEL_MRmmVvUgM1yWaxzmBqtT-er4jn-QnAThQ-tLWAddgIRQ1s3iooGNGlzJL6rWDZ78jWile2aJ7oPComoo4QeY6HoGCA2ciFh3fCzRadnKq450mdovH8vHBxTOXFyfHbmGKrmheJsywBv6IE_d5GYSg4nz96G5B0Z9xNSH-iZY9dXi" ${style}>`;
+      if (s.startsWith('VFCI') || s.startsWith('VLCI') || s.startsWith('VRCI') || s.startsWith('VTGC')) {
+        return { label: 'Combate a Incêndios', color: 'text-amber-400 bg-amber-950/40 border-amber-800/50', icon: '🚒' };
       }
-      return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X9o9T1-ySyJOt4RGo5aAVBYMpp8ArbUwI6JkYyVUJYJQ0e--u63OJ4UNrf0RBdwkiAaXpd4yRchxIfK87N6NAzkeq-zOFfuFnc74uFsbju2GfQnx0uRry6HxLNw5CfqcXgSzdCzLsCDjZUb0MXbPDkgi4tNd40TPxZ82060N8ZyAfgpsw99RkY7gvWqXTkJrPa6HvUEbB8yUjTbWT6qeRvnpG2Zrv3vRY3Wg_PTDYp3iybN-drFPyS7iUC" ${style}>`;
+      if (s.startsWith('VUCI') || s.startsWith('VTTU') || s.startsWith('VTTP')) {
+        return { label: 'Urbano / Tanque', color: 'text-orange-400 bg-orange-950/40 border-orange-800/50', icon: '🚒' };
+      }
+      if (s.startsWith('VE30') || s.startsWith('VE') || s.startsWith('VPMA') || s.startsWith('VECI')) {
+        return { label: 'Especial / Plataforma', color: 'text-purple-400 bg-purple-950/40 border-purple-800/50', icon: '🏗️' };
+      }
+      if (s.startsWith('VCOT') || s.startsWith('VCOC') || s.startsWith('VOPE') || s.startsWith('VAOP')) {
+        return { label: 'Comando / Apoio', color: 'text-sky-400 bg-sky-950/40 border-sky-800/50', icon: '🚙' };
+      }
+      if (s.startsWith('BRTP') || s.startsWith('BOTE')) {
+        return { label: 'Embarcação / Mergulho', color: 'text-cyan-400 bg-cyan-950/40 border-cyan-800/50', icon: '🚤' };
+      }
+      return { label: 'Operacional', color: 'text-slate-400 bg-slate-900/50 border-slate-700/50', icon: '🚒' };
     }
 
-    function converterDataTimestamp(dataStr) {
-      if (!dataStr || !dataStr.trim()) return null;
-      const partes = dataStr.trim().split(/[\/\.-]/);
-      if (partes.length === 3) {
-        let d, m, a;
-        if (partes[0].length === 4) {
-          a = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; d = parseInt(partes[2], 10);
+    // Parser CSV seguro
+    function parseCSV(text) {
+      const p = [[]];
+      let row = p[0];
+      let inQuote = false;
+      let field = '';
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i + 1];
+        if (c === '"') {
+          if (inQuote && next === '"') { field += '"'; i++; } else { inQuote = !inQuote; }
+        } else if (c === ',' && !inQuote) {
+          row.push(field); field = '';
+        } else if ((c === '\r' || c === '\n') && !inQuote) {
+          if (c === '\r' && next === '\n') i++;
+          row.push(field); field = ''; row = []; p.push(row);
         } else {
-          d = parseInt(partes[0], 10); m = parseInt(partes[1], 10) - 1; a = parseInt(partes[2], 10);
+          field += c;
         }
-        return new Date(a, m, d).setHours(0,0,0,0);
       }
-      return null;
+      row.push(field);
+      return p.filter(r => r.length > 1 || (r[0] && r[0].trim().length > 0));
     }
 
+    // Validar se é a data de hoje
     function eHoje(dataStr) {
       if (!dataStr || !dataStr.trim()) return false;
-      const tsData = converterDataTimestamp(dataStr);
-      if (!tsData) return false;
-      const hoje = new Date().setHours(0,0,0,0);
-      return tsData === hoje;
-    }
-
-    function estaNoIntervaloDatas(dataInicioStr, dataFimStr) {
-      const hoje = new Date().setHours(0, 0, 0, 0);
-      const tsInicio = converterDataTimestamp(dataInicioStr);
-      const tsFim = converterDataTimestamp(dataFimStr);
-
-      if (!tsInicio && !tsFim) return true;
-      if (tsInicio && !tsFim) return hoje >= tsInicio;
-      if (!tsInicio && tsFim) return hoje <= tsFim;
-      return hoje >= tsInicio && hoje <= tsFim;
-    }
-
-    function parseCSV(text) {
-      if (!text || text.includes('<!DOCTYPE html>')) return [];
-      const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
-      if (linhas.length === 0) return [];
-
-      const parseLinha = (linha) => {
-        const res = [];
-        let cur = '';
-        let dentroAspas = false;
-        for (let i = 0; i < linha.length; i++) {
-          const c = linha[i];
-          if (c === '"') dentroAspas = !dentroAspas;
-          else if (c === ',' && !dentroAspas) {
-            res.push(cur.trim().replace(/^"|"$/g, ''));
-            cur = '';
-          } else {
-            cur += c;
-          }
-        }
-        res.push(cur.trim().replace(/^"|"$/g, ''));
-        return res;
-      };
-
-      return linhas.map(linha => parseLinha(linha));
-    }
-
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (ATUALIZADO PARA MÚLTIPLOS CANAIS)
-    async function carregarTeatroOperacoes() {
-      const container = document.getElementById('container-to');
-      try {
-        const res = await fetch(obterUrlGviz(GID_CANAIS));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
-
-        container.innerHTML = '';
-        if (todasLinhas.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos.</div>`;
-          return;
-        }
-
-        let encontrou = false;
-
-        todasLinhas.forEach(row => {
-          const dataInicio = row[0] ? row[0].trim() : '';
-          const dataFim = row[1] ? row[1].trim() : '';
-          const eventoVal = row[2] ? row[2].trim() : '';
-
-          if (!eventoVal || eventoVal.toLowerCase() === 'evento') return;
-          
-          if (!estaNoIntervaloDatas(dataInicio, dataFim)) return;
-
-          const canais = [];
-
-          const adicionarCanal = (val, classePadrao) => {
-            if (!val) return;
-
-            // Divide múltiplos canais na mesma célula por vírgula, barra ou hífen
-            const subCanais = val.split(/[,/\-]+/);
-
-            subCanais.forEach(item => {
-              const valClean = item.trim();
-              const valLower = valClean.toLowerCase();
-              
-              if (!valClean || valLower === 'canal' || valLower.includes('canal ')) return;
-
-              let classe = classePadrao;
-              if (valLower.includes('dmo')) classe = 'badge-dmo';
-              else if (valLower.includes('siresp') || valLower.includes('tat')) classe = 'badge-siresp';
-              else if (valLower.includes('repc') || valLower.includes('pc')) classe = 'badge-repc';
-              else if (valLower.includes('rob') || valLower.includes('man')) classe = 'badge-rob';
-
-              if (!canais.some(c => c.texto === valClean)) {
-                canais.push({ texto: valClean, classe: classe });
-              }
-            });
-          };
-
-          adicionarCanal(row[3], 'badge-bsb');    // Coluna D: Canal BSB
-          adicionarCanal(row[4], 'badge-rob');    // Coluna E: Canal ROB
-          adicionarCanal(row[5], 'badge-repc');   // Coluna F: Canal REPC
-          adicionarCanal(row[6], 'badge-siresp'); // Coluna G: Canal SIRESP
-          adicionarCanal(row[7], 'badge-dmo');    // Coluna H: BSB_DMO
-
-          if (canais.length > 0) {
-            encontrou = true;
-            const div = document.createElement('div');
-            div.className = 'card card-to';
-            
-            const badgesHTML = canais.map(c => 
-              `<span class="badge-canal ${c.classe}"><img src="https://lh3.googleusercontent.com/aida/AEtjO1Uigq01cgKGOR3dU2-oD_I07t90S4tBR68IktYDQgYegy2jRfja3Rr7FDIlOMF34tjIaD5fSL1IpKiNT2EauggtCl_5YHmLwzgFRPokHJVg3Gi3avYYQgHbZ3r0WTiH4qYJUbJpa4BAVwcboXiteeKKLzbBkv8BhvsJAzgNguKiAjkKSVKInO-jW7RW5RHzxHcEO-NleF64jG-JrVDBPz_dj8ZWQfGsYKo2tpui1uLz08tEPU5nOG5ZtAQl" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle; margin-right: 4px;"> ${c.texto}</span>`
-            ).join('');
-            
-            let textoData = '';
-            if (dataInicio && dataFim) {
-              textoData = `${dataInicio} até ${dataFim}`;
-            } else if (dataInicio) {
-              textoData = `A partir de ${dataInicio}`;
-            } else if (dataFim) {
-              textoData = `Até ${dataFim}`;
-            }
-
-            div.innerHTML = `
-              <div class="to-nome">${eventoVal}</div>
-              <div class="to-detalhes">
-                ${textoData ? `<div>📅 <strong>Data:</strong> ${textoData}</div>` : ''}
-                <div class="canais-lista">${badgesHTML}</div>
-              </div>
-            `;
-            container.appendChild(div);
-          }
-        });
-
-        if (!encontrou) {
-          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos.</div>`;
-        }
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem canais/rádios ativos.</div>`;
+      const hoje = new Date();
+      const match = dataStr.trim().match(/^(\d{1,2})[\/\.-](\d{1,2})(?:[\/\.-](\d{2,4}))?/);
+      if (match) {
+        const d = parseInt(match[1], 10);
+        const m = parseInt(match[2], 10);
+        let y = match[3] ? parseInt(match[3], 10) : hoje.getFullYear();
+        if (y < 100) y += 2000;
+        return d === hoje.getDate() && m === (hoje.getMonth() + 1) && y === hoje.getFullYear();
       }
+      return false;
     }
 
-    // 2. VIATURAS INOP
-    async function carregarViaturasINOP() {
-      const container = document.getElementById('container-inop');
+    // Extrair elementos da coluna Equipas
+    function parseEquipa(equipasRaw) {
+      if (!equipasRaw || !equipasRaw.trim()) return [];
+      const limpo = equipasRaw.trim()
+        .replace(/(\d+):(\d+)/g, '$1;$2')
+        .replace(/[\r\n]+/g, ';')
+        .replace(/[,;]+/g, ';');
+
+      const tokens = limpo.split(';').map(t => t.trim()).filter(t => t.length > 0);
+      const res = [];
+      tokens.forEach(tok => {
+        if (/^\d+(\s+\d+)+$/.test(tok)) {
+          tok.split(/\s+/).forEach(n => { if (n.trim()) res.push(n.trim()); });
+        } else {
+          res.push(tok);
+        }
+      });
+      return res;
+    }
+
+    // Extrair viaturas
+    function parseViaturas(meiosRaw) {
+      if (!meiosRaw || !meiosRaw.trim()) return [];
+      return meiosRaw.split(/[;,\n/]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && !s.toLowerCase().includes('nenhum'));
+    }
+
+    // Carregar Teatros de Operações
+    async function carregarTeatros() {
       try {
-        const res = await fetch(obterUrlGviz(GID_VIATURAS));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
+        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_CANAIS}`);
+        const rows = parseCSV(await res.text());
+        const container = document.getElementById('lista-teatros');
+        const dados = rows.slice(1).map(r => ({
+          designacao: (r[0] || '').trim(), canal: (r[1] || '').trim(), obs: (r[2] || '').trim()
+        })).filter(t => t.designacao || t.canal);
 
-        container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const viaturasInop = todasLinhas.filter(row => {
-          const estado = (row[1] || '').toUpperCase();
-          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
-        });
-
-        if (viaturasInop.length === 0) {
-          container.innerHTML = `<div class="card sem-registos" style="color: var(--accent-green);">✓ Todas as viaturas estão operacionais.</div>`;
+        document.getElementById('badge-teatros').textContent = `${dados.length} CANAIS`;
+        if (dados.length === 0) {
+          container.innerHTML = '<div class="text-xs text-slate-500 italic p-3 text-center">Nenhum canal ativo no momento.</div>';
           return;
         }
 
-        viaturasInop.forEach(row => {
-          const nome = row[0] || 'Viatura';
-          const motivo = row[3] || row[2] || 'Avaria Registada';
-          const svgIcone = obterIconeVeiculoSVG(nome);
-
-          const div = document.createElement('div');
-          div.className = 'card card-inop';
-          div.innerHTML = `
-            <div class="inop-info">
-              <div class="veiculo-icone-box inop-icone-box">
-                ${svgIcone}
-              </div>
-              <div class="inop-texto">
-                <h4>${nome}</h4>
-                <p>${motivo}</p>
-              </div>
+        container.innerHTML = dados.map(t => `
+          <div class="p-2.5 rounded-md bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-xs sm:text-sm text-slate-100 font-mono">${t.designacao || 'Teatro Operacional'}</span>
+              <span class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-sky-950/80 text-sky-300 border border-sky-800/60">${t.canal || 'LIVRE'}</span>
             </div>
-            <span class="badge-inop">INOP</span>
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Erro ao carregar viaturas INOP.</div>`;
-      }
+            ${t.obs ? `<div class="text-[11px] text-slate-400 mt-1">${t.obs}</div>` : ''}
+          </div>
+        `).join('');
+      } catch (e) { console.warn(e); }
     }
 
-    // 3. AGENDAMENTOS
+    // Carregar Viaturas INOP
+    async function carregarViaturas() {
+      try {
+        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_VIATURAS}`);
+        const rows = parseCSV(await res.text());
+        const container = document.getElementById('lista-viaturas');
+        const dados = rows.slice(1).map(r => ({
+          sigla: (r[0] || '').trim(), estado: (r[1] || '').trim(), obs: (r[2] || '').trim()
+        })).filter(v => v.sigla && (v.estado.toUpperCase().includes('INOP') || v.obs.length > 0));
+
+        document.getElementById('badge-viaturas').textContent = `${dados.length} INOP`;
+        if (dados.length === 0) {
+          container.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center p-4 text-center bg-slate-900/30 border border-dashed border-slate-800 rounded-md">
+              <div class="text-2xl mb-1">✅</div>
+              <div class="text-xs font-bold text-emerald-400">Frota 100% Operacional</div>
+              <div class="text-[10px] text-slate-400">Nenhuma viatura inoperacional registada.</div>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = dados.map(v => {
+          const meta = getVehicleMeta(v.sigla);
+          return `
+            <div class="p-2.5 rounded-md bg-slate-900/80 border border-slate-800/90 hover:border-red-900/50">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="p-1 rounded bg-slate-800 border border-slate-700 text-xs">${meta.icon}</span>
+                  <span class="font-bold text-xs sm:text-sm font-mono text-slate-100">${v.sigla}</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded font-mono ${meta.color} border">${meta.label}</span>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-red-950 text-red-300 border border-red-800">INOP</span>
+              </div>
+              ${v.obs ? `<div class="text-[11px] text-red-300/80 mt-1 pl-1 border-l-2 border-red-500/40 font-mono">${v.obs}</div>` : ''}
+            </div>`;
+        }).join('');
+      } catch (e) { console.warn(e); }
+    }
+
+    // Carregar Agendamentos & Equipas
     async function carregarAgendamentos() {
-      const container = document.getElementById('container-agendamentos');
       try {
-        const res = await fetch(obterUrlGviz(GID_AGENDAMENTOS));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
+        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_AGENDAMENTOS}`);
+        const rows = parseCSV(await res.text());
+        if (rows.length <= 1) return;
 
-        container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const agendamentosValidos = todasLinhas.filter(row => {
-          const dataRaw = row[0] || '';
-          const descricao = row[2] || '';
-          return descricao.trim() !== '' && eHoje(dataRaw) && !dataRaw.toLowerCase().includes('data');
+        let idxData = 0, idxHora = 1, idxDesc = 2, idxMeios = 3, idxEquipas = 4;
+        rows[0].forEach((c, idx) => {
+          const n = c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+          if (n.includes('data')) idxData = idx;
+          else if (n.includes('hora')) idxHora = idx;
+          else if (n.includes('descri')) idxDesc = idx;
+          else if (n.includes('meio') || n.includes('viatura')) idxMeios = idx;
+          else if (n.includes('equipa') || n.includes('operaciona') || n.includes('elemento')) idxEquipas = idx;
         });
 
-        if (agendamentosValidos.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos para hoje.</div>`;
-          return;
-        }
+        let ultimaData = '';
+        const lista = [];
 
-        agendamentosValidos.forEach(row => {
-          const dataRaw = row[0] || '';
-          const horaRaw = row[1] || '';
-          const descricao = row[2] || 'Serviço Agendado';
-          const meios = row[3] || '';
+        rows.slice(1).forEach(r => {
+          let dataRaw = (r[idxData] || '').trim();
+          const horaRaw = (r[idxHora] || '').trim();
+          const desc = (r[idxDesc] || '').trim();
+          const meiosRaw = (r[idxMeios] || '').trim();
+          const equipasRaw = (r[idxEquipas] || '').trim();
 
-          let dataFormatada = dataRaw;
-          if (horaRaw) dataFormatada += ` às ${horaRaw}`;
+          if (!desc || desc.toLowerCase() === 'descrição' || dataRaw.toLowerCase().includes('data')) return;
+          if (dataRaw) ultimaData = dataRaw;
+          else if (!dataRaw && ultimaData) dataRaw = ultimaData;
 
-          const svgIcone = obterIconeVeiculoSVG(meios || descricao);
-
-          const div = document.createElement('div');
-          div.className = 'card card-agendamento';
-          div.innerHTML = `
-            <div class="veiculo-icone-box">
-              ${svgIcone}
-            </div>
-            <div class="agendamento-conteudo">
-              ${dataFormatada ? `<div class="agendamento-data">📅 ${dataFormatada}</div>` : ''}
-              <div class="agendamento-desc">${descricao}</div>
-              ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
-            </div>
-          `;
-          container.appendChild(div);
+          lista.push({
+            dataRaw, horaRaw, desc,
+            meios: parseViaturas(meiosRaw),
+            equipas: parseEquipa(equipasRaw),
+            eHoje: eHoje(dataRaw)
+          });
         });
 
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos para hoje.</div>`;
-      }
+        todosAgendamentos = lista;
+        renderizarAgendamentos();
+      } catch (e) { console.warn(e); }
     }
 
-    // 4. OBSERVAÇÕES
+    function renderizarAgendamentos() {
+      const container = document.getElementById('lista-agendamentos');
+      const badge = document.getElementById('badge-agendamentos');
+      const btn = document.getElementById('btn-toggle-hoje');
+      const title = document.getElementById('agend-title');
+      const subtitle = document.getElementById('agend-subtitle');
+
+      const hojeFormatado = new Date().toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      title.textContent = apenasHoje ? 'Agendamentos do Dia' : 'Todos os Agendamentos';
+      subtitle.textContent = apenasHoje ? `Serviços programados para hoje (${hojeFormatado})` : 'Prevenções, eventos e tarefas agendadas';
+      btn.textContent = apenasHoje ? 'Só Hoje' : 'Todos';
+
+      const dados = apenasHoje ? todosAgendamentos.filter(a => a.eHoje) : todosAgendamentos;
+      badge.textContent = `${dados.length} ${dados.length === 1 ? 'SERVIÇO' : 'SERVIÇOS'}`;
+
+      if (dados.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center p-4 text-center bg-slate-900/30 border border-dashed border-slate-800 rounded-md">
+            <div class="text-2xl mb-1 text-amber-400">📅</div>
+            <div class="text-xs font-bold text-slate-200">${apenasHoje ? `Sem agendamentos previstos para hoje (${hojeFormatado})` : 'Sem agendamentos registados.'}</div>
+            <div class="text-[10px] text-slate-400 mt-1">${apenasHoje ? 'Os próximos agendamentos aparecerão automaticamente quando chegar o respetivo dia.' : ''}</div>
+            ${apenasHoje && todosAgendamentos.length > 0 ? `
+              <button onclick="toggleFiltroHoje()" class="mt-2 text-[11px] text-amber-400 hover:text-amber-300 underline font-semibold">
+                Ver agendamentos das próximas datas (${todosAgendamentos.length})
+              </button>
+            ` : ''}
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = dados.map(a => `
+        <div class="p-2.5 rounded-md bg-slate-900/80 border border-slate-800 hover:border-amber-900/40">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-950/60 text-amber-300 border border-amber-800/50">
+              🕒 ${a.horaRaw || a.dataRaw}
+            </span>
+            ${a.eHoje ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">Hoje</span>' : ''}
+            ${!apenasHoje ? `<span class="text-[10px] font-mono text-slate-400">(${a.dataRaw})</span>` : ''}
+          </div>
+
+          <div class="font-semibold text-xs sm:text-sm text-slate-100">${a.desc}</div>
+
+          <!-- Meios Alocados -->
+          ${a.meios.length > 0 ? `
+            <div class="mt-2 pt-1.5 border-t border-slate-800/70">
+              <div class="text-[10px] font-semibold text-sky-400 mb-1">Meios Alocados:</div>
+              <div class="flex flex-wrap gap-1.5">
+                ${a.meios.map(m => {
+                  const meta = getVehicleMeta(m);
+                  return `
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${meta.color} border">
+                      <span>${meta.icon}</span><span>${m}</span>
+                    </span>`;
+                }).join('')}
+              </div>
+            </div>` : ''}
+
+          <!-- Equipas Operacionais com Elementos Individuais -->
+          ${a.equipas.length > 0 ? `
+            <div class="mt-2 pt-1.5 border-t border-slate-800/70">
+              <div class="text-[10px] font-semibold text-emerald-400 mb-1">Equipa Operacional (${a.equipas.length} elementos):</div>
+              <div class="flex flex-wrap gap-1.5">
+                ${a.equipas.map(el => {
+                  const isNum = /^\d+$/.test(el);
+                  return `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-950/70 text-emerald-200 border border-emerald-500/40 shadow-sm">
+                      <span>👤</span><span>${isNum ? `Nº ${el}` : el}</span>
+                    </span>`;
+                }).join('')}
+              </div>
+            </div>` : ''}
+        </div>`).join('');
+    }
+
+    function toggleFiltroHoje() {
+      apenasHoje = !apenasHoje;
+      renderizarAgendamentos();
+    }
+
+    // Carregar Observações
     async function carregarObservacoes() {
-      const container = document.getElementById('container-observacoes');
       try {
-        const res = await fetch(obterUrlGviz(GID_COMUNICACOES));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
+        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_COMUNICACOES}`);
+        const rows = parseCSV(await res.text());
+        const dados = rows.slice(1).map(r => ({
+          texto: (r[0] || '').trim(), autor: (r[1] || '').trim()
+        })).filter(o => o.texto);
 
-        container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const obsValidas = todasLinhas.filter(row => {
-          if (!row[1] || row[1].trim() === '') return false;
-
-          const col0 = (row[0] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-          const col1 = (row[1] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-
-          if (col0.includes('titulo') || col0 === 'header' || col0 === 'data') return false;
-          if (col1 === 'observacoes' || col1 === 'observacao' || col1 === 'texto') return false;
-
-          return true;
-        });
-
-        if (obsValidas.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
+        document.getElementById('badge-observacoes').textContent = `${dados.length} NOTAS`;
+        const container = document.getElementById('lista-observacoes');
+        if (dados.length === 0) {
+          container.innerHTML = '<div class="text-xs text-slate-500 italic p-3 text-center">Nenhuma comunicação pendente.</div>';
           return;
         }
 
-        obsValidas.forEach(row => {
-          const titulo = row[0] || '';
-          const obsTexto = row[1] || '';
-
-          const div = document.createElement('div');
-          div.className = 'card card-observacao';
-          div.innerHTML = `
-            ${titulo ? `<div class="obs-titulo"><i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b;"></i> ${titulo}</div>` : ''}
-            <div class="obs-texto">${obsTexto}</div>
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
-      }
+        container.innerHTML = dados.map(o => `
+          <div class="p-2.5 rounded-md bg-slate-900/80 border border-slate-800">
+            <div class="text-xs sm:text-sm text-slate-200">${o.texto}</div>
+            ${o.autor ? `<div class="text-[10px] font-mono text-emerald-400 mt-1 font-semibold">— ${o.autor}</div>` : ''}
+          </div>`).join('');
+      } catch (e) { console.warn(e); }
     }
 
-    // 5. METEOROLOGIA IPMA
-    async function carregarMeteoIPMA() {
-      const containerTicker = document.getElementById('ticker-texto');
-      if (!containerTicker) return;
-
+    // Carregar IPMA
+    async function carregarIPMA() {
       try {
-        const [resMeteo, resTipos, resRcm] = await Promise.all([
-          fetch(URL_IPMA_METEO),
-          fetch(URL_IPMA_TIPOS),
-          fetch(URL_IPMA_RCM).catch(() => null)
-        ]);
-
-        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro IPMA");
-
-        const dataMeteo = await resMeteo.json();
-        const dataTipos = await resTipos.json();
-
-        const prev = dataMeteo.data[0];
-        const tMin = Math.round(prev.tMin);
-        const tMax = Math.round(prev.tMax);
-        const probChuva = prev.precipitaProb;
-        const dirVento = prev.predWindDir || 'N/D';
-        
-        const velVentoVal = (prev.classWindSpeed || 1) * 12; 
-        const rajadaVentoVal = Math.round(velVentoVal * 1.8);
-
-        const tipoObjeto = dataTipos.data.find(t => t.idWeatherType === prev.idWeatherType);
-        const descTempo = tipoObjeto ? tipoObjeto.descWeatherTypePT : 'Tempo Variável';
-
-        let ffmcVal = 87.4;
-        let isiVal = 5.8;
-        let fwiVal = 14.2;
-
-        if (resRcm && resRcm.ok) {
-          const dataRcm = await resRcm.json();
-          const dataChave = Object.keys(dataRcm)[0];
-          if (dataChave && dataRcm[dataChave] && dataRcm[dataChave][DICO_BRAGA]) {
-            const rcmObj = dataRcm[dataChave][DICO_BRAGA];
-            if (rcmObj.ffmc) ffmcVal = rcmObj.ffmc;
-            if (rcmObj.isi) isiVal = rcmObj.isi;
-            if (rcmObj.fwi) fwiVal = rcmObj.fwi;
-          }
+        const res = await fetch('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json');
+        const data = await res.json();
+        if (data && data.data && data.data.length > 0) {
+          const hojeMeteo = data.data[0];
+          document.getElementById('ipma-temp').textContent = `Min ${hojeMeteo.tMin}°C / Max ${hojeMeteo.tMax}°C`;
+          document.getElementById('ipma-vento').textContent = `Vento: ${hojeMeteo.predWindDir || 'N/A'}`;
+          document.getElementById('ipma-precip').textContent = `Prob. Chuva: ${hojeMeteo.precipitaProb || 0}%`;
         }
-
-        const mensagens = [
-          `🌤️ <strong>Previsão:</strong> ${descTempo}`,
-          `🌡️ <strong>Temp. Máx / Mín:</strong> ${tMax}°C / ${tMin}°C`,
-          `🌧️ <strong>Prob. Chuva:</strong> ${probChuva}%`,
-          `💨 <strong>Vento:</strong> ${velVentoVal} km/h (${dirVento})`,
-          `🌪️ <strong>Rajada Vento:</strong> ${rajadaVentoVal} km/h`,
-          `📊 <strong>FFMC:</strong> ${ffmcVal}`,
-          `📈 <strong>ISI:</strong> ${isiVal}`,
-          `🔥 <strong>Índice FWI:</strong> ${fwiVal}`
-        ];
-
-        containerTicker.innerHTML = mensagens
-          .map(msg => `<span class="ticker-item">${msg}</span>`)
-          .join('<span class="ticker-separador">✦</span>');
-
-      } catch (err) {
-        containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
+      } catch (e) {
+        document.getElementById('ipma-temp').textContent = 'Meteorologia IPMA disponível';
       }
     }
 
-    function carregarTodosOsDados() {
-      carregarTeatroOperacoes();
-      carregarViaturasINOP();
-      carregarAgendamentos();
-      carregarObservacoes();
-      carregarMeteoIPMA();
+    // Relógio Digital
+    function atualizarRelogio() {
+      const now = new Date();
+      document.getElementById('clock-time').textContent = 
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock-date').textContent = now.toLocaleDateString('pt-PT', {
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+      });
     }
 
-    setInterval(carregarTodosOsDados, 10000);
-    carregarTodosOsDados();
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+      else document.exitFullscreen().catch(() => {});
+    }
+
+    // Ciclo de atualização global (10 segundos)
+    async function atualizarTudo() {
+      const statusEl = document.getElementById('sync-status');
+      if (statusEl) statusEl.textContent = 'A SINCRONIZAR...';
+      await Promise.all([
+        carregarTeatros(),
+        carregarViaturas(),
+        carregarAgendamentos(),
+        carregarObservacoes(),
+        carregarIPMA()
+      ]);
+      if (statusEl) statusEl.textContent = 'EM DIRETO (10s)';
+    }
+
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
+    atualizarTudo();
+    setInterval(atualizarTudo, 10000);
   </script>
 </body>
 </html>
