@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<BSB Braga html>
 <html lang="pt">
 <head>
 <meta charset="utf-8"/>
@@ -379,17 +379,28 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
+    /* Função de Ícones de Viaturas Atualizada com FontAwesome */
     function obterIconeVeiculoSVG(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
-      const style = 'style="width: 100%; height: 100%; object-fit: contain;"';
-      
+      const style = 'style="font-size: clamp(1.4rem, 2.2vh, 2rem);"';
+
+      // Ambulâncias / ABSC
       if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X05nEiZz1ujeGojWBrUwgwKEQu9l8jIZLMSk5hegmJynRKblkEE_crAC0BFAMSxQnziNIHnM9k_Sl9Wqx43FCJUiCeeR587EgTV4uAgfmsQ2yFQAnUFwjeBGq_zhk2vtDy0cUzCO6lxxht5qvUSjqeuWW6_c0fjbD4BjxvQ0ixADivtv_RkJDbXE14u2Tq_mwtA9bHMMm8xyVvcgS6bVCBQWuYvkJz3NbVZTyHb3qiKNmcqXchU9I0vzor" ${style}>`;
+        return `<i class="fa-solid fa-truck-medical" style="color: #ef4444; ${style}"></i>`;
       }
+      
+      // Viaturas de Comando / Operacionais (VCOT, VCOC, VOPE)
       if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('VCOT') || nome.includes('VOPE')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1WHcN6GtjV6nPRpCYTUPT1M4EbplSOATAh3sral_FBqU_98kQs8K3UQ3Cu0CYeAkYj7GhZC0rm1sEL_MRmmVvUgM1yWaxzmBqtT-er4jn-QnAThQ-tLWAddgIRQ1s3iooGNGlzJL6rWDZ78jWile2aJ7oPComoo4QeY6HoGCA2ciFh3fCzRadnKq450mdovH8vHBxTOXFyfHbmGKrmheJsywBv6IE_d5GYSg4nz96G5B0Z9xNSH-iZY9dXi" ${style}>`;
+        return `<i class="fa-solid fa-car-side" style="color: #38bdf8; ${style}"></i>`;
       }
-      return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X9o9T1-ySyJOt4RGo5aAVBYMpp8ArbUwI6JkYyVUJYJQ0e--u63OJ4UNrf0RBdwkiAaXpd4yRchxIfK87N6NAzkeq-zOFfuFnc74uFsbju2GfQnx0uRry6HxLNw5CfqcXgSzdCzLsCDjZUb0MXbPDkgi4tNd40TPxZ82060N8ZyAfgpsw99RkY7gvWqXTkJrPa6HvUEbB8yUjTbWT6qeRvnpG2Zrv3vRY3Wg_PTDYp3iybN-drFPyS7iUC" ${style}>`;
+      
+      // Viaturas Urbanas / Florestais / Tanques (VFCI, VTTU, VLCI, etc.)
+      if (nome.startsWith('VFCI') || nome.startsWith('VTTU') || nome.startsWith('VLCI') || nome.startsWith('VTPT') || nome.includes('COMBATE')) {
+        return `<i class="fa-solid fa-fire-extinguisher" style="color: #f97316; ${style}"></i>`;
+      }
+
+      // Ícone padrão para outros veículos de Bombeiros (Camião)
+      return `<i class="fa-solid fa-truck-droplet" style="color: #f59e0b; ${style}"></i>`;
     }
 
     function converterDataTimestamp(dataStr) {
@@ -514,7 +525,7 @@
             div.className = 'card card-to';
             
             const badgesHTML = canais.map(c => 
-              `<span class="badge-canal ${c.classe}"><img src="https://lh3.googleusercontent.com/aida/AEtjO1Uigq01cgKGOR3dU2-oD_I07t90S4tBR68IktYDQgYegy2jRfja3Rr7FDIlOMF34tjIaD5fSL1IpKiNT2EauggtCl_5YHmLwzgFRPokHJVg3Gi3avYYQgHbZ3r0WTiH4qYJUbJpa4BAVwcboXiteeKKLzbBkv8BhvsJAzgNguKiAjkKSVKInO-jW7RW5RHzxHcEO-NleF64jG-JrVDBPz_dj8ZWQfGsYKo2tpui1uLz08tEPU5nOG5ZtAQl" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle; margin-right: 4px;"> ${c.texto}</span>`
+              `<span class="badge-canal ${c.classe}"><i class="fa-solid fa-walkie-talkie" style="margin-right: 4px;"></i> ${c.texto}</span>`
             ).join('');
             
             let textoData = '';
