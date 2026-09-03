@@ -40,22 +40,20 @@
       display: flex;
       flex-direction: column;
       gap: clamp(6px, 1vh, 12px);
+      height: 100vh; /* Garante ocupação de 100% do ecrã */
     }
 
+    /* Distribui o espaço vertical para ocupar a ecrã toda */
     section { 
       display: flex; 
       flex-direction: column; 
       min-height: 0; 
+      flex: 1; /* Força as secções a esticarem */
     }
 
-    section:nth-of-type(1),
-    section:nth-of-type(2),
-    section:nth-of-type(3) {
-      flex: 1;
-    }
-
+    /* Secção de Observações com maior destaque proporcional */
     section:nth-of-type(4) {
-      flex: 2.2;
+      flex: 1.8; 
     }
 
     .seccao-titulo {
@@ -91,6 +89,7 @@
       gap: 4px;
       position: relative;
       overflow: hidden;
+      height: 100%; /* Ocupa a altura da secção */
     }
 
     .card-to { 
@@ -376,9 +375,9 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';
     const DICO_BRAGA = '0303';
 
-    // Coleção de Desenhos de Viaturas de Bombeiros em Vector SVG
+    // Coleção de Ilustrações de Viaturas de Bombeiros em SVG
     const ILUSTRACOES_VEICULOS = {
-      // Camião Pesado de Combate (VUCI, VFCI, VTTU, VABTR, etc.)
+      // Camião Pesado (VUCI, VFCI, VTTU, VABTR, etc.)
       camiaoPesado: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
         <rect x="10" y="22" width="60" height="30" rx="3" fill="#dc2626"/>
         <rect x="12" y="25" width="25" height="12" rx="1" fill="#cbd5e1" opacity="0.3"/>
@@ -410,7 +409,7 @@
         <circle cx="88" cy="50" r="4" fill="#94a3b8"/>
       </svg>`,
 
-      // Veículo Ligeiro de Comando / Operações (VCOT, VCOC, VOPE, Ligeiro)
+      // Veículo Ligeiro de Comando / Operações (VCOT, VCOC, VOPE)
       veiculoComando: `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
         <path d="M 12 38 L 30 38 L 48 24 L 80 24 L 98 38 L 108 38 L 108 52 L 12 52 Z" fill="#dc2626"/>
         <path d="M 32 37 L 48 27 L 62 27 L 62 37 Z" fill="#38bdf8" opacity="0.85"/>
@@ -429,7 +428,6 @@
         <path d="M 72 22 L 96 22 L 106 34 L 106 52 L 72 52 Z" fill="#dc2626"/>
         <path d="M 75 25 L 92 25 L 98 33 L 75 33 Z" fill="#38bdf8" opacity="0.85"/>
         <rect x="10" y="38" width="96" height="5" fill="#facc15"/>
-        <!-- Cruz Amarela -->
         <rect x="34" y="28" width="12" height="4" fill="#facc15"/>
         <rect x="38" y="24" width="4" height="12" fill="#facc15"/>
         <rect x="80" y="18" width="10" height="4" rx="1" fill="#2563eb"/>
@@ -440,31 +438,22 @@
       </svg>`
     };
 
-    /* Função que Seleciona a Imagem da Viatura conforme a Tipologia */
     function obterIconeVeiculoSVG(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
 
-      // 1. Ambulâncias
       if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
         return ILUSTRACOES_VEICULOS.ambulancia;
       }
-      
-      // 2. Viaturas de Comando / Apoio / Ligeiro Operacional (VCOT, VCOC, VOPE)
       if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('VCOT') || nome.includes('VOPE')) {
         return ILUSTRACOES_VEICULOS.veiculoComando;
       }
-
-      // 3. Veículos Ligeiros de Combate (VLCI, Pick-up, VTTG)
       if (nome.startsWith('VLCI') || nome.includes('VLCI') || nome.startsWith('VTTG')) {
         return ILUSTRACOES_VEICULOS.veiculoLigeiroCombate;
       }
-
-      // 4. Camiões Pesados / Tanques / Urbana / Florestal (VUCI, VFCI, VTTU, VABTR, etc.)
       if (nome.startsWith('VUCI') || nome.startsWith('VFCI') || nome.startsWith('VTTU') || nome.startsWith('VABTR') || nome.includes('VUCI') || nome.includes('COMBATE') || nome.includes('CAMIAO')) {
         return ILUSTRACOES_VEICULOS.camiaoPesado;
       }
 
-      // Imagem Padrão (Camião Pesado de Bombeiros)
       return ILUSTRACOES_VEICULOS.camiaoPesado;
     }
 
