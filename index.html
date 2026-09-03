@@ -42,11 +42,23 @@
       gap: clamp(6px, 1vh, 12px);
     }
 
+    /* Ajuste proporcional de cada secção */
     section { 
-      flex: 1; 
       display: flex; 
       flex-direction: column; 
       min-height: 0; 
+    }
+
+    /* As 3 primeiras secções mantêm a proporção padrão (1x) */
+    section:nth-of-type(1),
+    section:nth-of-type(2),
+    section:nth-of-type(3) {
+      flex: 1;
+    }
+
+    /* A secção de Observações recebe mais de o dobro do espaço vertical (2.2x) */
+    section:nth-of-type(4) {
+      flex: 2.2;
     }
 
     .seccao-titulo {
@@ -221,25 +233,31 @@
       word-break: break-word;
     }
 
-    /* Observações */
-    .card-observacao { border-left: 4px solid var(--accent-purple); }
+    /* Observações Otimizadas */
+    .card-observacao { 
+      border-left: 4px solid var(--accent-purple); 
+      justify-content: flex-start;
+      overflow-y: auto;
+    }
+    
     .obs-titulo { 
-      font-weight: 700; 
+      font-weight: 800; 
       color: #c084fc; 
-      font-size: clamp(0.7rem, 1.1vh, 0.95rem); 
+      font-size: clamp(0.8rem, 1.3vh, 1.1rem); 
       text-transform: uppercase; 
       display: flex; 
       align-items: center; 
-      gap: 5px; 
+      gap: 6px; 
+      line-height: 1.2;
     }
     
     .obs-texto { 
-      font-size: clamp(0.8rem, 1.3vh, 1.1rem); 
+      font-size: clamp(0.85rem, 1.4vh, 1.2rem); 
       font-weight: 600; 
       color: #ffffff; 
       word-break: break-word;
-      line-height: 1.3;
-      margin-top: 2px; 
+      line-height: 1.35;
+      margin-top: 4px; 
     }
 
     .sem-registos { 
@@ -434,7 +452,7 @@
       return linhas.map(linha => parseLinha(linha));
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (ATUALIZADO PARA MÚLTIPLOS CANAIS)
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarTeatroOperacoes() {
       const container = document.getElementById('container-to');
       try {
@@ -464,7 +482,6 @@
           const adicionarCanal = (val, classePadrao) => {
             if (!val) return;
 
-            // Divide múltiplos canais na mesma célula por vírgula, barra ou hífen
             const subCanais = val.split(/[,/\-]+/);
 
             subCanais.forEach(item => {
