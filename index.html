@@ -1,5 +1,4 @@
 <!BSB html>
-<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -20,62 +19,80 @@
     }
 
     body {
-      padding: 15px;
-      padding-bottom: 55px;
+      padding: 12px;
+      padding-bottom: 50px;
     }
 
+    /* CABEÇALHO COMPACTO E PROFISSIONAL */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #080d17;
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: 1px solid #1a2638;
-      margin-bottom: 15px;
+      background: linear-gradient(180deg, #0f172a 0%, #080d17 100%);
+      padding: 6px 16px;
+      border-radius: 6px;
+      border: 1px solid #1e293b;
+      border-left: 4px solid #0284c7;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     .header-title {
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: #38bdf8;
-      font-size: 1.2rem;
-      font-weight: bold;
+      gap: 8px;
+      color: #e2e8f0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    .clock {
+    .header-title span.badge-bsb {
       background-color: #0284c7;
-      padding: 6px 16px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 1.2rem;
+      color: #ffffff;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .clock {
+      background-color: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+      padding: 3px 12px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      font-family: monospace;
     }
 
     .dashboard-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 12px;
     }
 
     .card {
       background-color: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 8px;
-      padding: 15px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
     }
 
     .card-header {
-      font-size: 0.95rem;
-      font-weight: bold;
+      font-size: 0.9rem;
+      font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: 0.5px;
     }
 
     .card-header.blue { color: #38bdf8; }
@@ -106,8 +123,8 @@
     }
 
     .item-icon-svg {
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 32px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -119,7 +136,7 @@
       height: 100%;
     }
 
-    .item-details h4 { font-size: 0.95rem; color: #f8fafc; }
+    .item-details h4 { font-size: 0.9rem; color: #f8fafc; }
     .item-details p { font-size: 0.75rem; color: #94a3b8; }
 
     .badge-inop {
@@ -127,21 +144,29 @@
       color: white;
       font-size: 0.7rem;
       font-weight: bold;
-      padding: 4px 8px;
+      padding: 3px 6px;
       border-radius: 4px;
     }
 
-    .bombeiros-list {
+    /* BADGES DAS EQUIPAS COM CAPACETE */
+    .bombeiros-container {
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       gap: 6px;
       margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .bombeiros-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 600;
     }
 
     .bombeiro-tag {
       background-color: #0f172a;
-      border: 1px solid #38bdf8;
-      color: #38bdf8;
+      border: 1px solid #f97316;
+      color: #ffedd5;
       font-size: 0.75rem;
       font-weight: bold;
       padding: 2px 6px;
@@ -151,6 +176,12 @@
       gap: 4px;
     }
 
+    .bombeiro-tag svg {
+      width: 14px;
+      height: 14px;
+      fill: #f97316;
+    }
+
     .canal-card {
       background-color: #1e293b;
       padding: 10px;
@@ -158,31 +189,32 @@
       border-left: 4px solid #38bdf8;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .canal-card .canal-icon {
-      width: 32px;
-      height: 32px;
+    .canal-icon-radio {
+      width: 28px;
+      height: 36px;
       flex-shrink: 0;
     }
 
-    .canal-card h4 { font-size: 0.85rem; margin-bottom: 2px; }
+    .canal-card h4 { font-size: 0.85rem; margin-bottom: 4px; color: #f8fafc; }
     .badge-canal {
       background-color: #0284c7;
       color: white;
       font-size: 0.75rem;
-      padding: 2px 6px;
+      padding: 2px 8px;
       border-radius: 4px;
       display: inline-block;
       font-weight: bold;
+      letter-spacing: 0.5px;
     }
 
     .meteo-header {
       display: flex;
       justify-content: space-between;
       background-color: #1e293b;
-      padding: 10px;
+      padding: 8px 12px;
       border-radius: 6px;
       margin-bottom: 10px;
       font-size: 0.85rem;
@@ -191,34 +223,33 @@
     .meteo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
       text-align: center;
     }
 
     .meteo-item {
       background-color: #1e293b;
-      padding: 10px;
+      padding: 8px;
       border-radius: 6px;
     }
 
-    .meteo-item .value { font-size: 1.1rem; font-weight: bold; margin-top: 4px; }
+    .meteo-item .value { font-size: 1.05rem; font-weight: bold; margin-top: 2px; }
     .meteo-item .label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; }
     .fwi-high { color: #ef4444; }
 
-    /* RODAPÉ MAIS LENTO (90s) */
+    /* RODAPÉ TICKER */
     .footer-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 38px;
-      background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      height: 34px;
+      background: #080d17;
       border-top: 2px solid #facc15;
       color: #ffffff;
       display: flex;
       align-items: center;
       overflow: hidden;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
       z-index: 9999;
     }
 
@@ -227,7 +258,7 @@
       padding-left: 100%;
       display: inline-block;
       animation: ticker 90s linear infinite;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -248,9 +279,10 @@
 </head>
 <body>
 
+  <!-- CABEÇALHO COMPACTO -->
   <header>
     <div class="header-title">
-      🛡️ BATALHÃO DE SAPADORES BOMBEIROS DE BRAGA — PAINEL OPERACIONAL
+      🛡️ BATALHÃO DE SAPADORES BOMBEIROS DE BRAGA <span class="badge-bsb">CENTCOM</span>
     </div>
     <div class="clock" id="relogio">--:--:--</div>
   </header>
@@ -348,7 +380,6 @@
       });
     }
 
-    // Auxiliar: Converte texto DD/MM/AAAA em Objeto Date
     function parseDataPT(str) {
       if (!str || !str.trim()) return null;
       const limpo = str.trim().split(' ')[0];
@@ -357,7 +388,6 @@
       return new Date(partes[2], partes[1] - 1, partes[0]);
     }
 
-    // Valida se HOJE está entre Data Início e Data Fim
     function estaAtivoNoIntervalo(dataInicioStr, dataFimStr) {
       const agora = new Date();
       agora.setHours(0, 0, 0, 0);
@@ -373,7 +403,6 @@
       return true;
     }
 
-    // Valida se a data corresponde estritamente ao DIA ATUAL
     function ehDataDeHoje(dataStr) {
       const d = parseDataPT(dataStr);
       if (!d) return false;
@@ -383,77 +412,44 @@
              d.getFullYear() === agora.getFullYear();
     }
 
-    // SIMBOLOGIA GRÁFICA REALISTA DE VEÍCULOS DE BOMBEIROS E EMERGÊNCIA
-    function obterIconoVeiculoSVG(texto) {
-      const txt = (texto || '').toUpperCase();
+    // ÍCONE DO RÁDIO PORTÁTIL DE TELECOMUNICAÇÕES (WALKIE-TALKIE / SIRESP)
+    const ICONE_RADIO_TELECOM = `<svg class="canal-icon-radio" viewBox="0 0 24 36" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Antena -->
+      <line x1="8" y1="1" x2="8" y2="10" stroke="#38bdf8" stroke-width="2.5"/>
+      <!-- Botão/Seletor de Canais Superior -->
+      <rect x="13" y="6" width="4" height="4" fill="#0284c7" rx="1"/>
+      <!-- Corpo Principal do Rádio -->
+      <rect x="4" y="10" width="16" height="24" rx="3" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+      <!-- Ecrã LCD -->
+      <rect x="7" y="13" width="10" height="6" fill="#0b1320" stroke="#0284c7" stroke-width="1"/>
+      <!-- Grelha do Altifalante -->
+      <line x1="7" y1="22" x2="17" y2="22" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="7" y1="25" x2="17" y2="25" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="7" y1="28" x2="17" y2="28" stroke="#38bdf8" stroke-width="1.5"/>
+    </svg>`;
 
-      // 1. AMBULÂNCIA / EMERGÊNCIA MÉDICA (ABSC, AEM, AMBULÂNCIA, ABTD)
-      if (txt.includes('ABSC') || txt.includes('ABTD') || txt.includes('AEM') || txt.includes('AMBUL')) {
-        return `<svg viewBox="0 0 48 32" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M 4 8 L 32 8 L 44 16 L 44 24 L 4 24 Z" fill="#1e293b"/>
-          <path d="M 32 8 L 32 16 L 44 16"/>
-          <path d="M 34 10 L 41 15 L 34 15 Z" fill="#0284c7" opacity="0.6"/>
-          <path d="M 18 11 V 19 M 14 15 H 22" stroke="#ef4444" stroke-width="2.5"/>
-          <circle cx="12" cy="24" r="4" fill="#0b1320" stroke="#ef4444"/>
-          <circle cx="36" cy="24" r="4" fill="#0b1320" stroke="#ef4444"/>
-          <rect x="30" y="5" width="4" height="3" fill="#38bdf8"/>
-        </svg>`;
-      }
+    // ÍCONE SVG DO CAPACETE DE BOMBEIRO
+    const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 24 24">
+      <path d="M12 2C7 2 3 6 3 11v3h18v-3c0-5-4-9-9-9zM4 15h16v2H4vz"/>
+      <path d="M12 4a1 1 0 0 1 1 1v4a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1z"/>
+      <rect x="2" y="17" width="20" height="2" rx="1"/>
+    </svg>`;
 
-      // 2. CAMINHÃO DE BOMBEIROS / PESADO DE COMBATE (VFCI, VUCI, VECI, VTTU, VSAE, VLCI)
-      if (txt.includes('VFCI') || txt.includes('VUCI') || txt.includes('VECI') || txt.includes('VTTU') || txt.includes('VSAE') || txt.includes('VLCI')) {
-        return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
-          <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
-          <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
-          <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
-          <rect x="34" y="6" width="5" height="3" fill="#38bdf8"/>
-          <circle cx="10" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
-          <circle cx="22" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
-          <circle cx="38" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
-        </svg>`;
-      }
-
-      // 3. VEÍCULO DE ELEVAÇÃO / ESCADA (VE30, VETA, ESCADA)
-      if (txt.includes('VE30') || txt.includes('VETA') || txt.includes('ESCADA') || txt.includes('PLATAFORMA')) {
-        return `<svg viewBox="0 0 48 32" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="14" width="26" height="10" fill="#1e293b"/>
-          <path d="M 30 14 H 42 L 45 18 V 24 H 30 Z" fill="#1e293b"/>
-          <path d="M 6 11 L 38 4" stroke="#facc15" stroke-width="2.5"/>
-          <path d="M 8 11 L 9 8 M 16 9 L 17 6 M 24 7 L 25 4" stroke="#ffffff"/>
-          <circle cx="12" cy="24" r="4" fill="#0b1320" stroke="#facc15"/>
-          <circle cx="36" cy="24" r="4" fill="#0b1320" stroke="#facc15"/>
-        </svg>`;
-      }
-
-      // 4. SUV / COMANDO / APOIO TÁTICO (VCOT, VCOC, VTTP, VTP, BRTP, VAOP)
-      if (txt.includes('VCOT') || txt.includes('VCOC') || txt.includes('VTTP') || txt.includes('VTP') || txt.includes('BRTP') || txt.includes('VAOP')) {
-        return `<svg viewBox="0 0 48 32" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M 4 15 L 12 9 L 30 9 L 38 15 L 44 16 V 23 H 4 Z" fill="#1e293b"/>
-          <path d="M 14 11 H 21 V 15 H 9 Z" fill="#0284c7" opacity="0.6"/>
-          <path d="M 23 11 H 29 L 34 15 H 23 Z" fill="#0284c7" opacity="0.6"/>
-          <rect x="20" y="6" width="6" height="3" fill="#38bdf8"/>
-          <circle cx="12" cy="23" r="4" fill="#0b1320" stroke="#f59e0b"/>
-          <circle cx="34" cy="23" r="4" fill="#0b1320" stroke="#f59e0b"/>
-        </svg>`;
-      }
-
-      // ÍCONE GENÉRICO OPERACIONAL
-      return `<svg viewBox="0 0 48 32" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 6 16 L 14 10 L 32 10 L 40 16 V 23 H 6 Z" fill="#1e293b"/>
-        <circle cx="14" cy="23" r="3.5" fill="#0b1320" stroke="#38bdf8"/>
-        <circle cx="32" cy="23" r="3.5" fill="#0b1320" stroke="#38bdf8"/>
+    // ÍCONE CAMIÃO DE BOMBEIROS PARA OS MEIOS
+    function obterIconoCaminhaoBombeiros() {
+      return `<svg viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
+        <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
+        <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
+        <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
+        <rect x="34" y="6" width="5" height="3" fill="#38bdf8"/>
+        <circle cx="10" cy="24" r="4" fill="#0b1320" stroke="#f97316"/>
+        <circle cx="22" cy="24" r="4" fill="#0b1320" stroke="#f97316"/>
+        <circle cx="38" cy="24" r="4" fill="#0b1320" stroke="#f97316"/>
       </svg>`;
     }
 
-    const ICONE_RADIO = `<svg class="canal-icon" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M16 3l-3 5H8a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V10a2 2 0 00-2-2h-1"/>
-      <line x1="12" y1="2" x2="12" y2="8"/>
-      <circle cx="12" cy="13" r="1"/>
-      <path d="M10 17h4"/>
-    </svg>`;
-
-    // 1. CANAIS RADIO (Mapeamento exato da Aba 'Canais Radio')
+    // 1. CANAIS RADIO
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
@@ -463,12 +459,11 @@
         const canaisAtivos = [];
 
         linhas.forEach(col => {
-          const dataInicio = col[0]; // Col A: Data inicio
-          const dataFim = col[1];    // Col B: Data Fim
-          const evento = col[2] || 'Teatro Operacional'; // Col C: Evento
+          const dataInicio = col[0];
+          const dataFim = col[1];
+          const evento = col[2] || 'Teatro Operacional';
 
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
-            // Percorre Col D em diante (Canais atribuídos)
             for (let i = 3; i < col.length; i++) {
               const canal = col[i];
               if (canal && canal.trim().length > 0) {
@@ -485,7 +480,7 @@
 
         container.innerHTML = canaisAtivos.map(item => `
           <div class="canal-card">
-            ${ICONE_RADIO}
+            ${ICONE_RADIO_TELECOM}
             <div>
               <h4>${item.evento}</h4>
               <span class="badge-canal">${item.canal}</span>
@@ -497,7 +492,7 @@
       }
     }
 
-    // 2. VEÍCULOS INOPERACIONAIS (Mapeamento exato da Aba 'Veículos')
+    // 2. VEÍCULOS INOPERACIONAIS
     async function carregarVeiculos() {
       try {
         const dados = await obterDadosAba(GIDS.veiculos);
@@ -505,7 +500,7 @@
         const container = document.getElementById('container-veiculos');
 
         const inops = linhas.filter(col => {
-          const estado = (col[1] || '').toUpperCase(); // Col B: Estado Operacional
+          const estado = (col[1] || '').toUpperCase();
           return estado.includes('INOP') || estado.includes('INOPERACIONAL');
         });
 
@@ -515,9 +510,9 @@
         }
 
         container.innerHTML = inops.map(col => {
-          const nomeVeiculo = col[0] || 'Veículo'; // Col A: Veículo
-          const observacao = col[2] || 'Avaria Registada'; // Col C: Observações
-          const svgIcon = obterIconoVeiculoSVG(nomeVeiculo);
+          const nomeVeiculo = col[0] || 'Veículo';
+          const observacao = col[2] || 'Avaria Registada';
+          const svgIcon = obterIconoCaminhaoBombeiros();
 
           return `
             <div class="item-card">
@@ -537,14 +532,13 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (Mapeamento exato da Aba 'Agendamento')
+    // 3. AGENDAMENTOS DO DIA (Com ícone de camião nos meios e capacete nas equipas)
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-agendamentos');
 
-        // Filtra rigorosamente eventos cuja Data (Col A) corresponde ao DIA ATUAL
         const agendamentosHoje = linhas.filter(col => ehDataDeHoje(col[0]));
 
         if (agendamentosHoje.length === 0) {
@@ -553,25 +547,38 @@
         }
 
         container.innerHTML = agendamentosHoje.map(col => {
-          const hora = col[1] ? `[${col[1]}] ` : ''; // Col B: Hora
-          const descricao = col[2] || '';             // Col C: Descrição
-          const meios = col[3] || '';                 // Col D: Meios Alocados
-          const equipas = col[4] || '';               // Col E: Equipas
+          const hora = col[1] ? `[${col[1]}] ` : '';
+          const descricao = col[2] || '';
+          const meios = col[3] || '';
+          const equipas = col[4] || '';
 
-          const svgVeiculo = obterIconoVeiculoSVG(meios + ' ' + descricao);
+          const svgCaminhao = obterIconoCaminhaoBombeiros();
 
-          const bombeirosTags = equipas ? equipas.split(/[,;/]/).map(num => 
-            num.trim() ? `<span class="bombeiro-tag">⛑️ ${num.trim()}</span>` : ''
-          ).join(' ') : '';
+          // Formatação dos elementos com capacete e número
+          const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
+            const numLimpo = num.trim();
+            return numLimpo ? `<span class="bombeiro-tag">${SVG_CAPACETE_BOMBEIRO} ${numLimpo}</span>` : '';
+          }).join('') : '';
 
           return `
             <div class="item-card" style="border-left-color: #f97316;">
               <div class="item-info">
-                <div class="item-icon-svg">${svgVeiculo}</div>
+                <div class="item-icon-svg">${svgCaminhao}</div>
                 <div class="item-details" style="width: 100%;">
-                  <p style="color: #f97316; font-weight: bold;">${hora}${descricao}</p>
-                  ${meios ? `<p style="color: #cbd5e1; font-size: 0.8rem; margin-top: 2px;">Meios: ${meios}</p>` : ''}
-                  ${bombeirosTags ? `<div class="bombeiros-list">${bombeirosTags}</div>` : ''}
+                  <p style="color: #fb923c; font-weight: bold; font-size: 0.95rem;">${hora}${descricao}</p>
+                  
+                  ${meios ? `
+                    <p style="color: #cbd5e1; font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                      <strong style="color: #94a3b8;">Meios:</strong> ${meios}
+                    </p>
+                  ` : ''}
+
+                  ${bombeirosBadges ? `
+                    <div class="bombeiros-container">
+                      <span class="bombeiros-label">Equipas:</span>
+                      ${bombeirosBadges}
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             </div>
@@ -582,11 +589,11 @@
       }
     }
 
-    // 4. COMUNICADOS (Mapeamento exato da Aba 'Comunicações')
+    // 4. COMUNICADOS
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
-        const linhas = dados.slice(1).filter(col => (col[0] || col[1])); // Col A: Título, Col B: Observações
+        const linhas = dados.slice(1).filter(col => (col[0] || col[1]));
 
         if (linhas.length > 0) {
           const texto = linhas.map(col => {
