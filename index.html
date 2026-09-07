@@ -3,520 +3,463 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batalhão de Sapadores Bombeiros de Braga — Painel Operacional</title>
+  <title>CENTCOM - Painel Operacional BSB Braga</title>
   <style>
+    /* Reset & Variáveis Básicas */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    html, body {
-      background-color: #0b1320;
-      color: #ffffff;
-      min-height: 100vh;
     }
 
     body {
-      padding: 15px;
-      padding-bottom: 55px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 20px;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #080d17;
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: 1px solid #1a2638;
-      margin-bottom: 15px;
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #38bdf8;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .clock {
-      background-color: #0284c7;
-      padding: 6px 16px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-
+    /* Grelha Principal Dashboard */
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 20px;
     }
 
-    .card {
-      background-color: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
+    .card-painel {
+      background-color: #1a233a;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    .card-header {
-      font-size: 0.95rem;
-      font-weight: bold;
+    .titulo-painel {
+      font-size: 1.1rem;
+      font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .card-header.blue { color: #38bdf8; }
-    .card-header.red { color: #f87171; }
-    .card-header.orange { color: #fb923c; }
+    .titulo-painel.canais { color: #38bdf8; }
+    .titulo-painel.inop { color: #f87171; }
+    .titulo-painel.agendamentos { color: #fbbf24; }
 
-    .grid-2-columns {
+    /* Grelha de Canais / TO */
+    .container-canais-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .canal-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 14px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       gap: 10px;
     }
 
-    .item-card {
-      background-color: #1e293b;
-      border-radius: 6px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-left: 4px solid #ef4444;
+    .canal-card h4 {
+      font-size: 0.95rem;
+      color: #f1f5f9;
+      font-weight: 600;
     }
 
-    .item-info {
+    .badge-canal {
+      display: inline-block;
+      background-color: #0284c7;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    /* Lista Veículos INOP */
+    .container-inop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .inop-card {
       display: flex;
       align-items: center;
       gap: 12px;
-      width: 100%;
+      background: #0f172a;
+      border-left: 4px solid #ef4444;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border-top: 1px solid #1e293b;
+      border-right: 1px solid #1e293b;
+      border-bottom: 1px solid #1e293b;
     }
 
-    .item-icon-svg {
-      width: 42px;
-      height: 42px;
-      flex-shrink: 0;
+    .inop-icon-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(239, 68, 68, 0.12);
+      padding: 10px;
+      border-radius: 8px;
+      flex-shrink: 0;
     }
 
-    .item-icon-svg svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor;
-      filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+    .inop-detalhes {
+      flex-grow: 1;
     }
 
-    .item-details h4 { font-size: 0.95rem; color: #f8fafc; }
-    .item-details p { font-size: 0.75rem; color: #94a3b8; }
+    .inop-detalhes h4 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #f8fafc;
+      font-weight: 700;
+    }
+
+    .inop-detalhes p {
+      margin: 2px 0 0 0;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
 
     .badge-inop {
-      background-color: #ef4444;
+      background-color: #dc2626;
       color: white;
       font-size: 0.7rem;
-      font-weight: bold;
+      font-weight: 700;
       padding: 4px 8px;
       border-radius: 4px;
     }
 
-    .bombeiros-list {
+    /* Lista Agendamentos */
+    .container-agendamentos-list {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .bombeiro-tag {
-      background-color: #0f172a;
+    .agendamento-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    .agendamento-icon {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .agendamento-conteudo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .agendamento-data {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    .agendamento-titulo {
+      font-size: 0.95rem;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .agendamento-veiculo {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .badge-frequencia {
+      background-color: #1e293b;
       border: 1px solid #38bdf8;
       color: #38bdf8;
       font-size: 0.75rem;
-      font-weight: bold;
-      padding: 2px 6px;
+      font-weight: 600;
+      padding: 2px 8px;
       border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      width: fit-content;
+      margin-top: 4px;
     }
 
-    .canal-card {
-      background-color: #1e293b;
+    /* Mensagem vazia */
+    .mensagem-vazio {
+      color: #94a3b8;
+      font-size: 0.9rem;
       padding: 10px;
-      border-radius: 6px;
-      border-left: 4px solid #38bdf8;
-    }
-
-    .canal-card h4 { font-size: 0.85rem; margin-bottom: 4px; }
-    .badge-canal {
-      background-color: #0284c7;
-      color: white;
-      font-size: 0.75rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-block;
-    }
-
-    .meteo-header {
-      display: flex;
-      justify-content: space-between;
-      background-color: #1e293b;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      font-size: 0.85rem;
-    }
-
-    .meteo-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      text-align: center;
-    }
-
-    .meteo-item {
-      background-color: #1e293b;
-      padding: 10px;
-      border-radius: 6px;
-    }
-
-    .meteo-item .value { font-size: 1.1rem; font-weight: bold; margin-top: 4px; }
-    .meteo-item .label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; }
-    .fwi-high { color: #ef4444; }
-
-    /* RODAPÉ E ANIMAÇÃO LENTA */
-    .footer-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 38px;
-      background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-      border-top: 2px solid #facc15;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
-      z-index: 9999;
-    }
-
-    .footer-text {
-      white-space: nowrap;
-      padding-left: 100%;
-      display: inline-block;
-      animation: ticker 50s linear infinite; /* Animação mais lenta */
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .footer-text span.highlight-yellow { color: #facc15; }
-    .footer-text span.highlight-cyan { color: #38bdf8; }
-
-    @keyframes ticker {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
-    }
-
-    @media (max-width: 900px) {
-      .dashboard-grid, .grid-2-columns { grid-template-columns: 1fr; }
+      grid-column: span 2;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-title">
-      🛡️ BATALHÃO DE SAPADORES BOMBEIROS DE BRAGA — PAINEL OPERACIONAL
-    </div>
-    <div class="clock" id="relogio">--:--:--</div>
-  </header>
-
   <div class="dashboard-grid">
 
-    <!-- TEATRO DE OPERAÇÕES / CANAIS (2 COLUNAS) -->
-    <div class="card">
-      <div class="card-header blue">📻 TEATRO DE OPERAÇÕES / CANAIS</div>
-      <div class="grid-2-columns" id="container-canais"></div>
-    </div>
-
-    <!-- VEÍCULOS INOPERACIONAIS (INOP) (2 COLUNAS) -->
-    <div class="card">
-      <div class="card-header red">⚠️ VEÍCULOS INOPERACIONAIS (INOP)</div>
-      <div class="grid-2-columns" id="container-veiculos"></div>
-    </div>
-
-    <!-- AGENDAMENTOS DO DIA -->
-    <div class="card">
-      <div class="card-header orange">📅 AGENDAMENTOS DO DIA</div>
-      <div style="display: flex; flex-direction: column; gap: 10px;" id="container-agendamentos"></div>
-    </div>
-
-    <!-- METEOROLOGIA & RISCO -->
-    <div class="card">
-      <div class="card-header blue">🌧️ METEOROLOGIA & RISCO (IPMA BRAGA)</div>
-      <div class="meteo-header">
-        <span>🌤️ Céu pouco nublado</span>
-        <span>🌡️ 30°C / 14°C</span>
-        <span>🌧️ Prob. Chuva: 0.0%</span>
-      </div>
-      <div class="meteo-grid">
-        <div class="meteo-item"><div class="value">12 km/h</div><div class="label">Vento (W)</div></div>
-        <div class="meteo-item"><div class="value">22 km/h</div><div class="label">Rajada Máx</div></div>
-        <div class="meteo-item"><div class="value fwi-high">14.2</div><div class="label">Índice FWI</div></div>
-        <div class="meteo-item"><div class="value">87.4</div><div class="label">Índice FFMC</div></div>
-        <div class="meteo-item"><div class="value">5.8</div><div class="label">Índice ISI</div></div>
-        <div class="meteo-item"><div class="value" style="color: #4ade80;">BRAGA</div><div class="label">Concelho (0303)</div></div>
+    <!-- 1. QUADRO: TEATRO DE OPERAÇÕES / CANAIS -->
+    <div class="card-painel">
+      <h3 class="titulo-painel canais">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/></svg>
+        Teatro de Operações / Canais
+      </h3>
+      <div id="container-canais" class="container-canais-grid">
+        <p class="mensagem-vazio">A carregar dados...</p>
       </div>
     </div>
 
-  </div>
-
-  <div class="footer-bar">
-    <div class="footer-text" id="ticker-comunicacoes">
-      <span class="highlight-cyan">📢 A CARREGAR DADOS...</span>
+    <!-- 2. QUADRO: VEÍCULOS INOPERACIONAIS (INOP) -->
+    <div class="card-painel">
+      <h3 class="titulo-painel inop">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Veículos Inoperacionais (INOP)
+      </h3>
+      <div id="container-inop" class="container-inop-grid">
+        <p class="mensagem-vazio">A carregar veículos...</p>
+      </div>
     </div>
+
+    <!-- 3. QUADRO: AGENDAMENTOS DO DIA -->
+    <div class="card-painel">
+      <h3 class="titulo-painel agendamentos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agendamentos do Dia
+      </h3>
+      <div id="container-agendamentos" class="container-agendamentos-list">
+        <p class="mensagem-vazio">A carregar agendamentos...</p>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    const SPREADSHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
-
+    // Configuração de IDs da tua folha de dados (Google Sheets ou API)
     const GIDS = {
-      canais: '881712175',
-      veiculos: '1032427330',
-      agendamentos: '959314983',
-      comunicados: '1196343008'
+      canais: '0',        // ID/Nome da Aba de Canais
+      inop: '1',          // ID/Nome da Aba de Veículos INOP
+      agendamentos: '2'   // ID/Nome da Aba de Agendamentos
     };
 
-    // Coleção de Ícones SVGs Realistas
-    const SVG_ICONS = {
-      // Camião de Bombeiros / Veículo Pesado
-      pesado: `<svg viewBox="0 0 64 64"><path d="M58,32H54V20a2,2,0,0,0-2-2H36V12a2,2,0,0,0-2-2H28a2,2,0,0,0-2,2v6H12a2,2,0,0,0-2,2V32H6a2,2,0,0,0-2,2V46a2,2,0,0,0,2,2H10a6,6,0,0,0,12,0H42a6,6,0,0,0,12,0H58a2,2,0,0,0,2-2V34A2,2,0,0,0,58,32ZM16,48a3,3,0,1,1,3-3A3,3,0,0,1,16,48ZM30,14h4v4H30ZM48,48a3,3,0,1,1,3-3A3,3,0,0,1,48,48ZM54,30H38V22H54ZM14,22H34V30H14Z"/></svg>`,
+    // ==========================================
+    // VALIDATION DE DATA (FILTRO EXCLUSÃO)
+    // ==========================================
+    function estaAtivo(dataFimStr) {
+      if (!dataFimStr) return true;
       
-      // Ambulância
-      ambulancia: `<svg viewBox="0 0 64 64"><path d="M58 26h-6v-8a2 2 0 0 0-2-2H12a2 2 0 0 0-2 2v20H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a6 6 0 0 0 12 0h20a6 6 0 0 0 12 0h4a2 2 0 0 0 2-2V28a2 2 0 0 0-2-2zm-42 22a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm32 0a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm6-16H36V20h18zm-28 0h-6v-4h6v-6h4v6h6v4h-6v6h-4z"/></svg>`,
-      
-      // Veículo Ligeiro de Comando (VCOT)
-      ligeiro: `<svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM7.5 17C6.67 17 6 16.33 6 15.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>`,
-      
-      padrao: `<svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>`
-    };
-
-    function atualizarRelogio() {
       const agora = new Date();
-      document.getElementById('relogio').textContent = 
-        String(agora.getHours()).padStart(2, '0') + ':' +
-        String(agora.getMinutes()).padStart(2, '0') + ':' +
-        String(agora.getSeconds()).padStart(2, '0');
-    }
-    setInterval(atualizarRelogio, 1000);
-    atualizarRelogio();
-
-    async function obterDadosAba(gid) {
-      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Erro de acesso");
-      const texto = await response.text();
-      
-      const linhas = texto.split('\n').filter(l => l.trim().length > 0);
-      return linhas.map(linha => {
-        const resultado = [];
-        let dentroDeAspas = false;
-        let campo = '';
-        
-        for (let c of linha) {
-          if (c === '"') {
-            dentroDeAspas = !dentroDeAspas;
-          } else if (c === ',' && !dentroDeAspas) {
-            resultado.push(campo.trim().replace(/^"|"$/g, ''));
-            campo = '';
-          } else {
-            campo += c;
-          }
-        }
-        resultado.push(campo.trim().replace(/^"|"$/g, ''));
-        return resultado;
-      });
-    }
-
-    function parseData(str) {
-      if (!str) return null;
-      const partes = str.trim().split(' ');
-      if (partes.length === 0) return null;
-      
+      const partes = dataFimStr.trim().split(' ');
       const dataPartes = partes[0].split('/').map(Number);
-      if (dataPartes.length < 3) return null;
+      
+      if (dataPartes.length < 3) return true;
+      
       const [d, m, a] = dataPartes;
+      let h = 23, min = 59, seg = 59; // Se não tiver hora, assume até ao fim do dia
 
-      let h = 0, min = 0;
       if (partes.length >= 2) {
         const horaPartes = partes[1].split(':').map(Number);
-        h = horaPartes[0] || 0;
-        min = horaPartes[1] || 0;
+        h = horaPartes[0] ?? 23;
+        min = horaPartes[1] ?? 59;
       }
 
-      return new Date(a, m - 1, d, h, min);
+      const fim = new Date(a, m - 1, d, h, min, seg);
+      return agora <= fim; // Retorna true apenas se ainda NÃO passou da Data Fim
     }
 
-    // Valida se está dentro do período ativo e não expirou
-    function estaNoIntervaloAtivo(dataInicioStr, dataFimStr) {
-      if (!dataInicioStr) return true;
-      const agora = new Date();
-      const inicio = parseData(dataInicioStr);
-      const fim = parseData(dataFimStr);
+    // ==========================================
+    // ÍCONES SVG VETORIAIS E PROFISSIONAIS
+    // ==========================================
+    function obterIconeVeiculo(nomeVeiculo) {
+      const nome = (nomeVeiculo || '').toUpperCase();
 
-      if (inicio && agora < inicio) return false;
-      if (fim && agora > fim) return false;
-      
-      return true;
-    }
-
-    // Valida estritamente se o agendamento pertence ao dia de HOJE
-    function ehDoDiaAtual(dataInicioStr) {
-      if (!dataInicioStr) return false;
-      const inicio = parseData(dataInicioStr);
-      if (!inicio) return false;
-
-      const agora = new Date();
-      return inicio.getDate() === agora.getDate() &&
-             inicio.getMonth() === agora.getMonth() &&
-             inicio.getFullYear() === agora.getFullYear();
-    }
-
-    // Seleciona a imagem SVG conforme o tipo de veículo
-    function obterIconoVeiculoSVG(texto) {
-      const txt = (texto || '').toUpperCase();
-      if (txt.includes('ABSC') || txt.includes('ABTD') || txt.includes('AMBUL') || txt.includes('ABSA')) {
-        return SVG_ICONS.ambulancia;
+      // Combate a Incêndios / Pesados (VFCI, VTTU, VLCI, VECI, etc.)
+      if (nome.includes('VFCI') || nome.includes('VTTU') || nome.includes('VLCI') || nome.includes('VECI')) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+          <path d="M15 18H9"/>
+          <path d="M19 18h2a1 1 0 0 0 1-1v-3.28a1 1 0 0 0-.3-.7l-3.2-3.2a1 1 0 0 0-.7-.3H14"/>
+          <circle cx="6.5" cy="17.5" r="2.5"/>
+          <circle cx="16.5" cy="17.5" r="2.5"/>
+        </svg>`;
       }
-      if (txt.includes('VCOT')) {
-        return SVG_ICONS.ligeiro;
+
+      // Ambulâncias e Emergência Médica (ABSC, AEM, VMER)
+      if (nome.includes('ABSC') || nome.includes('AEM') || nome.includes('AMBULANCIA')) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 10H6v4h4v4h4v-4h4v-4h-4V6h-4v4z"/>
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+        </svg>`;
       }
-      if (txt.includes('VFCI') || txt.includes('VUCI') || txt.includes('VSAE') || txt.includes('VTTU') || txt.includes('VECI') || txt.includes('VEICULO')) {
-        return SVG_ICONS.pesado;
-      }
-      return SVG_ICONS.padrao;
+
+      // Comando, Logística e Transporte (VCOT, VTTP, BRTP, VTP)
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.0 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/>
+        <circle cx="7" cy="17" r="2"/>
+        <circle cx="17" cy="17" r="2"/>
+      </svg>`;
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (Apenas ativos no momento)
+    const ICONE_VISITA = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+    const ICONE_SERVICO = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+
+
+    // ==========================================
+    // FUNÇÃO AUXILIAR DE TESTE / CARREGAMENTO DADOS
+    // (Substituir 'obterDadosAba' pela tua função do Google Sheets)
+    // ==========================================
+    async function obterDadosAba(abaId) {
+      // Exemplo mock para teste. Aqui liga a tua leitura do Google Sheets
+      if (abaId === GIDS.canais) {
+        return [
+          ["Nome/Teatro", "Canal/Frequência", "Data Início", "Data Fim"],
+          ["Teatro Operacional 01", "Canal 01 - 168.300", "01/01/2026", "31/12/2030"], // Ativo
+          ["Operação Apoio Norte", "Canal 05 - 169.100", "01/09/2026", "05/09/2026"], // Já passou (OCULTO)
+          ["Reforço Incêndios", "SIRESP T1", "04/09/2026", "06/09/2026"]              // Já passou (OCULTO)
+        ];
+      }
+      if (abaId === GIDS.inop) {
+        return [
+          ["Veículo", "Avaria"],
+          ["VFCI 06", "Avaria Mecânica"],
+          ["VTTU 01", "Avaria Registada"],
+          ["VTTP 01", "Avaria Registada"],
+          ["BRTP 01", "Avaria Registada"]
+        ];
+      }
+      if (abaId === GIDS.agendamentos) {
+        return [
+          ["Data/Hora", "Descrição", "Veículo/Obs", "Canais"],
+          ["07/09/2026 até 10h00 - 13h00", "Visita ao Quartel - Centro de Estudos Saber Plural", "", ""],
+          ["07/09/2026 até 16h", "Teste de Equipamento", "VCOT 01", "5, 10, 15, 20"]
+        ];
+      }
+      return [];
+    }
+
+
+    // ==========================================
+    // RENDERING DOS QUADROS
+    // ==========================================
+
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-canais');
         
-        const ativos = linhas.filter(col => estaNoIntervaloAtivo(col[2], col[3]));
+        // Filtra para esconder o que ultrapassou a Data Fim
+        const ativos = linhas.filter(col => {
+          const dataFim = col[3] || col[1];
+          return estaAtivo(dataFim);
+        });
 
         if (ativos.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2;">Sem canais ativos no momento.</p>';
+          container.innerHTML = '<p class="mensagem-vazio">Sem canais/operações ativos no momento.</p>';
           return;
         }
 
-        container.innerHTML = ativos.map(col => `
-          <div class="canal-card">
-            <h4>${col[0] || 'Geral'}</h4>
-            <span class="badge-canal">📟 ${col[1] || ''}</span>
-          </div>
-        `).join('');
+        container.innerHTML = ativos.map(col => {
+          const nomeTeatro = col[0] || 'Geral';
+          const canalFreq = col[1] || '';
+
+          return `
+            <div class="canal-card">
+              <h4>${nomeTeatro}</h4>
+              <span class="badge-canal">📟 ${canalFreq}</span>
+            </div>
+          `;
+        }).join('');
       } catch (e) {
         console.error("Erro nos Canais:", e);
       }
     }
 
-    // 2. VEÍCULOS INOPERACIONAIS (INOP) (Com ícones realistas: Ambulância/Camião)
-    async function carregarVeiculos() {
+    // 2. VEÍCULOS INOPERACIONAIS
+    async function carregarVeiculosInop() {
       try {
-        const dados = await obterDadosAba(GIDS.veiculos);
+        const dados = await obterDadosAba(GIDS.inop);
         const linhas = dados.slice(1);
-        const container = document.getElementById('container-veiculos');
+        const container = document.getElementById('container-inop');
 
-        const inops = linhas.filter(col => {
-          const estado = (col[1] || '').toLowerCase();
-          return estado.includes('inop') || estado.includes('inoperacional');
-        });
-
-        if (inops.length === 0) {
-          container.innerHTML = '<p style="color:#4ade80; grid-column: span 2;">Sem veículos INOP.</p>';
+        if (!linhas || linhas.length === 0) {
+          container.innerHTML = '<p style="color:#4ade80; padding:10px;">Todos os veículos estão operacionais.</p>';
           return;
         }
 
-        container.innerHTML = inops.map(col => {
-          const nomeVeiculo = col[0] || '';
-          const svgIcon = obterIconoVeiculoSVG(nomeVeiculo);
+        container.innerHTML = linhas.map(col => {
+          const veiculo = col[0] || 'Veículo';
+          const avaria = col[1] || 'Avaria Registada';
+          const icone = obterIconeVeiculo(veiculo);
 
           return `
-            <div class="item-card">
-              <div class="item-info">
-                <div class="item-icon-svg" style="color: #ef4444;">${svgIcon}</div>
-                <div class="item-details">
-                  <h4>${nomeVeiculo}</h4>
-                  <p>${col[2] || 'Avaria Registada'}</p>
-                </div>
+            <div class="inop-card">
+              <div class="inop-icon-wrapper">
+                ${icone}
+              </div>
+              <div class="inop-detalhes">
+                <h4>${veiculo}</h4>
+                <p>${avaria}</p>
               </div>
               <span class="badge-inop">INOP</span>
             </div>
           `;
         }).join('');
       } catch (e) {
-        console.error("Erro nos Veículos:", e);
+        console.error("Erro nos Veículos INOP:", e);
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (Exclusivo do dia atual + Capacetes nos números)
+    // 3. AGENDAMENTOS DO DIA
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-agendamentos');
 
-        // Filtra para mostrar apenas agendamentos do dia de HOJE
-        const agendamentosHoje = linhas.filter(col => ehDoDiaAtual(col[0]));
-
-        if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8;">Sem agendamentos previstos para o dia de hoje.</p>';
+        if (!linhas || linhas.length === 0) {
+          container.innerHTML = '<p class="mensagem-vazio">Sem agendamentos previstos para hoje.</p>';
           return;
         }
 
-        container.innerHTML = agendamentosHoje.map(col => {
-          const dataInicio = col[0] || '';
-          const dataFim = col[1] || '';
-          const titulo = col[2] || '';
-          const detalhes = col[3] || '';
-          const bombeirosRaw = col[4] || '';
+        container.innerHTML = linhas.map(col => {
+          const dataHora = col[0] || '';
+          const descricao = col[1] || '';
+          const veiculoOuObs = col[2] || '';
+          const canais = col[3] || '';
 
-          const svgVeiculo = obterIconoVeiculoSVG(detalhes + ' ' + titulo);
-
-          // Gera a lista de bombeiros com capacete ⛑️ antes do número interno
-          const bombeirosTags = bombeirosRaw ? bombeirosRaw.split(';').map(num => 
-            `<span class="bombeiro-tag">⛑️ ${num.trim()}</span>`
-          ).join(' ') : '';
-
-          const periodoTexto = dataFim ? `${dataInicio} até ${dataFim}` : dataInicio;
+          const icone = veiculoOuObs 
+            ? obterIconeVeiculo(veiculoOuObs) 
+            : (descricao.toLowerCase().includes('visita') ? ICONE_VISITA : ICONE_SERVICO);
 
           return `
-            <div class="item-card" style="border-left-color: #f97316;">
-              <div class="item-info">
-                <div class="item-icon-svg" style="color: #f97316;">${svgVeiculo}</div>
-                <div class="item-details" style="width: 100%;">
-                  <p style="color: #f97316; font-weight: bold;">${periodoTexto}</p>
-                  <h4>${titulo}</h4>
-                  <p>${detalhes}</p>
-                  ${bombeirosTags ? `<div class="bombeiros-list">${bombeirosTags}</div>` : ''}
-                </div>
+            <div class="agendamento-card">
+              <div class="agendamento-icon">
+                ${icone}
+              </div>
+              <div class="agendamento-conteudo">
+                <span class="agendamento-data">${dataHora}</span>
+                <h4 class="agendamento-titulo">${descricao}</h4>
+                ${veiculoOuObs ? `<p class="agendamento-veiculo">${veiculoOuObs}</p>` : ''}
+                ${canais ? `<div class="badge-frequencia">📟 ${canais}</div>` : ''}
               </div>
             </div>
           `;
@@ -526,39 +469,12 @@
       }
     }
 
-    // 4. COMUNICADOS (RODAPÉ) - Passagem mais lenta
-    async function carregarComunicados() {
-      try {
-        const dados = await obterDadosAba(GIDS.comunicados);
-        const linhas = dados.slice(1);
-        
-        const ativos = linhas.filter(col => estaNoIntervaloAtivo(col[2], col[3]));
-
-        if (ativos.length > 0) {
-          const texto = ativos.map(col => {
-            const titulo = col[0] || '';
-            const observacao = col[1] ? ` — ${col[1]}` : '';
-            return `<span class="highlight-cyan">📢 ${titulo}</span><span class="highlight-yellow">${observacao}</span>`;
-          }).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
-
-          document.getElementById('ticker-comunicacoes').innerHTML = texto;
-        } else {
-          document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-cyan">SEM COMUNICADOS ATIVOS NO MOMENTO</span>';
-        }
-      } catch (e) {
-        console.error("Erro nos Comunicados:", e);
-      }
-    }
-
-    function sincronizarTudo() {
+    // Inicialização ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
       carregarCanais();
-      carregarVeiculos();
+      carregarVeiculosInop();
       carregarAgendamentos();
-      carregarComunicados();
-    }
-
-    sincronizarTudo();
-    setInterval(sincronizarTudo, 30000);
+    });
   </script>
 </body>
 </html>
