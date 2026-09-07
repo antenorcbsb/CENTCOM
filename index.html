@@ -155,9 +155,18 @@
       padding: 10px;
       border-radius: 6px;
       border-left: 4px solid #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .canal-card h4 { font-size: 0.85rem; margin-bottom: 4px; }
+    .canal-card .canal-icon {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .canal-card h4 { font-size: 0.85rem; margin-bottom: 2px; }
     .badge-canal {
       background-color: #0284c7;
       color: white;
@@ -165,6 +174,7 @@
       padding: 2px 6px;
       border-radius: 4px;
       display: inline-block;
+      font-weight: bold;
     }
 
     .meteo-header {
@@ -337,29 +347,42 @@
       });
     }
 
-    // Filtra exclusivamente o que NÃO ultrapassou a Data Fim
-    function naoUltrapassouDataFim(dataFimStr) {
-      if (!dataFimStr) return true;
-      
+    // Validação rigorosa de intervalo de datas/horas (Data Início e Data Fim)
+    function estaAtivoNoMomento(dataInicioStr, dataFimStr) {
       const agora = new Date();
-      const partes = dataFimStr.trim().split(' ');
-      const dataPartes = partes[0].split('/').map(Number);
-      if (dataPartes.length < 3) return true;
 
-      const [d, m, a] = dataPartes;
-      let h = 23, min = 59, seg = 59;
+      // Função auxiliar para converter string "DD/MM/AAAA [HH:MM]" em Objeto Date
+      function parseData(str, eFim = false) {
+        if (!str || !str.trim()) return null;
+        const partes = str.trim().split(' ');
+        const dataPartes = partes[0].split('/').map(Number);
+        if (dataPartes.length < 3) return null;
 
-      if (partes.length >= 2) {
-        const horaPartes = partes[1].split(':').map(Number);
-        h = horaPartes[0] ?? 23;
-        min = horaPartes[1] ?? 59;
+        const [d, m, a] = dataPartes;
+        let h = eFim ? 23 : 0;
+        let min = eFim ? 59 : 0;
+
+        if (partes.length >= 2) {
+          const horaPartes = partes[1].split(':').map(Number);
+          h = horaPartes[0] ?? h;
+          min = horaPartes[1] ?? min;
+        }
+        return new Date(a, m - 1, d, h, min, 0);
       }
 
-      const fim = new Date(a, m - 1, d, h, min, seg);
-      return agora <= fim;
+      const dInicio = parseData(dataInicioStr, false);
+      const dFim = parseData(dataFimStr, true);
+
+      // Se existir data de início e a data atual for anterior, ainda não está ativo
+      if (dInicio && agora < dInicio) return false;
+
+      // Se existir data de fim e a data atual for posterior, já expirou
+      if (dFim && agora > dFim) return false;
+
+      return true;
     }
 
-    // Filtra rigorosamente agendamentos do DIA ATUAL
+    // Filtra exclusivamente agendamentos do DIA ATUAL
     function ehDoDiaAtual(dataInicioStr) {
       if (!dataInicioStr) return false;
       const partes = dataInicioStr.trim().split(' ');
@@ -372,40 +395,78 @@
       return d === agora.getDate() && (m - 1) === agora.getMonth() && a === agora.getFullYear();
     }
 
-    // Ícones Vetoriais SVG Limpos e Limpos
+    // SIMBOLOGIA TÉCNICA E OPERACIONAL PARA VEÍCULOS DE BOMBEIROS
     function obterIconoVeiculoSVG(texto) {
       const txt = (texto || '').toUpperCase();
-      if (txt.includes('ABSC') || txt.includes('ABTD') || txt.includes('AMBUL')) {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10H6v4h4v4h4v-4h4v-4h-4V6h-4v4z"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>`;
+
+      // Ambulância (ABSC / AEM / AMBULÂNCIA)
+      if (txt.includes('ABSC') || txt.includes('ABTD') || txt.includes('AEM') || txt.includes('AMBUL')) {
+        return `<svg viewBox="0 0 32 32" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="8" width="28" height="16" rx="2"/>
+          <path d="M16 11v10M11 16h10" stroke-width="2.5"/>
+          <circle cx="8" cy="24" r="3" fill="#0b1320"/>
+          <circle cx="24" cy="24" r="3" fill="#0b1320"/>
+        </svg>`;
       }
-      if (txt.includes('VFCI') || txt.includes('VTTU') || txt.includes('VUCI') || txt.includes('VSAE')) {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.28a1 1 0 0 0-.3-.7l-3.2-3.2a1 1 0 0 0-.7-.3H14"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>`;
+
+      // Autobomba / Combate Urbano/Florestal (VFCI, VUCI, VECI, VTTU, VSAE)
+      if (txt.includes('VFCI') || txt.includes('VUCI') || txt.includes('VECI') || txt.includes('VTTU') || txt.includes('VSAE') || txt.includes('VLCI')) {
+        return `<svg viewBox="0 0 32 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 10h18v12H2z"/>
+          <path d="M20 14h8l3 4v4h-11z"/>
+          <path d="M6 10V6h10v4"/>
+          <circle cx="8" cy="22" r="3" fill="#0b1320"/>
+          <circle cx="23" cy="22" r="3" fill="#0b1320"/>
+        </svg>`;
       }
-      if (txt.includes('VISITA') || txt.includes('QUARTEL')) {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+
+      // Comando / Apoio / Transporte (VCOT, VTTP, VTP, BRTP)
+      if (txt.includes('VCOT') || txt.includes('VTTP') || txt.includes('VTP') || txt.includes('BRTP')) {
+        return `<svg viewBox="0 0 32 32" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 14l3-6h14l4 6v8H3z"/>
+          <circle cx="8" cy="22" r="3" fill="#0b1320"/>
+          <circle cx="22" cy="22" r="3" fill="#0b1320"/>
+          <path d="M12 8v6M18 8v6"/>
+        </svg>`;
       }
-      return `<svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.0 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`;
+
+      // Ícone para Visitas / Serviços Especiais
+      return `<svg viewBox="0 0 32 32" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4a6 6 0 100 12 6 6 0 000-12z"/>
+        <path d="M6 28v-2a10 10 0 0120 0v2"/>
+      </svg>`;
     }
 
-    // 1. CANAIS (Apenas que não ultrapassaram a Data Fim)
+    // ÍCONE DE RÁDIO PORTÁTIL / PORTÁTIL WALKY-TALKY
+    const ICONE_RADIO = `<svg class="canal-icon" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 3l-3 5H8a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V10a2 2 0 00-2-2h-1"/>
+      <line x1="12" y1="2" x2="12" y2="8"/>
+      <circle cx="12" cy="13" r="1"/>
+      <path d="M10 17h4"/>
+    </svg>`;
+
+    // 1. CANAIS (Validação de Início e Fim rigorosa)
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-canais');
         
-        // Exclui registos passados (verifica Coluna 3 - Data Fim)
-        const ativos = linhas.filter(col => naoUltrapassouDataFim(col[3]));
+        // Coluna 2: Data Início | Coluna 3: Data Fim
+        const ativos = linhas.filter(col => estaAtivoNoMomento(col[2], col[3]));
 
         if (ativos.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2;">Sem canais ativos no momento.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo no momento.</p>';
           return;
         }
 
         container.innerHTML = ativos.map(col => `
           <div class="canal-card">
-            <h4>${col[0] || 'Geral'}</h4>
-            <span class="badge-canal">📟 ${col[1] || ''}</span>
+            ${ICONE_RADIO}
+            <div>
+              <h4>${col[0] || 'Teatro Operacional'}</h4>
+              <span class="badge-canal">${col[1] || 'CH'}</span>
+            </div>
           </div>
         `).join('');
       } catch (e) {
@@ -426,7 +487,7 @@
         });
 
         if (inops.length === 0) {
-          container.innerHTML = '<p style="color:#4ade80; grid-column: span 2;">Sem veículos INOP.</p>';
+          container.innerHTML = '<p style="color:#4ade80; grid-column: span 2; padding: 10px;">Todos os veículos estão operacionais.</p>';
           return;
         }
 
@@ -462,7 +523,7 @@
         const agendamentosHoje = linhas.filter(col => ehDoDiaAtual(col[0]));
 
         if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8;">Sem agendamentos previstos para o dia de hoje.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para hoje.</p>';
           return;
         }
 
@@ -475,7 +536,6 @@
 
           const svgVeiculo = obterIconoVeiculoSVG(detalhes + ' ' + titulo);
 
-          // Capacetes antes de cada número interno
           const bombeirosTags = bombeirosRaw ? bombeirosRaw.split(',').map(num => 
             `<span class="bombeiro-tag">⛑️ ${num.trim()}</span>`
           ).join(' ') : '';
@@ -507,7 +567,8 @@
         const dados = await obterDadosAba(GIDS.comunicados);
         const linhas = dados.slice(1);
 
-        const ativos = linhas.filter(col => naoUltrapassouDataFim(col[3]));
+        // Validação de intervalo do comunicado
+        const ativos = linhas.filter(col => estaAtivoNoMomento(col[2], col[3]));
 
         if (ativos.length > 0) {
           const texto = ativos.map(col => {
