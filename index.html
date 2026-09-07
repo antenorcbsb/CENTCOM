@@ -204,7 +204,7 @@
     .meteo-item .label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; }
     .fwi-high { color: #ef4444; }
 
-    /* RODAPÉ MAIS LENTO (90s) */
+    /* RODAPÉ LENTO (90s) */
     .footer-bar {
       position: fixed;
       bottom: 0;
@@ -225,7 +225,7 @@
       white-space: nowrap;
       padding-left: 100%;
       display: inline-block;
-      animation: ticker 90s linear infinite; /* VELOCIDADE SUAVIZADA */
+      animation: ticker 90s linear infinite;
       font-size: 0.95rem;
       font-weight: 700;
       letter-spacing: 0.5px;
@@ -347,7 +347,7 @@
       });
     }
 
-    // Validação rigorosa de intervalo de datas/horas (Data Início e Data Fim)
+    // Validação de intervalo de datas/horas (Data Início e Data Fim)
     function estaAtivoNoMomento(dataInicioStr, dataFimStr) {
       const agora = new Date();
 
@@ -378,7 +378,7 @@
       return true;
     }
 
-    // Filtra exclusivamente agendamentos / registos do DIA ATUAL
+    // Filtra exclusivamente registos do DIA ATUAL
     function ehDoDiaAtual(dataInicioStr) {
       if (!dataInicioStr) return false;
       const partes = dataInicioStr.trim().split(' ');
@@ -398,14 +398,10 @@
       // 1. AMBULÂNCIA / EMERGÊNCIA MÉDICA (ABSC, AEM, AMBULÂNCIA, ABTD)
       if (txt.includes('ABSC') || txt.includes('ABTD') || txt.includes('AEM') || txt.includes('AMBUL')) {
         return `<svg viewBox="0 0 48 32" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Corpo do Furgão / Ambulância -->
           <path d="M 4 8 L 32 8 L 44 16 L 44 24 L 4 24 Z" fill="#1e293b"/>
           <path d="M 32 8 L 32 16 L 44 16"/>
-          <!-- Janela Cabine -->
           <path d="M 34 10 L 41 15 L 34 15 Z" fill="#0284c7" opacity="0.6"/>
-          <!-- Cruzes de Emergência -->
           <path d="M 18 11 V 19 M 14 15 H 22" stroke="#ef4444" stroke-width="2.5"/>
-          <!-- Rodas e Luzes -->
           <circle cx="12" cy="24" r="4" fill="#0b1320" stroke="#ef4444"/>
           <circle cx="36" cy="24" r="4" fill="#0b1320" stroke="#ef4444"/>
           <rect x="30" y="5" width="4" height="3" fill="#38bdf8"/>
@@ -415,16 +411,11 @@
       // 2. CAMINHÃO DE BOMBEIROS / PESADO DE COMBATE (VFCI, VUCI, VECI, VTTU, VSAE, VLCI)
       if (txt.includes('VFCI') || txt.includes('VUCI') || txt.includes('VECI') || txt.includes('VTTU') || txt.includes('VSAE') || txt.includes('VLCI')) {
         return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Estrutura Principal e Tanque -->
           <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
-          <!-- Cabine Dupla de Comando -->
           <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
           <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
-          <!-- Escada no Tejadilho -->
           <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
-          <!-- Giropilhas -->
           <rect x="34" y="6" width="5" height="3" fill="#38bdf8"/>
-          <!-- Rodas Todo-o-Terreno -->
           <circle cx="10" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
           <circle cx="22" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
           <circle cx="38" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
@@ -434,35 +425,28 @@
       // 3. VEÍCULO DE ELEVAÇÃO / ESCADA (VETA, VE30, ESCADA)
       if (txt.includes('VETA') || txt.includes('VE30') || txt.includes('ESCADA') || txt.includes('PLATAFORMA')) {
         return `<svg viewBox="0 0 48 32" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Corpo Principal -->
           <rect x="4" y="14" width="26" height="10" fill="#1e293b"/>
           <path d="M 30 14 H 42 L 45 18 V 24 H 30 Z" fill="#1e293b"/>
-          <!-- Escada Articulada Extensível -->
           <path d="M 6 11 L 38 4" stroke="#facc15" stroke-width="2.5"/>
           <path d="M 8 11 L 9 8 M 16 9 L 17 6 M 24 7 L 25 4" stroke="#ffffff"/>
-          <!-- Rodas -->
           <circle cx="12" cy="24" r="4" fill="#0b1320" stroke="#facc15"/>
           <circle cx="36" cy="24" r="4" fill="#0b1320" stroke="#facc15"/>
         </svg>`;
       }
 
-      // 4. SUV / COMANDO / APOIO TÁTICO (VCOT, VTTP, VTP, BRTP, COMMAND)
+      // 4. SUV / COMANDO / APOIO TÁTICO (VCOT, VTTP, VTP, BRTP)
       if (txt.includes('VCOT') || txt.includes('VTTP') || txt.includes('VTP') || txt.includes('BRTP')) {
         return `<svg viewBox="0 0 48 32" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Silhueta SUV / 4x4 -->
           <path d="M 4 15 L 12 9 L 30 9 L 38 15 L 44 16 V 23 H 4 Z" fill="#1e293b"/>
-          <!-- Vidros do SUV -->
           <path d="M 14 11 H 21 V 15 H 9 Z" fill="#0284c7" opacity="0.6"/>
           <path d="M 23 11 H 29 L 34 15 H 23 Z" fill="#0284c7" opacity="0.6"/>
-          <!-- Pirilampo Superior -->
           <rect x="20" y="6" width="6" height="3" fill="#38bdf8"/>
-          <!-- Roda Sobresselente / Rodas SUV -->
           <circle cx="12" cy="23" r="4" fill="#0b1320" stroke="#f59e0b"/>
           <circle cx="34" cy="23" r="4" fill="#0b1320" stroke="#f59e0b"/>
         </svg>`;
       }
 
-      // ÍCONE GENÉRICO OPERACIONAL DE SERVIÇO
+      // ÍCONE GENÉRICO OPERACIONAL
       return `<svg viewBox="0 0 48 32" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M 6 16 L 14 10 L 32 10 L 40 16 V 23 H 6 Z" fill="#1e293b"/>
         <circle cx="14" cy="23" r="3.5" fill="#0b1320" stroke="#38bdf8"/>
@@ -470,7 +454,7 @@
       </svg>`;
     }
 
-    // ÍCONE DE RÁDIO PORTÁTIL / PORTÁTIL WALKY-TALKY
+    // ÍCONE DE RÁDIO PORTÁTIL
     const ICONE_RADIO = `<svg class="canal-icon" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M16 3l-3 5H8a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V10a2 2 0 00-2-2h-1"/>
       <line x1="12" y1="2" x2="12" y2="8"/>
@@ -478,31 +462,45 @@
       <path d="M10 17h4"/>
     </svg>`;
 
-    // 1. CANAIS (Filtrado estritamente para o DIA ATUAL e ATIVO NO MOMENTO)
+    // 1. CANAIS (Mapeamento corrigido baseado na estrutura exata da folha)
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
-        const linhas = dados.slice(1);
+        const linhas = dados.slice(1); // Ignora cabeçalho
         const container = document.getElementById('container-canais');
         
-        // Coluna 2: Data Início | Coluna 3: Data Fim
-        // Exige que esteja ATIVO no momento E PERTENCE ao DIA ATUAL
-        const ativosHoje = linhas.filter(col => estaAtivoNoMomento(col[2], col[3]) && ehDoDiaAtual(col[2]));
+        // Mapeamento correto das colunas:
+        // col[0]: Data inicio
+        // col[1]: Data Fim
+        // col[2]: Evento
+        // col[3] a col[7]: Canais (BSB, ROB, REPC, SIRESP, BSB_DMO)
+        const ativosHoje = linhas.filter(col => {
+          const dataInicio = col[0];
+          const dataFim = col[1];
+          return estaAtivoNoMomento(dataInicio, dataFim) && ehDoDiaAtual(dataInicio);
+        });
 
         if (ativosHoje.length === 0) {
           container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo para o dia de hoje.</p>';
           return;
         }
 
-        container.innerHTML = ativosHoje.map(col => `
-          <div class="canal-card">
-            ${ICONE_RADIO}
-            <div>
-              <h4>${col[0] || 'Teatro Operacional'}</h4>
-              <span class="badge-canal">${col[1] || 'CH'}</span>
+        container.innerHTML = ativosHoje.map(col => {
+          const evento = col[2] || 'Teatro Operacional';
+          
+          // Procura o primeiro canal preenchido entre as colunas D e H
+          const canalAtribuido = col[3] || col[4] || col[5] || col[6] || col[7] || 'CH';
+
+          return `
+            <div class="canal-card">
+              ${ICONE_RADIO}
+              <div>
+                <h4>${evento}</h4>
+                <span class="badge-canal">${canalAtribuido}</span>
+              </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } catch (e) {
         console.error("Erro nos Canais:", e);
       }
