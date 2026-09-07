@@ -100,11 +100,27 @@
     .item-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
     }
 
-    .item-icon { font-size: 1.5rem; }
+    /* Estilo para os ícones vetoriais mais reais */
+    .item-icon-svg {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-icon-svg svg {
+      width: 100%;
+      height: 100%;
+      fill: #f97316;
+      filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+    }
+
     .item-details h4 { font-size: 0.95rem; color: #f8fafc; }
     .item-details p { font-size: 0.75rem; color: #94a3b8; }
 
@@ -238,7 +254,7 @@
       <div class="grid-2-columns" id="container-canais"></div>
     </div>
 
-    <!-- VEÍCULOS INOPERACIONAIS (INOP) -->
+    <!-- VEÍCULOS INOPERACIONAIS (INOP) (2 COLUNAS) -->
     <div class="card">
       <div class="card-header red">⚠️ VEÍCULOS INOPERACIONAIS (INOP)</div>
       <div class="grid-2-columns" id="container-veiculos"></div>
@@ -286,6 +302,18 @@
       comunicados: '1196343008'
     };
 
+    // Ícones Vetoriais Realistas (SVG)
+    const SVG_ICONS = {
+      // Veículo Ligeiro de Comando (VCOT)
+      ligeiro: `<svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM7.5 17C6.67 17 6 16.33 6 15.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>`,
+      
+      // Veículo Pesado de Combate a Incêndios (VFCI, VUCI, VSAE, VTTU, VECI)
+      pesado: `<svg viewBox="0 0 64 64"><path d="M58,32H54V20a2,2,0,0,0-2-2H36V12a2,2,0,0,0-2-2H28a2,2,0,0,0-2,2v6H12a2,2,0,0,0-2,2V32H6a2,2,0,0,0-2,2V46a2,2,0,0,0,2,2H10a6,6,0,0,0,12,0H42a6,6,0,0,0,12,0H58a2,2,0,0,0,2-2V34A2,2,0,0,0,58,32ZM16,48a3,3,0,1,1,3-3A3,3,0,0,1,16,48ZM30,14h4v4H30ZM48,48a3,3,0,1,1,3-3A3,3,0,0,1,48,48ZM54,30H38V22H54ZM14,22H34V30H14Z"/></svg>`,
+      
+      // Genérico para eventos sem veículo
+      padrao: `<svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>`
+    };
+
     function atualizarRelogio() {
       const agora = new Date();
       document.getElementById('relogio').textContent = 
@@ -296,7 +324,6 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
 
-    // Leitor de CSV com suporte a vírgulas e aspas internas
     async function obterDadosAba(gid) {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
       const response = await fetch(url);
@@ -324,19 +351,27 @@
       });
     }
 
-    // Função de validação de horário de exibição
     function estaNoIntervaloAtivo(dataInicioStr, dataFimStr) {
-      if (!dataInicioStr) return true; // Se não tiver data estipulada, exibe por defeito
+      if (!dataInicioStr) return true;
       
       const agora = new Date();
       
-      // Formato esperado: DD/MM/AAAA HH:MM
       const parseData = (str) => {
         if (!str) return null;
         const partes = str.trim().split(' ');
-        if (partes.length < 2) return null;
-        const [d, m, a] = partes[0].split('/').map(Number);
-        const [h, min] = partes[1].split(':').map(Number);
+        if (partes.length === 0) return null;
+        
+        const dataPartes = partes[0].split('/').map(Number);
+        if (dataPartes.length < 3) return null;
+        const [d, m, a] = dataPartes;
+
+        let h = 0, min = 0;
+        if (partes.length >= 2) {
+          const horaPartes = partes[1].split(':').map(Number);
+          h = horaPartes[0] || 0;
+          min = horaPartes[1] || 0;
+        }
+
         return new Date(a, m - 1, d, h, min);
       };
 
@@ -349,19 +384,21 @@
       return true;
     }
 
-    // 1. Canais
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-canais');
         
-        if (linhas.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8;">Sem canais configurados.</p>';
+        const ativos = linhas.filter(col => estaNoIntervaloAtivo(col[2], col[3]));
+
+        if (ativos.length === 0) {
+          container.innerHTML = '<p style="color:#94a3b8;">Sem canais ativos no momento.</p>';
           return;
         }
 
-        container.innerHTML = linhas.map(col => `
+        container.innerHTML = ativos.map(col => `
           <div class="canal-card">
             <h4>${col[0] || 'Geral'}</h4>
             <span class="badge-canal">📟 ${col[1] || ''}</span>
@@ -372,25 +409,30 @@
       }
     }
 
-    // 2. Veículos INOP
+    // 2. VEÍCULOS INOPERACIONAIS (INOP)
     async function carregarVeiculos() {
       try {
         const dados = await obterDadosAba(GIDS.veiculos);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-veiculos');
 
-        if (linhas.length === 0) {
+        const inops = linhas.filter(col => {
+          const estado = (col[1] || '').toLowerCase();
+          return estado.includes('inop') || estado.includes('inoperacional');
+        });
+
+        if (inops.length === 0) {
           container.innerHTML = '<p style="color:#4ade80;">Sem veículos INOP.</p>';
           return;
         }
 
-        container.innerHTML = linhas.map(col => `
+        container.innerHTML = inops.map(col => `
           <div class="item-card">
             <div class="item-info">
-              <span class="item-icon">🚒</span>
+              <span class="item-icon-svg" style="color: #ef4444;">${SVG_ICONS.pesado}</span>
               <div class="item-details">
                 <h4>${col[0] || ''}</h4>
-                <p>${col[1] || 'Avaria Registada'}</p>
+                <p>${col[2] || 'Avaria Registada'}</p>
               </div>
             </div>
             <span class="badge-inop">INOP</span>
@@ -401,15 +443,25 @@
       }
     }
 
-    // 3. Agendamentos (Com Filtro de Data e Hora)
-    // Formato Colunas Excel: DataInicio | DataFim | Titulo | Detalhes | Bombeiros
+    // Seleciona o SVG realista com base na tipologia
+    function obterIconoVeiculoSVG(texto) {
+      const txt = (texto || '').toUpperCase();
+      if (txt.includes('VCOT')) {
+        return SVG_ICONS.ligeiro;
+      }
+      if (txt.includes('VFCI') || txt.includes('VUCI') || txt.includes('VSAE') || txt.includes('VTTU') || txt.includes('VECI')) {
+        return SVG_ICONS.pesado;
+      }
+      return SVG_ICONS.padrao;
+    }
+
+    // 3. AGENDAMENTOS DO DIA (Com ícones realistas)
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-agendamentos');
 
-        // Filtra para manter só agendamentos ativos no dia e hora atuais
         const ativos = linhas.filter(col => estaNoIntervaloAtivo(col[0], col[1]));
 
         if (ativos.length === 0) {
@@ -424,6 +476,8 @@
           const detalhes = col[3] || col[2] || '';
           const bombeirosRaw = col[4] || col[3] || '';
 
+          const svgVeiculo = obterIconoVeiculoSVG(detalhes);
+
           const bombeirosTags = bombeirosRaw ? bombeirosRaw.split(';').map(num => 
             `<span class="bombeiro-tag">⛑️ ${num.trim()}</span>`
           ).join(' ') : '';
@@ -433,7 +487,7 @@
           return `
             <div class="item-card" style="border-left-color: #f97316;">
               <div class="item-info">
-                <span class="item-icon">📅</span>
+                <div class="item-icon-svg">${svgVeiculo}</div>
                 <div class="item-details" style="width: 100%;">
                   <p style="color: #f97316; font-weight: bold;">${periodoTexto}</p>
                   <h4>${titulo}</h4>
@@ -449,20 +503,21 @@
       }
     }
 
-    // 4. Comunicados Rodapé (Com Filtro de Data/Hora e Suporte a Textos Longos)
-    // Formato Colunas Excel: TextoComunicado | DataInicio | DataFim
+    // 4. COMUNICADOS (RODAPÉ)
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
         const linhas = dados.slice(1);
         
-        // Filtra os comunicados programados para o momento atual
-        const ativos = linhas.filter(col => estaNoIntervaloAtivo(col[1], col[2]));
+        const ativos = linhas.filter(col => estaNoIntervaloAtivo(col[2], col[3]));
 
         if (ativos.length > 0) {
-          const texto = ativos.map(col => 
-            `<span class="highlight-cyan">📢</span> <span class="highlight-yellow">${col[0]}</span>`
-          ).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
+          const texto = ativos.map(col => {
+            const titulo = col[0] || '';
+            const observacao = col[1] ? ` — ${col[1]}` : '';
+            return `<span class="highlight-cyan">📢 ${titulo}</span><span class="highlight-yellow">${observacao}</span>`;
+          }).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
+
           document.getElementById('ticker-comunicacoes').innerHTML = texto;
         } else {
           document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-cyan">SEM COMUNICADOS ATIVOS NO MOMENTO</span>';
