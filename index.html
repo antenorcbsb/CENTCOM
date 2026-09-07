@@ -260,12 +260,12 @@
 
     .meteo-item {
       background-color: #1e293b;
-      padding: 8px;
+      padding: 10px;
       border-radius: 6px;
     }
 
-    .meteo-item .value { font-size: 1.05rem; font-weight: bold; margin-top: 2px; }
-    .meteo-item .label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; }
+    .meteo-item .value { font-size: 1.15rem; font-weight: bold; margin-top: 2px; }
+    .meteo-item .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
     .fwi-high { color: #ef4444; }
 
     /* RODAPÉ TICKER */
@@ -341,18 +341,24 @@
     <!-- METEOROLOGIA IPMA -->
     <div class="card">
       <div class="card-header blue">🌧️ METEOROLOGIA & RISCO (IPMA BRAGA)</div>
-      <div class="meteo-header">
+      <div class="meteo-header" id="meteo-resumo">
         <span>🌤️ Céu pouco nublado</span>
         <span>🌡️ 30°C / 14°C</span>
         <span>🌧️ Prob. Chuva: 0.0%</span>
       </div>
-      <div class="meteo-grid">
-        <div class="meteo-item"><div class="value">12 km/h</div><div class="label">Vento (W)</div></div>
-        <div class="meteo-item"><div class="value">22 km/h</div><div class="label">Rajada Máx</div></div>
-        <div class="meteo-item"><div class="value fwi-high">14.2</div><div class="label">Índice FWI</div></div>
-        <div class="meteo-item"><div class="value">87.4</div><div class="label">Índice FFMC</div></div>
-        <div class="meteo-item"><div class="value">5.8</div><div class="label">Índice ISI</div></div>
-        <div class="meteo-item"><div class="value" style="color: #4ade80;">BRAGA</div><div class="label">Concelho (0303)</div></div>
+      <div class="meteo-grid" id="meteo-valores">
+        <div class="meteo-item">
+          <div class="value" id="val-vento" style="color: #4ade80;">12 km/h</div>
+          <div class="label">Vento (W)</div>
+        </div>
+        <div class="meteo-item">
+          <div class="value" id="val-rajada" style="color: #facc15;">22 km/h</div>
+          <div class="label">Rajada Máx</div>
+        </div>
+        <div class="meteo-item">
+          <div class="value fwi-high" id="val-fwi">14.2</div>
+          <div class="label">Índice FWI</div>
+        </div>
       </div>
     </div>
 
@@ -447,6 +453,15 @@
              d.getFullYear() === agora.getFullYear();
     }
 
+    /* DETERMINAR COR COM BASE NA VELOCIDADE DO VENTO (km/h) */
+    function obterCorVento(velocidade) {
+      const v = parseFloat(velocidade) || 0;
+      if (v < 20) return '#4ade80'; // Verde (< 20 km/h)
+      if (v < 40) return '#facc15'; // Amarelo (20 - 39 km/h)
+      if (v < 60) return '#fb923c'; // Laranja (40 - 59 km/h)
+      return '#ef4444';            // Vermelho (>= 60 km/h)
+    }
+
     /* ÍCONES SVG */
     const ICONE_RADIO_TELECOM = `<svg class="canal-icon-radio" viewBox="0 0 24 36" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="8" y1="1" x2="8" y2="10" stroke="#38bdf8" stroke-width="2.5"/>
@@ -499,7 +514,7 @@
       <rect x="2" y="17" width="20" height="2" rx="1"/>
     </svg>`;
 
-    // 1. CANAIS RÁDIO (CORRIGIDO PARA MAPEAMENTO DAS COLUNAS A, B e C)
+    // 1. CANAIS RÁDIO
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
@@ -510,16 +525,15 @@
         const paletaCores = ['#38bdf8', '#fb923c', '#4ade80', '#facc15', '#a855f7'];
 
         linhas.forEach(col => {
-          const dataInicio = col[0]; // Coluna A: Data início
-          const dataFim = col[1];    // Coluna B: Data Fim
-          const evento = col[2] || 'Teatro Operacional'; // Coluna C: Evento
+          const dataInicio = col[0];
+          const dataFim = col[1];
+          const evento = col[2] || 'Teatro Operacional';
 
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
             if (!eventosMap[evento]) {
               eventosMap[evento] = [];
             }
             
-            // Colunas D, E, F, G, H (Índices 3 a 7)
             const colunasCanais = [col[3], col[4], col[5], col[6], col[7]];
 
             colunasCanais.forEach(canal => {
@@ -607,7 +621,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (HORA FORMATADA ABAIXO DO TÍTULO)
+    // 3. AGENDAMENTOS DO DIA
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
@@ -675,7 +689,23 @@
       }
     }
 
-    // 4. COMUNICADOS
+    // 4. METEOROLOGIA DINÂMICA (APLICAÇÃO DAS CORES NO VENTO E RAJADA)
+    function atualizarCoresMeteo(ventoVel, rajadaVel) {
+      const elVento = document.getElementById('val-vento');
+      const elRajada = document.getElementById('val-rajada');
+
+      if (elVento) {
+        elVento.textContent = `${ventoVel} km/h`;
+        elVento.style.color = obterCorVento(ventoVel);
+      }
+
+      if (elRajada) {
+        elRajada.textContent = `${rajadaVel} km/h`;
+        elRajada.style.color = obterCorVento(rajadaVel);
+      }
+    }
+
+    // 5. COMUNICADOS
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
@@ -702,6 +732,9 @@
       carregarVeiculos();
       carregarAgendamentos();
       carregarComunicados();
+      
+      // Exemplo de valores do vento a aplicar dinamicamente:
+      atualizarCoresMeteo(12, 22);
     }
 
     sincronizarTudo();
