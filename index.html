@@ -13,14 +13,14 @@
     }
 
     html, body {
-      background-color: #0b1320; /* Fundo escuro fixo sem espaços brancos */
+      background-color: #0b1320;
       color: #ffffff;
       min-height: 100vh;
     }
 
     body {
       padding: 15px;
-      padding-bottom: 55px; /* Espaço para o rodapé fixo */
+      padding-bottom: 55px;
     }
 
     /* Cabeçalho do Painel */
@@ -53,14 +53,14 @@
       font-size: 1.2rem;
     }
 
-    /* Layout Principal da Dashboard */
+    /* Layout Principal */
     .dashboard-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 15px;
     }
 
-    /* Estilo genérico dos Cards */
+    /* Estilo dos Cards */
     .card {
       background-color: #0f172a;
       border: 1px solid #1e293b;
@@ -84,14 +84,14 @@
     .card-header.red { color: #f87171; }
     .card-header.orange { color: #fb923c; }
 
-    /* Layout em 2 colunas */
+    /* Layouts Internos em Grelha */
     .grid-2-columns {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
 
-    /* Cartão Dinâmico */
+    /* Item Card Genérico */
     .item-card {
       background-color: #1e293b;
       border-radius: 6px;
@@ -132,7 +132,7 @@
       border-radius: 4px;
     }
 
-    /* Lista de Bombeiros / Capacete */
+    /* Lista de Bombeiros / Capacetes */
     .bombeiros-list {
       display: flex;
       flex-wrap: wrap;
@@ -142,7 +142,7 @@
 
     .bombeiro-tag {
       background-color: #0f172a;
-      border: 1px solid #3b82f6;
+      border: 1px solid #38bdf8;
       color: #38bdf8;
       font-size: 0.75rem;
       font-weight: bold;
@@ -153,25 +153,24 @@
       gap: 4px;
     }
 
-    /* Canais */
+    /* Canais (2 colunas) */
     .canal-card {
       background-color: #1e293b;
-      padding: 12px;
+      padding: 10px;
       border-radius: 6px;
       border-left: 4px solid #38bdf8;
-      margin-bottom: 8px;
     }
 
     .canal-card h4 {
-      font-size: 0.9rem;
-      margin-bottom: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
     }
 
     .badge-canal {
       background-color: #0284c7;
       color: white;
       font-size: 0.75rem;
-      padding: 3px 8px;
+      padding: 2px 6px;
       border-radius: 4px;
       display: inline-block;
     }
@@ -214,7 +213,7 @@
 
     .fwi-high { color: #ef4444; }
 
-    /* BARRA DE RODAPÉ (TICKER) */
+    /* Rodapé (Ticker) */
     .footer-bar {
       position: fixed;
       bottom: 0;
@@ -242,15 +241,8 @@
       text-transform: uppercase;
     }
 
-    .footer-text span.highlight-yellow {
-      color: #facc15;
-      text-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
-    }
-
-    .footer-text span.highlight-cyan {
-      color: #38bdf8;
-      text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-    }
+    .footer-text span.highlight-yellow { color: #facc15; }
+    .footer-text span.highlight-cyan { color: #38bdf8; }
 
     @keyframes ticker {
       0% { transform: translate3d(0, 0, 0); }
@@ -269,24 +261,21 @@
   <!-- CABEÇALHO -->
   <header>
     <div class="header-title">
-      🛡️ Batalhão de Sapadores Bombeiros de Braga — Painel Operacional
+      🛡️ BATALHÃO DE SAPADORES BOMBEIROS DE BRAGA — PAINEL OPERACIONAL
     </div>
-    <div class="clock" id="relogio">16:52:13</div>
+    <div class="clock" id="relogio">--:--:--</div>
   </header>
 
   <!-- GRELHA PRINCIPAL -->
   <div class="dashboard-grid">
 
-    <!-- TEATRO DE OPERAÇÕES / CANAIS -->
+    <!-- TEATRO DE OPERAÇÕES / CANAIS (2 COLUNAS) -->
     <div class="card">
       <div class="card-header blue">
         📻 TEATRO DE OPERAÇÕES / CANAIS
       </div>
-      <div id="container-canais">
-        <div class="canal-card">
-          <h4>Comunicações Gerais do Batalhão</h4>
-          <span class="badge-canal">📟 0301Geral</span>
-        </div>
+      <div class="grid-2-columns" id="container-canais">
+        <!-- Preenchido via Google Sheets -->
       </div>
     </div>
 
@@ -296,7 +285,7 @@
         ⚠️ VEÍCULOS INOPERACIONAIS (INOP)
       </div>
       <div class="grid-2-columns" id="container-veiculos">
-        <!-- Preenchido dinamicamente pelo Google Sheets -->
+        <!-- Preenchido via Google Sheets -->
       </div>
     </div>
 
@@ -306,7 +295,7 @@
         📅 AGENDAMENTOS DO DIA
       </div>
       <div style="display: flex; flex-direction: column; gap: 10px;" id="container-agendamentos">
-        <!-- Preenchido dinamicamente com suporte a N.º de Bombeiro com capacete ⛑️ -->
+        <!-- Preenchido via Google Sheets -->
       </div>
     </div>
 
@@ -350,16 +339,24 @@
 
   </div>
 
-  <!-- BARRA DE RODAPÉ -->
+  <!-- RODAPÉ DE COMUNICADOS -->
   <div class="footer-bar">
     <div class="footer-text" id="ticker-comunicacoes">
-      <span class="highlight-cyan">📢 A CARREGAR COMUNICAÇÕES...</span>
+      <span class="highlight-cyan">📢 A CARREGAR DADOS DO EXCEL...</span>
     </div>
   </div>
 
-  <!-- SCRIPTS DE SINCRONIZAÇÃO -->
   <script>
-    // RELÓGIO
+    const SPREADSHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
+
+    const GIDS = {
+      canais: '881712175',
+      veiculos: '1032427330',
+      agendamentos: '959314983',
+      comunicados: '1196343008'
+    };
+
+    // Relógio
     function atualizarRelogio() {
       const agora = new Date();
       document.getElementById('relogio').textContent = 
@@ -370,84 +367,140 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
 
-    // CONFIGURAÇÃO DO GOOGLE SHEETS
-    const SPREADSHEET_ID = 'O_TEU_SPREADSHEET_ID_AQUI'; // Insere o teu ID do Google Sheets
-    const GID_COMUNICACOES = '1196343008';
-
-    // FUNÇÃO AUXILIAR PARA LER CSV DAS ABAS
-    async function obterDadosCSV(gid) {
+    // Função de leitura CSV do Google Sheets
+    async function obterDadosAba(gid) {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}`;
       const response = await fetch(url);
-      if (!response.ok) throw new Error("Erro na ligação à folha");
+      if (!response.ok) throw new Error("Erro de acesso");
       const texto = await response.text();
-      return texto.split('\n').map(l => l.replace(/^"|"$/g, '').trim()).filter(l => l.length > 0);
+      return texto.split('\n')
+        .map(l => l.replace(/^"|"$/g, '').trim())
+        .filter(l => l.length > 0)
+        .map(l => l.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
     }
 
-    // 1. CARREGAR RODAPÉ (COMUNICAÇÕES)
-    async function carregarComunicacoes() {
+    // 1. Atualizar Canais (2 colunas)
+    async function carregarCanais() {
       try {
-        const linhas = await obterDadosCSV(GID_COMUNICACOES);
-        const mensagens = linhas.slice(1);
-
-        if (mensagens.length > 0) {
-          const textoFormatado = mensagens.map(msg => 
-            `<span class="highlight-cyan">📢</span> <span class="highlight-yellow">${msg}</span>`
-          ).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
-          document.getElementById('ticker-comunicacoes').innerHTML = textoFormatado;
-        } else {
-          document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-cyan">SEM COMUNICAÇÕES ATIVAS</span>';
+        const dados = await obterDadosAba(GIDS.canais);
+        const linhas = dados.slice(1);
+        const container = document.getElementById('container-canais');
+        
+        if (linhas.length === 0) {
+          container.innerHTML = '<p style="color:#94a3b8;">Sem canais configurados.</p>';
+          return;
         }
-      } catch (err) {
+
+        container.innerHTML = linhas.map(col => `
+          <div class="canal-card">
+            <h4>${col[0] || 'Geral'}</h4>
+            <span class="badge-canal">📟 ${col[1] || ''}</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error("Erro nos Canais:", e);
+      }
+    }
+
+    // 2. Atualizar Veículos INOP
+    async function carregarVeiculos() {
+      try {
+        const dados = await obterDadosAba(GIDS.veiculos);
+        const linhas = dados.slice(1);
+        const container = document.getElementById('container-veiculos');
+
+        if (linhas.length === 0) {
+          container.innerHTML = '<p style="color:#4ade80;">Sem veículos INOP.</p>';
+          return;
+        }
+
+        container.innerHTML = linhas.map(col => `
+          <div class="item-card">
+            <div class="item-info">
+              <span class="item-icon">🚒</span>
+              <div class="item-details">
+                <h4>${col[0] || ''}</h4>
+                <p>${col[1] || 'Avaria Registada'}</p>
+              </div>
+            </div>
+            <span class="badge-inop">INOP</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error("Erro nos Veículos:", e);
+      }
+    }
+
+    // 3. Atualizar Agendamentos do Dia
+    async function carregarAgendamentos() {
+      try {
+        const dados = await obterDadosAba(GIDS.agendamentos);
+        const linhas = dados.slice(1);
+        const container = document.getElementById('container-agendamentos');
+
+        if (linhas.length === 0) {
+          container.innerHTML = '<p style="color:#94a3b8;">Sem agendamentos para hoje.</p>';
+          return;
+        }
+
+        container.innerHTML = linhas.map(col => {
+          const dataHora = col[0] || '';
+          const titulo = col[1] || '';
+          const detalhes = col[2] || '';
+          const bombeirosRaw = col[3] || '';
+
+          const bombeirosTags = bombeirosRaw ? bombeirosRaw.split(';').map(num => 
+            `<span class="bombeiro-tag">⛑️ ${num.trim()}</span>`
+          ).join(' ') : '';
+
+          return `
+            <div class="item-card" style="border-left-color: #f97316;">
+              <div class="item-info">
+                <span class="item-icon">📅</span>
+                <div class="item-details" style="width: 100%;">
+                  <p style="color: #f97316; font-weight: bold;">${dataHora}</p>
+                  <h4>${titulo}</h4>
+                  <p>${detalhes}</p>
+                  ${bombeirosTags ? `<div class="bombeiros-list">${bombeirosTags}</div>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error("Erro nos Agendamentos:", e);
+      }
+    }
+
+    // 4. Atualizar Rodapé (Comunicados)
+    async function carregarComunicados() {
+      try {
+        const dados = await obterDadosAba(GIDS.comunicados);
+        const linhas = dados.slice(1);
+        
+        if (linhas.length > 0) {
+          const texto = linhas.map(col => 
+            `<span class="highlight-cyan">📢</span> <span class="highlight-yellow">${col[0]}</span>`
+          ).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
+          document.getElementById('ticker-comunicacoes').innerHTML = texto;
+        } else {
+          document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-cyan">SEM COMUNICADOS ATIVOS</span>';
+        }
+      } catch (e) {
         document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-yellow">INFORMAÇÃO OPERACIONAL EM TEMPO REAL — BATALHÃO SAPADORES BOMBEIROS BRAGA</span>';
       }
     }
 
-    // 2. EXEMPLO DE ESTRUTURA PARA AGENDAMENTOS COM CAPACETE (⛑️) E N.º DE BOMBEIRO
-    // Formato esperado nas colunas da aba Agendamentos: DataHora | Titulo | Detalhes | Bombeiros (ex: "102, 105, 112")
-    function renderizarAgendamentosExemplo() {
-      const container = document.getElementById('container-agendamentos');
-      
-      // Exemplo dinâmico gerado com os IDs de bombeiro e o capacete
-      const agendamentos = [
-        {
-          data: "07/09/2026 às 10h00 - 13h00",
-          titulo: "Visita ao Quartel - Centro de Estudos Saber Plural",
-          detalhes: "(20 Crianças entre os 10 e os 14 anos)",
-          bombeiros: ["102", "115"]
-        },
-        {
-          data: "07/09/2026 às 16h00",
-          titulo: "Teste de Equipamento",
-          detalhes: "Meios: VCOT 01",
-          bombeiros: ["108", "121", "134"]
-        }
-      ];
-
-      container.innerHTML = agendamentos.map(item => {
-        const tagsBombeiros = item.bombeiros.map(num => 
-          `<span class="bombeiro-tag">⛑️ ${num}</span>`
-        ).join(' ');
-
-        return `
-          <div class="item-card" style="border-left-color: #f97316;">
-            <div class="item-info">
-              <span class="item-icon">🚒</span>
-              <div class="item-details" style="width: 100%;">
-                <p style="color: #f97316; font-weight: bold;">${item.data}</p>
-                <h4>${item.titulo}</h4>
-                <p>${item.detalhes}</p>
-                <div class="bombeiros-list">${tagsBombeiros}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+    // Sincronização Global
+    function sincronizarTudo() {
+      carregarCanais();
+      carregarVeiculos();
+      carregarAgendamentos();
+      carregarComunicados();
     }
 
-    // INICIALIZAÇÃO
-    carregarComunicacoes();
-    renderizarAgendamentosExemplo();
-    setInterval(carregarComunicacoes, 30000);
+    sincronizarTudo();
+    setInterval(sincronizarTudo, 30000);
   </script>
 </body>
 </html>
