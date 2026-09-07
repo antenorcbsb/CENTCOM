@@ -1,5 +1,4 @@
 <!BSB html>
-<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -24,13 +23,14 @@
       padding-bottom: 50px;
     }
 
-    /* CABEÇALHO COMPACTO E LIMPO (SEM ÍCONES) */
+    /* CABEÇALHO COMPACTO E CENTRALIZADO */
     header {
+      position: relative;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       background: linear-gradient(180deg, #0f172a 0%, #080d17 100%);
-      padding: 6px 16px;
+      padding: 8px 16px;
       border-radius: 6px;
       border: 1px solid #1e293b;
       border-left: 4px solid #38bdf8;
@@ -40,13 +40,16 @@
 
     .header-title {
       color: #38bdf8;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 800;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
+      text-align: center;
     }
 
     .clock {
+      position: absolute;
+      right: 16px;
       background-color: #1e293b;
       color: #38bdf8;
       border: 1px solid #0284c7;
@@ -194,15 +197,27 @@
     .meios-container {
       color: #cbd5e1;
       font-size: 0.82rem;
-      margin-top: 4px;
+      margin-top: 6px;
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
     }
 
-    .meios-icon-truck {
+    .meio-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+      font-size: 0.78rem;
+    }
+
+    .meios-icon-svg {
       width: 18px;
-      height: 14px;
+      height: 16px;
       display: inline-block;
       vertical-align: middle;
     }
@@ -268,13 +283,13 @@
     .meteo-item .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
     .fwi-high { color: #ef4444; }
 
-    /* RODAPÉ TICKER */
+    /* RODAPÉ TICKER REVISADO */
     .footer-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 34px;
+      height: 36px;
       background: #080d17;
       border-top: 2px solid #facc15;
       color: #ffffff;
@@ -288,15 +303,19 @@
       white-space: nowrap;
       padding-left: 100%;
       display: inline-block;
-      animation: ticker 90s linear infinite;
+      animation: ticker 130s linear infinite; /* Velocidade reduzida para melhor leitura */
       font-size: 0.9rem;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    .footer-text span.highlight-yellow { color: #facc15; }
-    .footer-text span.highlight-cyan { color: #38bdf8; }
+    .msg-block {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      margin-right: 30px;
+    }
 
     @keyframes ticker {
       0% { transform: translate3d(0, 0, 0); }
@@ -305,6 +324,8 @@
 
     @media (max-width: 900px) {
       .dashboard-grid, .grid-2-columns { grid-template-columns: 1fr; }
+      header { justify-content: flex-start; }
+      .clock { position: static; margin-left: auto; }
     }
   </style>
 </head>
@@ -312,9 +333,7 @@
 
   <!-- CABEÇALHO -->
   <header>
-    <div class="header-title">
-      BSB BRAGA - CENTCOM
-    </div>
+    <div class="header-title">BSB BRAGA - CENTCOM</div>
     <div class="clock" id="relogio">--:--:--</div>
   </header>
 
@@ -366,7 +385,7 @@
 
   <div class="footer-bar">
     <div class="footer-text" id="ticker-comunicacoes">
-      <span class="highlight-cyan">📢 A CARREGAR DADOS...</span>
+      <span style="color: #38bdf8;">📢 A CARREGAR DADOS...</span>
     </div>
   </div>
 
@@ -453,13 +472,12 @@
              d.getFullYear() === agora.getFullYear();
     }
 
-    /* DETERMINAR COR COM BASE NA VELOCIDADE DO VENTO (km/h) */
     function obterCorVento(velocidade) {
       const v = parseFloat(velocidade) || 0;
-      if (v < 20) return '#4ade80'; // Verde (< 20 km/h)
-      if (v < 40) return '#facc15'; // Amarelo (20 - 39 km/h)
-      if (v < 60) return '#fb923c'; // Laranja (40 - 59 km/h)
-      return '#ef4444';            // Vermelho (>= 60 km/h)
+      if (v < 20) return '#4ade80';
+      if (v < 40) return '#facc15';
+      if (v < 60) return '#fb923c';
+      return '#ef4444';
     }
 
     /* ÍCONES SVG */
@@ -488,13 +506,35 @@
       <polyline points="12 6 12 12 16 14"></polyline>
     </svg>`;
 
-    const MINI_ICONE_CAMIAO = `<svg class="meios-icon-truck" viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    /* ÍCONES ESPECÍFICOS PARA MEIOS */
+    const SVG_MEIO_CAMIAO = `<svg class="meios-icon-svg" viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
       <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
       <circle cx="10" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
       <circle cx="22" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
       <circle cx="38" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
     </svg>`;
+
+    const SVG_MEIO_LIGEIRO = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1l2-4h8l2 4h1a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm14 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+    </svg>`;
+
+    const SVG_MEIO_BOTE = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 16c2 1 4 1 6 0 3-1 5-1 8 0 2 1 4 1 6 0"/>
+      <path d="M3 12l2-5h14l2 5v2H3v-2z" fill="#1e293b"/>
+      <path d="M12 3v4M9 5h6"/>
+    </svg>`;
+
+    function obterIconoMeioEspecifico(nomeMeio) {
+      const m = nomeMeio.toUpperCase();
+      if (m.includes('BRTP') || m.includes('BOTE') || m.includes('EMBARCA') || m.includes('EBD')) {
+        return SVG_MEIO_BOTE;
+      }
+      if (m.includes('VAOP') || m.includes('VLCI') || m.includes('VCOT') || m.includes('VFCI') || m.includes('LIGEIRO')) {
+        return SVG_MEIO_LIGEIRO;
+      }
+      return SVG_MEIO_CAMIAO;
+    }
 
     function obterIconoCaminhaoBombeiros() {
       return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -621,7 +661,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA
+    // 3. AGENDAMENTOS DO DIA (ÍCONES INDIVIDUAIS POR MEIO)
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
@@ -640,11 +680,28 @@
         container.innerHTML = agendamentosHoje.map((col, index) => {
           const hora = col[1] ? col[1].trim() : '';
           const descricao = col[2] || '';
-          const meios = col[3] || '';
+          const meiosTexto = col[3] || '';
           const equipas = col[4] || '';
 
           const corAtual = coresBorda[index % coresBorda.length];
           const svgAgendamento = obterIconoAgendamento(corAtual);
+
+          // Tratar e renderizar múltiplos meios individualmente com ícones específicos
+          let meiosHtml = '';
+          if (meiosTexto.trim()) {
+            const listaMeios = meiosTexto.split(/[,;/+]/).map(m => m.trim()).filter(m => m.length > 0);
+            const itensMeios = listaMeios.map(meio => {
+              const svgIcone = obterIconoMeioEspecifico(meio);
+              return `<span class="meio-item">${svgIcone} <span>${meio}</span></span>`;
+            }).join('');
+
+            meiosHtml = `
+              <div class="meios-container">
+                <strong style="color: #94a3b8; margin-right: 2px;">Meios:</strong>
+                ${itensMeios}
+              </div>
+            `;
+          }
 
           const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
             const numLimpo = num.trim();
@@ -665,13 +722,7 @@
                     </div>
                   ` : ''}
 
-                  ${meios ? `
-                    <div class="meios-container">
-                      <strong style="color: #94a3b8;">Meios:</strong> 
-                      ${MINI_ICONE_CAMIAO}
-                      <span>${meios}</span>
-                    </div>
-                  ` : ''}
+                  ${meiosHtml}
 
                   ${bombeirosBadges ? `
                     <div class="bombeiros-container">
@@ -689,7 +740,7 @@
       }
     }
 
-    // 4. METEOROLOGIA DINÂMICA (APLICAÇÃO DAS CORES NO VENTO E RAJADA)
+    // 4. METEOROLOGIA DINÂMICA
     function atualizarCoresMeteo(ventoVel, rajadaVel) {
       const elVento = document.getElementById('val-vento');
       const elRajada = document.getElementById('val-rajada');
@@ -705,22 +756,36 @@
       }
     }
 
-    // 5. COMUNICADOS
+    // 5. COMUNICADOS (RODAPÉ COM MULTICORES E LEITURA SUAVE)
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
         const linhas = dados.slice(1).filter(col => (col[0] || col[1]));
 
         if (linhas.length > 0) {
-          const texto = linhas.map(col => {
+          const coresComunicados = [
+            { titulo: '#facc15', obs: '#ffffff' }, // Amarelo + Branco
+            { titulo: '#38bdf8', obs: '#e2e8f0' }, // Ciano + Cinza Claro
+            { titulo: '#4ade80', obs: '#ffffff' }, // Verde + Branco
+            { titulo: '#f97316', obs: '#ffedd5' }  // Laranja + Tom suave
+          ];
+
+          const texto = linhas.map((col, index) => {
             const titulo = col[0] || '';
             const obs = col[1] ? ` — ${col[1]}` : '';
-            return `<span class="highlight-cyan">📢 ${titulo}</span><span class="highlight-yellow">${obs}</span>`;
-          }).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
+            const esquematizacaoCor = coresComunicados[index % coresComunicados.length];
+
+            return `
+              <span class="msg-block">
+                <span style="color: ${esquematizacaoCor.titulo}; font-weight: bold;">📢 ${titulo}</span>
+                <span style="color: ${esquematizacaoCor.obs};">${obs}</span>
+              </span>
+            `;
+          }).join(' <span style="color: #64748b; margin-right: 20px;">★</span> ');
 
           document.getElementById('ticker-comunicacoes').innerHTML = texto;
         } else {
-          document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-cyan">SEM COMUNICADOS ATIVOS NO MOMENTO</span>';
+          document.getElementById('ticker-comunicacoes').innerHTML = '<span style="color: #38bdf8; font-weight: bold;">📢 SEM COMUNICADOS ATIVOS NO MOMENTO</span>';
         }
       } catch (e) {
         console.error("Erro nos Comunicados:", e);
@@ -733,7 +798,6 @@
       carregarAgendamentos();
       carregarComunicados();
       
-      // Exemplo de valores do vento a aplicar dinamicamente:
       atualizarCoresMeteo(12, 22);
     }
 
