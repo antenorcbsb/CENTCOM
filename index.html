@@ -462,50 +462,54 @@
       <path d="M10 17h4"/>
     </svg>`;
 
-    // 1. CANAIS (Mapeamento corrigido baseado na estrutura exata da folha)
-    async function carregarCanais() {
-      try {
-        const dados = await obterDadosAba(GIDS.canais);
-        const linhas = dados.slice(1); // Ignora cabeçalho
-        const container = document.getElementById('container-canais');
-        
-        // Mapeamento correto das colunas:
-        // col[0]: Data inicio
-        // col[1]: Data Fim
-        // col[2]: Evento
-        // col[3] a col[7]: Canais (BSB, ROB, REPC, SIRESP, BSB_DMO)
-        const ativosHoje = linhas.filter(col => {
-          const dataInicio = col[0];
-          const dataFim = col[1];
-          return estaAtivoNoMomento(dataInicio, dataFim) && ehDoDiaAtual(dataInicio);
-        });
+    // 1. CANAIS (Validação corrigida para a estrutura da folha de cálculo)
+async function carregarCanais() {
+  try {
+    const dados = await obterDadosAba(GIDS.canais);
+    const linhas = dados.slice(1);
+    const container = document.getElementById('container-canais');
+    
+    const canaisAtivos = [];
 
-        if (ativosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo para o dia de hoje.</p>';
-          return;
+    linhas.forEach(col => {
+      const dataInicio = col[0];
+      const dataFim = col[1];
+      const evento = col[2] || 'Teatro Operacional';
+
+      // Verifica se o evento está no intervalo ativo (Data Início <= HOJE <= Data Fim)
+      if (estaAtivoNoMomento(dataInicio, dataFim)) {
+        // Percorre as colunas de canais (da coluna D/índice 3 em diante)
+        for (let i = 3; i < col.length; i++) {
+          const nomeCanal = col[i];
+          if (nomeCanal && nomeCanal.trim().length > 0) {
+            canaisAtivos.push({
+              evento: evento,
+              canal: nomeCanal.trim()
+            });
+          }
         }
-
-        container.innerHTML = ativosHoje.map(col => {
-          const evento = col[2] || 'Teatro Operacional';
-          
-          // Procura o primeiro canal preenchido entre as colunas D e H
-          const canalAtribuido = col[3] || col[4] || col[5] || col[6] || col[7] || 'CH';
-
-          return `
-            <div class="canal-card">
-              ${ICONE_RADIO}
-              <div>
-                <h4>${evento}</h4>
-                <span class="badge-canal">${canalAtribuido}</span>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {
-        console.error("Erro nos Canais:", e);
       }
+    });
+
+    if (canaisAtivos.length === 0) {
+      container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo no momento.</p>';
+      return;
     }
 
+    container.innerHTML = canaisAtivos.map(item => `
+      <div class="canal-card">
+        ${ICONE_RADIO}
+        <div>
+          <h4>${item.evento}</h4>
+          <span class="badge-canal">${item.canal}</span>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (e) {
+    console.error("Erro nos Canais:", e);
+  }
+}
     // 2. VEÍCULOS INOPERACIONAIS (INOP)
     async function carregarVeiculos() {
       try {
