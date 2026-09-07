@@ -1,5 +1,4 @@
 <BSB Braga html>
-<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -17,6 +16,7 @@
       background-color: #0b1320;
       color: #ffffff;
       padding: 15px;
+      padding-bottom: 55px; /* Espaço para o rodapé */
     }
 
     /* Cabeçalho do Painel */
@@ -56,7 +56,7 @@
       gap: 15px;
     }
 
-    /* Estilo genérico dos Quadros / Cards */
+    /* Estilo genérico dos Cards */
     .card {
       background-color: #0f172a;
       border: 1px solid #1e293b;
@@ -80,10 +80,10 @@
     .card-header.red { color: #f87171; }
     .card-header.orange { color: #fb923c; }
 
-    /* Layout dinâmico em 2 colunas para Veículos e Agendamentos */
+    /* Layout em 2 colunas para Veículos INOP */
     .grid-2-columns {
       display: grid;
-      grid-template-columns: repeat(2, 1fr); /* Divide em 2 colunas */
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
 
@@ -187,7 +187,49 @@
 
     .fwi-high { color: #ef4444; }
 
-    /* Ajuste para ecrãs menores */
+    /* BARRA DE RODAPÉ (TICKER) */
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 38px;
+      background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      border-top: 2px solid #facc15;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+    }
+
+    .footer-text {
+      white-space: nowrap;
+      padding-left: 100%;
+      display: inline-block;
+      animation: ticker 25s linear infinite;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .footer-text span.highlight-yellow {
+      color: #facc15;
+      text-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
+    }
+
+    .footer-text span.highlight-cyan {
+      color: #38bdf8;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
     @media (max-width: 900px) {
       .dashboard-grid, .grid-2-columns {
         grid-template-columns: 1fr;
@@ -202,10 +244,10 @@
     <div class="header-title">
       🛡️ Batalhão de Sapadores Bombeiros de Braga — Painel Operacional
     </div>
-    <div class="clock" id="relogio">16:37:35</div>
+    <div class="clock" id="relogio">16:52:13</div>
   </header>
 
-  <!-- GREIHA PRINCIPAL DA DASHBOARD -->
+  <!-- GRELHA PRINCIPAL DA DASHBOARD -->
   <div class="dashboard-grid">
 
     <!-- TEATRO DE OPERAÇÕES / CANAIS -->
@@ -219,7 +261,7 @@
       </div>
     </div>
 
-    <!-- VEÍCULOS INOPERACIONAIS (INOP) - 2 COLUNAS -->
+    <!-- VEÍCULOS INOPERACIONAIS (INOP) -->
     <div class="card">
       <div class="card-header red">
         ⚠️ VEÍCULOS INOPERACIONAIS (INOP)
@@ -341,8 +383,16 @@
 
   </div>
 
-  <!-- RELÓGIO EM TEMPO REAL -->
+  <!-- BARRA DE RODAPÉ INFORMATIVA -->
+  <div class="footer-bar">
+    <div class="footer-text" id="ticker-comunicacoes">
+      <span class="highlight-cyan">📢 A CARREGAR COMUNICAÇÕES...</span>
+    </div>
+  </div>
+
+  <!-- SCRIPT RELÓGIO + LEITURA POR GID -->
   <script>
+    // RELÓGIO EM TEMPO REAL
     function atualizarRelogio() {
       const agora = new Date();
       const horas = String(agora.getHours()).padStart(2, '0');
@@ -352,6 +402,41 @@
     }
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
+
+    // LEITURA DA ABA COMUNICAÇÕES VIA GID
+    const SPREADSHEET_ID = 'O_TEU_SPREADSHEET_ID_AQUI'; // Insere aqui o ID da folha Google
+    const GID = '1196343008'; // ID da aba Comunicações
+    const csvURL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${GID}`;
+
+    async function carregarComunicacoes() {
+      try {
+        const response = await fetch(csvURL);
+        const csvText = await response.text();
+        
+        // Trata o CSV retirando aspas duplas e linhas vazias
+        const linhas = csvText.split('\n')
+          .map(linha => linha.replace(/^"|"$/g, '').trim())
+          .filter(linha => linha.length > 0);
+
+        // Omite a linha de cabeçalho
+        const mensagens = linhas.slice(1);
+
+        if (mensagens.length > 0) {
+          const textoFormatado = mensagens.map(msg => {
+            return `<span class="highlight-cyan">📢</span> <span class="highlight-yellow">${msg}</span>`;
+          }).join(' &nbsp;&nbsp;&nbsp;—&nbsp;&nbsp;&nbsp; ');
+
+          document.getElementById('ticker-comunicacoes').innerHTML = textoFormatado;
+        } else {
+          document.getElementById('ticker-comunicacoes').innerHTML = '<span class="highlight-cyan">SEM COMUNICAÇÕES ATIVAS</span>';
+        }
+      } catch (error) {
+        console.error('Erro ao carregar comunicações:', error);
+      }
+    }
+
+    carregarComunicacoes();
+    setInterval(carregarComunicacoes, 30000); // Atualização automática a cada 30s
   </script>
 </body>
 </html>
