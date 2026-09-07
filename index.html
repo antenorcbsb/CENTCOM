@@ -1,9 +1,10 @@
 <!BSB html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batalhão de Sapadores Bombeiros de Braga — CENTCOM</title>
+  <title>BSB Braga - CentCom</title>
   <style>
     * {
       box-sizing: border-box;
@@ -32,7 +33,7 @@
       padding: 6px 16px;
       border-radius: 6px;
       border: 1px solid #1e293b;
-      border-left: 4px solid #0284c7;
+      border-left: 4px solid #38bdf8;
       margin-bottom: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
@@ -41,9 +42,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #e2e8f0;
-      font-size: 1.05rem;
-      font-weight: 700;
+      color: #38bdf8; /* Nova cor de destaque para o título */
+      font-size: 1.1rem;
+      font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
@@ -123,8 +124,8 @@
     }
 
     .item-icon-svg {
-      width: 40px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -146,6 +147,23 @@
       font-weight: bold;
       padding: 3px 6px;
       border-radius: 4px;
+    }
+
+    /* ESTILOS PARA OS MEIOS COM MINI ÍCONE */
+    .meios-container {
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meios-icon-truck {
+      width: 18px;
+      height: 14px;
+      display: inline-block;
+      vertical-align: middle;
     }
 
     /* BADGES DAS EQUIPAS COM CAPACETE */
@@ -279,10 +297,10 @@
 </head>
 <body>
 
-  <!-- CABEÇALHO COMPACTO -->
+  <!-- CABEÇALHO ATUALIZADO -->
   <header>
     <div class="header-title">
-      🛡️ BATALHÃO DE SAPADORES BOMBEIROS DE BRAGA <span class="badge-bsb">CENTCOM</span>
+      🛡️ BSB BRAGA - CENTCOM
     </div>
     <div class="clock" id="relogio">--:--:--</div>
   </header>
@@ -412,42 +430,56 @@
              d.getFullYear() === agora.getFullYear();
     }
 
-    // ÍCONE DO RÁDIO PORTÁTIL DE TELECOMUNICAÇÕES (WALKIE-TALKIE / SIRESP)
+    // ÍCONE RÁDIO PORTÁTIL
     const ICONE_RADIO_TELECOM = `<svg class="canal-icon-radio" viewBox="0 0 24 36" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <!-- Antena -->
       <line x1="8" y1="1" x2="8" y2="10" stroke="#38bdf8" stroke-width="2.5"/>
-      <!-- Botão/Seletor de Canais Superior -->
       <rect x="13" y="6" width="4" height="4" fill="#0284c7" rx="1"/>
-      <!-- Corpo Principal do Rádio -->
       <rect x="4" y="10" width="16" height="24" rx="3" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
-      <!-- Ecrã LCD -->
       <rect x="7" y="13" width="10" height="6" fill="#0b1320" stroke="#0284c7" stroke-width="1"/>
-      <!-- Grelha do Altifalante -->
       <line x1="7" y1="22" x2="17" y2="22" stroke="#38bdf8" stroke-width="1.5"/>
       <line x1="7" y1="25" x2="17" y2="25" stroke="#38bdf8" stroke-width="1.5"/>
       <line x1="7" y1="28" x2="17" y2="28" stroke="#38bdf8" stroke-width="1.5"/>
     </svg>`;
 
-    // ÍCONE SVG DO CAPACETE DE BOMBEIRO
+    // ÍCONE DE CALENDÁRIO / AGENDAMENTO (VARIÁVEL DE COR)
+    function obterIconoAgendamento(cor = '#fb923c') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+        <rect x="7" y="14" width="3" height="3" fill="${cor}"/>
+      </svg>`;
+    }
+
+    // ÍCONE DO CAMIÃO DE BOMBEIROS (MINI PARA O CAMPO MEIOS)
+    const MINI_ICONE_CAMIAO = `<svg class="meios-icon-truck" viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
+      <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
+      <circle cx="10" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
+      <circle cx="22" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
+      <circle cx="38" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
+    </svg>`;
+
+    // ÍCONE DO CAMIÃO DE BOMBEIROS PARA OS VEÍCULOS INOP
+    function obterIconoCaminhaoBombeiros() {
+      return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
+        <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
+        <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
+        <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
+        <circle cx="10" cy="24" r="4" fill="#0b1320" stroke="#f87171"/>
+        <circle cx="22" cy="24" r="4" fill="#0b1320" stroke="#f87171"/>
+        <circle cx="38" cy="24" r="4" fill="#0b1320" stroke="#f87171"/>
+      </svg>`;
+    }
+
+    // ÍCONE CAPACETE
     const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 24 24">
       <path d="M12 2C7 2 3 6 3 11v3h18v-3c0-5-4-9-9-9zM4 15h16v2H4vz"/>
       <path d="M12 4a1 1 0 0 1 1 1v4a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1z"/>
       <rect x="2" y="17" width="20" height="2" rx="1"/>
     </svg>`;
-
-    // ÍCONE CAMIÃO DE BOMBEIROS PARA OS MEIOS
-    function obterIconoCaminhaoBombeiros() {
-      return `<svg viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
-        <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
-        <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
-        <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
-        <rect x="34" y="6" width="5" height="3" fill="#38bdf8"/>
-        <circle cx="10" cy="24" r="4" fill="#0b1320" stroke="#f97316"/>
-        <circle cx="22" cy="24" r="4" fill="#0b1320" stroke="#f97316"/>
-        <circle cx="38" cy="24" r="4" fill="#0b1320" stroke="#f97316"/>
-      </svg>`;
-    }
 
     // 1. CANAIS RADIO
     async function carregarCanais() {
@@ -512,12 +544,11 @@
         container.innerHTML = inops.map(col => {
           const nomeVeiculo = col[0] || 'Veículo';
           const observacao = col[2] || 'Avaria Registada';
-          const svgIcon = obterIconoCaminhaoBombeiros();
 
           return `
             <div class="item-card">
               <div class="item-info">
-                <div class="item-icon-svg">${svgIcon}</div>
+                <div class="item-icon-svg">${obterIconoCaminhaoBombeiros()}</div>
                 <div class="item-details">
                   <h4>${nomeVeiculo}</h4>
                   <p>${observacao}</p>
@@ -532,7 +563,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (Com ícone de camião nos meios e capacete nas equipas)
+    // 3. AGENDAMENTOS DO DIA (Com cores intercaladas e ícone de veículo nos meios)
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
@@ -546,31 +577,35 @@
           return;
         }
 
-        container.innerHTML = agendamentosHoje.map(col => {
+        const coresBorda = ['#fb923c', '#38bdf8', '#facc15', '#4ade80'];
+
+        container.innerHTML = agendamentosHoje.map((col, index) => {
           const hora = col[1] ? `[${col[1]}] ` : '';
           const descricao = col[2] || '';
           const meios = col[3] || '';
           const equipas = col[4] || '';
 
-          const svgCaminhao = obterIconoCaminhaoBombeiros();
+          const corAtual = coresBorda[index % coresBorda.length];
+          const svgAgendamento = obterIconoAgendamento(corAtual);
 
-          // Formatação dos elementos com capacete e número
           const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
             const numLimpo = num.trim();
             return numLimpo ? `<span class="bombeiro-tag">${SVG_CAPACETE_BOMBEIRO} ${numLimpo}</span>` : '';
           }).join('') : '';
 
           return `
-            <div class="item-card" style="border-left-color: #f97316;">
+            <div class="item-card" style="border-left-color: ${corAtual};">
               <div class="item-info">
-                <div class="item-icon-svg">${svgCaminhao}</div>
+                <div class="item-icon-svg">${svgAgendamento}</div>
                 <div class="item-details" style="width: 100%;">
-                  <p style="color: #fb923c; font-weight: bold; font-size: 0.95rem;">${hora}${descricao}</p>
+                  <p style="color: ${corAtual}; font-weight: bold; font-size: 0.95rem;">${hora}${descricao}</p>
                   
                   ${meios ? `
-                    <p style="color: #cbd5e1; font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                      <strong style="color: #94a3b8;">Meios:</strong> ${meios}
-                    </p>
+                    <div class="meios-container">
+                      <strong style="color: #94a3b8;">Meios:</strong> 
+                      ${MINI_ICONE_CAMIAO}
+                      <span>${meios}</span>
+                    </div>
                   ` : ''}
 
                   ${bombeirosBadges ? `
