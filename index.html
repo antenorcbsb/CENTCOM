@@ -395,27 +395,37 @@
       });
     }
 
+    // Função de parsing de data corrigida e tolerante a horas/espaços
     function parseDataPT(str) {
       if (!str || !str.trim()) return null;
-      const limpo = str.trim().split(' ')[0];
+      const limpo = str.trim().split(' ')[0]; // Pega apenas na parte DD/MM/AAAA
       const partes = limpo.split('/').map(Number);
-      if (partes.length < 3) return null;
+      if (partes.length < 3 || isNaN(partes[0]) || isNaN(partes[1]) || isNaN(partes[2])) return null;
       return new Date(partes[2], partes[1] - 1, partes[0]);
     }
 
+    // FILTRAGEM RIGOROSA DE INTERVALO DE DATAS
     function estaAtivoNoIntervalo(dataInicioStr, dataFimStr) {
       const agora = new Date();
-      agora.setHours(0, 0, 0, 0);
+      agora.setHours(0, 0, 0, 0); // Normaliza para o início do dia atual
 
       const dInicio = parseDataPT(dataInicioStr);
-      const dFim = parseDataPT(dataFimStr);
+      let dFim = parseDataPT(dataFimStr);
 
-      if (dInicio && agora < dInicio) return false;
-      if (dFim) {
-        dFim.setHours(23, 59, 59, 999);
-        if (agora > dFim) return false;
+      // Se não houver data de início válida, ignora o registo
+      if (!dInicio) return false;
+
+      // Se não houver data de fim, assume-se que o evento termina no próprio dia de início
+      if (!dFim) {
+        dFim = new Date(dInicio);
       }
-      return true;
+
+      // Ajusta o fim do dia para 23:59:59
+      dInicio.setHours(0, 0, 0, 0);
+      dFim.setHours(23, 59, 59, 999);
+
+      // O evento está ativo se a data de hoje estiver entre dInicio e dFim (inclusive)
+      return agora >= dInicio && agora <= dFim;
     }
 
     function ehDataDeHoje(dataStr) {
@@ -478,33 +488,33 @@
       <rect x="2" y="17" width="20" height="2" rx="1"/>
     </svg>`;
 
-    // 1. CANAIS RÁDIO (AGRUPADOS POR EVENTO COM BADGES COLORIDAS - COLUNAS D, E, F, G, H)
+    // 1. CANAIS RÁDIO (AGRUPADOS COM FILTRAGEM RIGOROSA DE DATAS)
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
-        const linhas = dados.slice(1); // Ignora o cabeçalho
+        const linhas = dados.slice(1);
         const container = document.getElementById('container-canais');
         
         const eventosMap = {};
-        const paletaCores = ['#38bdf8', '#fb923c', '#4ade80', '#facc15', '#a855f7']; // Ciano, Laranja, Verde, Amarelo, Roxo
+        const paletaCores = ['#38bdf8', '#fb923c', '#4ade80', '#facc15', '#a855f7'];
 
         linhas.forEach(col => {
           const dataInicio = col[0]; // Coluna A
-          const evento = col[1] || 'Teatro Operacional'; // Coluna B (Evento)
+          const evento = col[1] || 'Teatro Operacional'; // Coluna B
           const dataFim = col[2];   // Coluna C
 
+          // Valida estritamente se o evento está no intervalo ativo de datas
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
             if (!eventosMap[evento]) {
               eventosMap[evento] = [];
             }
             
-            // Mapeamento explícito das Colunas D, E, F, G e H (Índices 3 a 7)
+            // Colunas D, E, F, G e H (Índices 3 a 7)
             const colunasCanais = [col[3], col[4], col[5], col[6], col[7]];
 
             colunasCanais.forEach(canal => {
               if (canal && canal.trim().length > 0) {
                 const canalLimpo = canal.trim();
-                // Evita duplicar o mesmo rádio dentro do mesmo evento
                 if (!eventosMap[evento].includes(canalLimpo)) {
                   eventosMap[evento].push(canalLimpo);
                 }
@@ -513,7 +523,7 @@
           }
         });
 
-        // Limpar eventos que não tenham nenhum rádio preenchido
+        // Remove eventos que eventualmente tenham ficado sem canais
         Object.keys(eventosMap).forEach(key => {
           if (eventosMap[key].length === 0) delete eventosMap[key];
         });
