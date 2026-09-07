@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!BSB html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -105,8 +105,8 @@
     }
 
     .item-icon-svg {
-      width: 38px;
-      height: 38px;
+      width: 44px;
+      height: 44px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -204,7 +204,7 @@
     .meteo-item .label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; }
     .fwi-high { color: #ef4444; }
 
-    /* RODAPÉ LENTO */
+    /* RODAPÉ MAIS LENTO (90s) */
     .footer-bar {
       position: fixed;
       bottom: 0;
@@ -225,7 +225,7 @@
       white-space: nowrap;
       padding-left: 100%;
       display: inline-block;
-      animation: ticker 50s linear infinite;
+      animation: ticker 90s linear infinite; /* VELOCIDADE SUAVIZADA */
       font-size: 0.95rem;
       font-weight: 700;
       letter-spacing: 0.5px;
@@ -351,7 +351,6 @@
     function estaAtivoNoMomento(dataInicioStr, dataFimStr) {
       const agora = new Date();
 
-      // Função auxiliar para converter string "DD/MM/AAAA [HH:MM]" em Objeto Date
       function parseData(str, eFim = false) {
         if (!str || !str.trim()) return null;
         const partes = str.trim().split(' ');
@@ -373,16 +372,13 @@
       const dInicio = parseData(dataInicioStr, false);
       const dFim = parseData(dataFimStr, true);
 
-      // Se existir data de início e a data atual for anterior, ainda não está ativo
       if (dInicio && agora < dInicio) return false;
-
-      // Se existir data de fim e a data atual for posterior, já expirou
       if (dFim && agora > dFim) return false;
 
       return true;
     }
 
-    // Filtra exclusivamente agendamentos do DIA ATUAL
+    // Filtra exclusivamente agendamentos / registos do DIA ATUAL
     function ehDoDiaAtual(dataInicioStr) {
       if (!dataInicioStr) return false;
       const partes = dataInicioStr.trim().split(' ');
@@ -395,45 +391,82 @@
       return d === agora.getDate() && (m - 1) === agora.getMonth() && a === agora.getFullYear();
     }
 
-    // SIMBOLOGIA TÉCNICA E OPERACIONAL PARA VEÍCULOS DE BOMBEIROS
+    // SIMBOLOGIA GRÁFICA REALISTA DE VEÍCULOS DE BOMBEIROS E EMERGÊNCIA
     function obterIconoVeiculoSVG(texto) {
       const txt = (texto || '').toUpperCase();
 
-      // Ambulância (ABSC / AEM / AMBULÂNCIA)
+      // 1. AMBULÂNCIA / EMERGÊNCIA MÉDICA (ABSC, AEM, AMBULÂNCIA, ABTD)
       if (txt.includes('ABSC') || txt.includes('ABTD') || txt.includes('AEM') || txt.includes('AMBUL')) {
-        return `<svg viewBox="0 0 32 32" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="8" width="28" height="16" rx="2"/>
-          <path d="M16 11v10M11 16h10" stroke-width="2.5"/>
-          <circle cx="8" cy="24" r="3" fill="#0b1320"/>
-          <circle cx="24" cy="24" r="3" fill="#0b1320"/>
+        return `<svg viewBox="0 0 48 32" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Corpo do Furgão / Ambulância -->
+          <path d="M 4 8 L 32 8 L 44 16 L 44 24 L 4 24 Z" fill="#1e293b"/>
+          <path d="M 32 8 L 32 16 L 44 16"/>
+          <!-- Janela Cabine -->
+          <path d="M 34 10 L 41 15 L 34 15 Z" fill="#0284c7" opacity="0.6"/>
+          <!-- Cruzes de Emergência -->
+          <path d="M 18 11 V 19 M 14 15 H 22" stroke="#ef4444" stroke-width="2.5"/>
+          <!-- Rodas e Luzes -->
+          <circle cx="12" cy="24" r="4" fill="#0b1320" stroke="#ef4444"/>
+          <circle cx="36" cy="24" r="4" fill="#0b1320" stroke="#ef4444"/>
+          <rect x="30" y="5" width="4" height="3" fill="#38bdf8"/>
         </svg>`;
       }
 
-      // Autobomba / Combate Urbano/Florestal (VFCI, VUCI, VECI, VTTU, VSAE)
+      // 2. CAMINHÃO DE BOMBEIROS / PESADO DE COMBATE (VFCI, VUCI, VECI, VTTU, VSAE, VLCI)
       if (txt.includes('VFCI') || txt.includes('VUCI') || txt.includes('VECI') || txt.includes('VTTU') || txt.includes('VSAE') || txt.includes('VLCI')) {
-        return `<svg viewBox="0 0 32 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 10h18v12H2z"/>
-          <path d="M20 14h8l3 4v4h-11z"/>
-          <path d="M6 10V6h10v4"/>
-          <circle cx="8" cy="22" r="3" fill="#0b1320"/>
-          <circle cx="23" cy="22" r="3" fill="#0b1320"/>
+        return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Estrutura Principal e Tanque -->
+          <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
+          <!-- Cabine Dupla de Comando -->
+          <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
+          <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
+          <!-- Escada no Tejadilho -->
+          <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
+          <!-- Giropilhas -->
+          <rect x="34" y="6" width="5" height="3" fill="#38bdf8"/>
+          <!-- Rodas Todo-o-Terreno -->
+          <circle cx="10" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
+          <circle cx="22" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
+          <circle cx="38" cy="24" r="4.5" fill="#0b1320" stroke="#f87171"/>
         </svg>`;
       }
 
-      // Comando / Apoio / Transporte (VCOT, VTTP, VTP, BRTP)
+      // 3. VEÍCULO DE ELEVAÇÃO / ESCADA (VETA, VE30, ESCADA)
+      if (txt.includes('VETA') || txt.includes('VE30') || txt.includes('ESCADA') || txt.includes('PLATAFORMA')) {
+        return `<svg viewBox="0 0 48 32" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Corpo Principal -->
+          <rect x="4" y="14" width="26" height="10" fill="#1e293b"/>
+          <path d="M 30 14 H 42 L 45 18 V 24 H 30 Z" fill="#1e293b"/>
+          <!-- Escada Articulada Extensível -->
+          <path d="M 6 11 L 38 4" stroke="#facc15" stroke-width="2.5"/>
+          <path d="M 8 11 L 9 8 M 16 9 L 17 6 M 24 7 L 25 4" stroke="#ffffff"/>
+          <!-- Rodas -->
+          <circle cx="12" cy="24" r="4" fill="#0b1320" stroke="#facc15"/>
+          <circle cx="36" cy="24" r="4" fill="#0b1320" stroke="#facc15"/>
+        </svg>`;
+      }
+
+      // 4. SUV / COMANDO / APOIO TÁTICO (VCOT, VTTP, VTP, BRTP, COMMAND)
       if (txt.includes('VCOT') || txt.includes('VTTP') || txt.includes('VTP') || txt.includes('BRTP')) {
-        return `<svg viewBox="0 0 32 32" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 14l3-6h14l4 6v8H3z"/>
-          <circle cx="8" cy="22" r="3" fill="#0b1320"/>
-          <circle cx="22" cy="22" r="3" fill="#0b1320"/>
-          <path d="M12 8v6M18 8v6"/>
+        return `<svg viewBox="0 0 48 32" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Silhueta SUV / 4x4 -->
+          <path d="M 4 15 L 12 9 L 30 9 L 38 15 L 44 16 V 23 H 4 Z" fill="#1e293b"/>
+          <!-- Vidros do SUV -->
+          <path d="M 14 11 H 21 V 15 H 9 Z" fill="#0284c7" opacity="0.6"/>
+          <path d="M 23 11 H 29 L 34 15 H 23 Z" fill="#0284c7" opacity="0.6"/>
+          <!-- Pirilampo Superior -->
+          <rect x="20" y="6" width="6" height="3" fill="#38bdf8"/>
+          <!-- Roda Sobresselente / Rodas SUV -->
+          <circle cx="12" cy="23" r="4" fill="#0b1320" stroke="#f59e0b"/>
+          <circle cx="34" cy="23" r="4" fill="#0b1320" stroke="#f59e0b"/>
         </svg>`;
       }
 
-      // Ícone para Visitas / Serviços Especiais
-      return `<svg viewBox="0 0 32 32" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M16 4a6 6 0 100 12 6 6 0 000-12z"/>
-        <path d="M6 28v-2a10 10 0 0120 0v2"/>
+      // ÍCONE GENÉRICO OPERACIONAL DE SERVIÇO
+      return `<svg viewBox="0 0 48 32" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 6 16 L 14 10 L 32 10 L 40 16 V 23 H 6 Z" fill="#1e293b"/>
+        <circle cx="14" cy="23" r="3.5" fill="#0b1320" stroke="#38bdf8"/>
+        <circle cx="32" cy="23" r="3.5" fill="#0b1320" stroke="#38bdf8"/>
       </svg>`;
     }
 
@@ -445,7 +478,7 @@
       <path d="M10 17h4"/>
     </svg>`;
 
-    // 1. CANAIS (Validação de Início e Fim rigorosa)
+    // 1. CANAIS (Filtrado estritamente para o DIA ATUAL e ATIVO NO MOMENTO)
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
@@ -453,14 +486,15 @@
         const container = document.getElementById('container-canais');
         
         // Coluna 2: Data Início | Coluna 3: Data Fim
-        const ativos = linhas.filter(col => estaAtivoNoMomento(col[2], col[3]));
+        // Exige que esteja ATIVO no momento E PERTENCE ao DIA ATUAL
+        const ativosHoje = linhas.filter(col => estaAtivoNoMomento(col[2], col[3]) && ehDoDiaAtual(col[2]));
 
-        if (ativos.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo no momento.</p>';
+        if (ativosHoje.length === 0) {
+          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo para o dia de hoje.</p>';
           return;
         }
 
-        container.innerHTML = ativos.map(col => `
+        container.innerHTML = ativosHoje.map(col => `
           <div class="canal-card">
             ${ICONE_RADIO}
             <div>
@@ -513,7 +547,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (Com capacete ⛑️ nos números internos)
+    // 3. AGENDAMENTOS DO DIA
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
@@ -567,7 +601,6 @@
         const dados = await obterDadosAba(GIDS.comunicados);
         const linhas = dados.slice(1);
 
-        // Validação de intervalo do comunicado
         const ativos = linhas.filter(col => estaAtivoNoMomento(col[2], col[3]));
 
         if (ativos.length > 0) {
