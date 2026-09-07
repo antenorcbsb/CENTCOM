@@ -15,6 +15,7 @@
       --accent-red: #ef4444;
       --accent-orange: #f97316;
       --accent-purple: #a855f7;
+      --accent-sky: #38bdf8;
       --text-main: #ffffff;
       --text-muted: #94a3b8;
     }
@@ -41,7 +42,7 @@
       gap: 10px;
     }
 
-    /* Cabeçalho da Dashboard */
+    /* Header */
     header.header-dashboard {
       display: flex;
       justify-content: space-between;
@@ -50,14 +51,14 @@
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 8px 16px;
-      height: 50px;
+      height: 48px;
       flex-shrink: 0;
     }
 
     .header-title {
       font-size: 1.1rem;
       font-weight: 800;
-      color: #38bdf8;
+      color: var(--accent-sky);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -74,7 +75,7 @@
       border: 1px solid rgba(2, 132, 199, 0.4);
     }
 
-    /* Conteúdo Principal (100% da altura) */
+    /* Main Grid */
     main.main-content {
       flex: 1;
       display: grid;
@@ -99,7 +100,7 @@
       font-size: 0.9rem;
       font-weight: 800;
       letter-spacing: 0.8px;
-      color: #38bdf8;
+      color: var(--accent-sky);
       text-transform: uppercase;
       margin-bottom: 6px;
       flex-shrink: 0;
@@ -120,7 +121,6 @@
       padding-right: 2px;
     }
 
-    /* Custom Scrollbar */
     .grid-cards::-webkit-scrollbar {
       width: 4px;
     }
@@ -143,188 +143,86 @@
       flex-shrink: 0;
     }
 
-    .card-to { 
-      border-left: 4px solid var(--accent-green); 
-    }
+    .card-to { border-left: 4px solid var(--accent-green); }
+    .to-nome { font-size: 1rem; font-weight: 700; color: #ffffff; }
+    .to-detalhes { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: var(--text-muted); }
     
-    .to-nome { 
-      font-size: 1rem; 
-      font-weight: 700; 
-      color: #ffffff; 
-      line-height: 1.2;
-    }
-    
-    .to-detalhes { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 4px; 
-      font-size: 0.8rem; 
-      color: var(--text-muted); 
-    }
-    
-    .canais-lista { 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 4px; 
-      margin-top: 4px; 
-    }
-    
+    .canais-lista { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
     .badge-canal { 
-      color: #fff; 
-      font-weight: 700; 
-      padding: 2px 6px; 
-      border-radius: 4px; 
-      font-size: 0.75rem; 
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      color: #fff; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; 
+      display: inline-flex; align-items: center; gap: 4px; 
     }
-    
     .badge-bsb { background-color: #0284c7; }
     .badge-rob { background-color: #10b981; }
     .badge-repc { background-color: #f97316; }
     .badge-siresp { background-color: #8b5cf6; }
     .badge-dmo { background-color: #e11d48; }
 
-    /* INOP Cards */
-    .card-inop { 
-      border-left: 4px solid var(--accent-red); 
-      flex-direction: row; 
-      justify-content: space-between; 
-      align-items: center; 
-    }
-    
-    .inop-info { 
-      display: flex; 
-      align-items: center; 
-      gap: 10px;
-      overflow: hidden; 
-    }
-    
+    /* INOP */
+    .card-inop { border-left: 4px solid var(--accent-red); flex-direction: row; justify-content: space-between; align-items: center; }
+    .inop-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
     .veiculo-icone-box { 
-      width: 44px; 
-      height: 44px; 
-      background-color: rgba(249, 115, 22, 0.15); 
-      border: 1px solid rgba(249, 115, 22, 0.4); 
-      border-radius: 6px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      flex-shrink: 0; 
-      padding: 4px;
+      width: 44px; height: 44px; background-color: rgba(249, 115, 22, 0.15); 
+      border: 1px solid rgba(249, 115, 22, 0.4); border-radius: 6px; 
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 4px; 
     }
-    
-    .inop-icone-box {
-      background-color: rgba(239, 68, 68, 0.15); 
-      border-color: rgba(239, 68, 68, 0.4); 
-    }
-    
-    .inop-texto h4 { 
-      font-size: 0.95rem; 
-      font-weight: 700; 
-      color: #ffffff; 
-    }
-    
-    .inop-texto p { 
-      font-size: 0.8rem; 
-      color: var(--text-muted); 
-    }
-    
-    .badge-inop { 
-      background-color: var(--accent-red); 
-      color: #ffffff; 
-      font-weight: 800; 
-      font-size: 0.75rem; 
-      padding: 3px 8px; 
-      border-radius: 4px; 
-      flex-shrink: 0; 
-    }
+    .inop-icone-box { background-color: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); }
+    .inop-texto h4 { font-size: 0.95rem; font-weight: 700; color: #ffffff; }
+    .inop-texto p { font-size: 0.8rem; color: var(--text-muted); }
+    .badge-inop { background-color: var(--accent-red); color: #ffffff; font-weight: 800; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; }
 
     /* Agendamentos */
-    .card-agendamento { 
-      border-left: 4px solid var(--accent-orange); 
-      flex-direction: row;
-      align-items: center;
-      gap: 10px;
+    .card-agendamento { border-left: 4px solid var(--accent-orange); flex-direction: row; align-items: center; gap: 10px; }
+    .agendamento-conteudo { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow: hidden; }
+    .agendamento-data { color: var(--accent-orange); font-weight: 700; font-size: 0.8rem; }
+    .agendamento-desc { font-size: 0.9rem; font-weight: 600; color: #ffffff; line-height: 1.2; }
+    .agendamento-meios { font-size: 0.8rem; color: var(--accent-sky); font-weight: 600; }
+
+    .bombeiros-destacados { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .badge-bombeiro { 
+      background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); 
+      color: var(--accent-sky); font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; 
+      display: inline-flex; align-items: center; gap: 4px; 
     }
-    
-    .agendamento-conteudo {
+
+    /* Grelha de Meteorologia no Quadro 4 */
+    .meteo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      height: 100%;
+    }
+
+    .meteo-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .agendamento-data { 
-      color: var(--accent-orange); 
-      font-weight: 700; 
-      font-size: 0.8rem; 
-    }
-    
-    .agendamento-desc { 
-      font-size: 0.9rem; 
-      font-weight: 600; 
-      color: #ffffff; 
-      line-height: 1.2;
-    }
-    
-    .agendamento-meios { 
-      font-size: 0.8rem; 
-      color: #38bdf8; 
-      font-weight: 600; 
-    }
-
-    /* Elementos/Bombeiros Destacados */
-    .bombeiros-destacados {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .badge-bombeiro {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      color: #38bdf8;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-flex;
       align-items: center;
+      justify-content: center;
+      text-align: center;
       gap: 4px;
     }
 
-    /* Observações */
-    .card-observacao { border-left: 4px solid var(--accent-purple); }
-    .obs-titulo { 
-      font-weight: 700; 
-      color: #c084fc; 
-      font-size: 0.8rem; 
-      text-transform: uppercase; 
-      display: flex; 
-      align-items: center; 
-      gap: 5px; 
-    }
-    
-    .obs-texto { 
-      font-size: 0.85rem; 
-      font-weight: 600; 
-      color: #ffffff; 
-      line-height: 1.3;
+    .meteo-card-wide {
+      grid-column: span 3;
+      flex-direction: row;
+      justify-content: space-around;
+      background: rgba(2, 132, 199, 0.1);
+      border-color: rgba(2, 132, 199, 0.3);
     }
 
-    .sem-registos { 
-      color: var(--text-muted); 
-      font-style: italic; 
-      padding: 8px; 
-      font-size: 0.85rem; 
-    }
+    .meteo-val { font-size: 1.2rem; font-weight: 800; color: #ffffff; }
+    .meteo-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .meteo-icon { font-size: 1.4rem; color: var(--accent-sky); margin-bottom: 2px; }
 
-    /* Ticker Rodapé */
+    .sem-registos { color: var(--text-muted); font-style: italic; padding: 8px; font-size: 0.85rem; }
+
+    /* Rodapé - Observações Ticker */
     .rodape-ticker {
-      height: 38px;
+      height: 40px;
       background-color: var(--card-bg);
       color: #ffffff;
       display: flex;
@@ -332,20 +230,20 @@
       overflow: hidden;
       border-radius: 6px;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       border: 1px solid var(--card-border);
-      border-top: 2px solid var(--accent-blue);
+      border-top: 2px solid var(--accent-purple);
       flex-shrink: 0;
     }
     
     .ticker-label { 
-      background-color: var(--accent-blue); 
+      background-color: var(--accent-purple); 
       color: #ffffff; 
-      padding: 0 12px; 
+      padding: 0 14px; 
       height: 100%; 
       display: flex; 
       align-items: center; 
-      gap: 6px; 
+      gap: 8px; 
       white-space: nowrap; 
       z-index: 2; 
       font-size: 0.8rem; 
@@ -363,19 +261,25 @@
       display: inline-block; 
       white-space: nowrap; 
       padding-left: 100%; 
-      animation: ticker-animacao 30s linear infinite; 
+      animation: ticker-animacao 40s linear infinite; 
     }
     
     .ticker-item { 
       display: inline-flex; 
       align-items: center; 
-      margin-right: 25px; 
+      margin-right: 30px; 
+      color: #f1f5f9;
     }
     
+    .ticker-item strong {
+      color: #c084fc;
+      margin-right: 6px;
+    }
+
     .ticker-separador { 
-      margin-left: 25px; 
-      color: #38bdf8; 
-      opacity: 0.7; 
+      margin-left: 30px; 
+      color: var(--accent-purple); 
+      opacity: 0.8; 
     }
 
     @keyframes ticker-animacao { 
@@ -386,7 +290,7 @@
 </head>
 <body>
 
-  <!-- Cabeçalho Principal -->
+  <!-- Cabeçalho -->
   <header class="header-dashboard">
     <div class="header-title">
       <i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i>
@@ -395,10 +299,10 @@
     <div class="header-clock" id="relogio-digital">00:00:00</div>
   </header>
 
-  <!-- Grelha Principal (2x2 para ocupar 100% da altura do ecrã) -->
+  <!-- Grelha Principal -->
   <main class="main-content">
     
-    <!-- Bloco 1: Teatro de Operações -->
+    <!-- Quadro 1: Teatro de Operações -->
     <section class="dashboard-block">
       <div class="seccao-titulo"><i class="fa-solid fa-walkie-talkie"></i> Teatro de Operações / Canais</div>
       <div class="grid-cards" id="container-to">
@@ -406,7 +310,7 @@
       </div>
     </section>
 
-    <!-- Bloco 2: Viaturas INOP -->
+    <!-- Quadro 2: Viaturas INOP -->
     <section class="dashboard-block">
       <div class="seccao-titulo" style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> Veículos Inoperacionais (INOP)</div>
       <div class="grid-cards" id="container-inop">
@@ -414,7 +318,7 @@
       </div>
     </section>
 
-    <!-- Bloco 3: Agendamentos -->
+    <!-- Quadro 3: Agendamentos -->
     <section class="dashboard-block">
       <div class="seccao-titulo" style="color: var(--accent-orange);"><i class="fa-solid fa-calendar-days"></i> Agendamentos do Dia</div>
       <div class="grid-cards" id="container-agendamentos">
@@ -422,22 +326,24 @@
       </div>
     </section>
 
-    <!-- Bloco 4: Observações / Avisos -->
+    <!-- Quadro 4: Meteorologia & Risco (Substitui Observações) -->
     <section class="dashboard-block">
-      <div class="seccao-titulo" style="color: var(--accent-purple);"><i class="fa-solid fa-bullhorn"></i> Observações & Comunicados</div>
-      <div class="grid-cards" id="container-observacoes">
-        <div class="card sem-registos">A carregar observações...</div>
+      <div class="seccao-titulo" style="color: var(--accent-sky);"><i class="fa-solid fa-cloud-sun-rain"></i> Meteorologia & Risco (IPMA Braga)</div>
+      <div class="meteo-grid" id="container-meteo">
+        <div class="meteo-card meteo-card-wide">
+          <span>A obter dados meteorológicos do IPMA...</span>
+        </div>
       </div>
     </section>
 
   </main>
 
-  <!-- Ticker Meteo IPMA -->
+  <!-- Rodapé Ticker: Observações & Comunicados -->
   <footer class="rodape-ticker">
-    <div class="ticker-label"><i class="fa-solid fa-cloud-sun"></i> IPMA BRAGA</div>
+    <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> OBSERVAÇÕES & COMUNICADOS</div>
     <div class="ticker-conteudo">
-      <div class="ticker-texto" id="ticker-texto">
-        <span class="ticker-item">A obter dados oficiais do IPMA...</span>
+      <div class="ticker-texto" id="ticker-observacoes">
+        <span class="ticker-item">A carregar observações e comunicados internos...</span>
       </div>
     </div>
   </footer>
@@ -469,30 +375,26 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
 
-    // Icones Dinâmicos por Tipologia de Veículo
+    // Ícones em SVG inline seguros para viaturas
     function obterIconeVeiculoSVG(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase().trim();
-      const style = 'style="width: 100%; height: 100%; object-fit: contain;"';
       
       // Ambulâncias / ABSC
-      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA') || nome.includes('ABSC')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X05nEiZz1ujeGojWBrUwgwKEQu9l8jIZLMSk5hegmJynRKblkEE_crAC0BFAMSxQnziNIHnM9k_Sl9Wqx43FCJUiCeeR587EgTV4uAgfmsQ2yFQAnUFwjeBGq_zhk2vtDy0cUzCO6lxxht5qvUSjqeuWW6_c0fjbD4BjxvQ0ixADivtv_RkJDbXE14u2Tq_mwtA9bHMMm8xyVvcgS6bVCBQWuYvkJz3NbVZTyHb3qiKNmcqXchU9I0vzor" ${style}>`;
+      if (nome.startsWith('ABSC') || nome.includes('AMBULANCIA')) {
+        return `<i class="fa-solid fa-truck-medical" style="font-size: 1.5rem; color: #ef4444;"></i>`;
       }
       
-      // Veículos Ligeiros de Comando / Ligação (VCOT, VCOC, VOPE, VSAE)
-      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.startsWith('VSAE') || nome.includes('LIGEIRO') || nome.includes('VCOT')) {
-        return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1WHcN6GtjV6nPRpCYTUPT1M4EbplSOATAh3sral_FBqU_98kQs8K3UQ3Cu0CYeAkYj7GhZC0rm1sEL_MRmmVvUgM1yWaxzmBqtT-er4jn-QnAThQ-tLWAddgIRQ1s3iooGNGlzJL6rWDZ78jWile2aJ7oPComoo4QeY6HoGCA2ciFh3fCzRadnKq450mdovH8vHBxTOXFyfHbmGKrmheJsywBv6IE_d5GYSg4nz96G5B0Z9xNSH-iZY9dXi" ${style}>`;
+      // Ligeiros / Comando (VCOT, VCOC, VOPE, VSAE)
+      if (nome.startsWith('VCOT') || nome.startsWith('VCOC') || nome.startsWith('VOPE') || nome.includes('LIGEIRO')) {
+        return `<i class="fa-solid fa-car-side" style="font-size: 1.5rem; color: #f97316;"></i>`;
       }
       
-      // Camiões e Pesados de Combate (VFCI, VTTU, VTGC, VFCI, URBANO, ETC)
-      return `<img src="https://lh3.googleusercontent.com/aida/AEtjO1X9o9T1-ySyJOt4RGo5aAVBYMpp8ArbUwI6JkYyVUJYJQ0e--u63OJ4UNrf0RBdwkiAaXpd4yRchxIfK87N6NAzkeq-zOFfuFnc74uFsbju2GfQnx0uRry6HxLNw5CfqcXgSzdCzLsCDjZUb0MXbPDkgi4tNd40TPxZ82060N8ZyAfgpsw99RkY7gvWqXTkJrPa6HvUEbB8yUjTbWT6qeRvnpG2Zrv3vRY3Wg_PTDYp3iybN-drFPyS7iUC" ${style}>`;
+      // Pesados / Combate (VFCI, VTTU, VTGC, URBANO, Camiões)
+      return `<i class="fa-solid fa-truck-field" style="font-size: 1.5rem; color: #f97316;"></i>`;
     }
 
-    // Gerador de Badges para Números de Bombeiros Destacados
     function gerarBadgesBombeiros(textoBombeiros) {
       if (!textoBombeiros || !textoBombeiros.trim()) return '';
-      
-      // Extrai números ou códigos de bombeiros separados por vírgula, espaço ou barra
       const lista = textoBombeiros.split(/[,;\/\s]+/).filter(item => item.trim().length > 0);
       if (lista.length === 0) return '';
 
@@ -522,8 +424,7 @@
       if (!dataStr || !dataStr.trim()) return false;
       const tsData = converterDataTimestamp(dataStr);
       if (!tsData) return false;
-      const hoje = new Date().setHours(0,0,0,0);
-      return tsData === hoje;
+      return tsData === new Date().setHours(0,0,0,0);
     }
 
     function estaNoIntervaloDatas(dataInicioStr, dataFimStr) {
@@ -669,7 +570,7 @@
         viaturasInop.forEach(row => {
           const nome = row[0] || 'Viatura';
           const motivo = row[3] || row[2] || 'Avaria Registada';
-          const elementoBombeiro = row[4] || row[5] || ''; // Deteta células com o número do bombeiro
+          const elementoBombeiro = row[4] || row[5] || '';
           const svgIcone = obterIconeVeiculoSVG(nome);
           const htmlBombeiros = gerarBadgesBombeiros(elementoBombeiro);
 
@@ -723,7 +624,7 @@
           const horaRaw = row[1] || '';
           const descricao = row[2] || 'Serviço Agendado';
           const meios = row[3] || '';
-          const bombeirosDestacados = row[4] || row[5] || ''; // Coluna com o número dos bombeiros
+          const bombeirosDestacados = row[4] || row[5] || '';
 
           let dataFormatada = dataRaw;
           if (horaRaw) dataFormatada += ` às ${horaRaw}`;
@@ -752,56 +653,10 @@
       }
     }
 
-    // 4. OBSERVAÇÕES
-    async function carregarObservacoes() {
-      const container = document.getElementById('container-observacoes');
-      try {
-        const res = await fetch(obterUrlGviz(GID_COMUNICACOES));
-        const csvTexto = await res.text();
-        const todasLinhas = parseCSV(csvTexto);
-
-        container.innerHTML = '';
-        if (todasLinhas.length === 0) return;
-
-        const obsValidas = todasLinhas.filter(row => {
-          if (!row[1] || row[1].trim() === '') return false;
-
-          const col0 = (row[0] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-          const col1 = (row[1] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-
-          if (col0.includes('titulo') || col0 === 'header' || col0 === 'data') return false;
-          if (col1 === 'observacoes' || col1 === 'observacao' || col1 === 'texto') return false;
-
-          return true;
-        });
-
-        if (obsValidas.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
-          return;
-        }
-
-        obsValidas.forEach(row => {
-          const titulo = row[0] || '';
-          const obsTexto = row[1] || '';
-
-          const div = document.createElement('div');
-          div.className = 'card card-observacao';
-          div.innerHTML = `
-            ${titulo ? `<div class="obs-titulo"><i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b;"></i> ${titulo}</div>` : ''}
-            <div class="obs-texto">${obsTexto}</div>
-          `;
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
-      }
-    }
-
-    // 5. METEOROLOGIA IPMA
+    // 4. METEOROLOGIA (AGORA NO QUADRO 4)
     async function carregarMeteoIPMA() {
-      const containerTicker = document.getElementById('ticker-texto');
-      if (!containerTicker) return;
+      const container = document.getElementById('container-meteo');
+      if (!container) return;
 
       try {
         const [resMeteo, resTipos, resRcm] = await Promise.all([
@@ -842,23 +697,94 @@
           }
         }
 
-        const mensagens = [
-          `🌤️ <strong>Previsão:</strong> ${descTempo}`,
-          `🌡️ <strong>Temp. Máx / Mín:</strong> ${tMax}°C / ${tMin}°C`,
-          `🌧️ <strong>Prob. Chuva:</strong> ${probChuva}%`,
-          `💨 <strong>Vento:</strong> ${velVentoVal} km/h (${dirVento})`,
-          `🌪️ <strong>Rajada Vento:</strong> ${rajadaVentoVal} km/h`,
-          `📊 <strong>FFMC:</strong> ${ffmcVal}`,
-          `📈 <strong>ISI:</strong> ${isiVal}`,
-          `🔥 <strong>Índice FWI:</strong> ${fwiVal}`
-        ];
+        container.innerHTML = `
+          <div class="meteo-card meteo-card-wide">
+            <div><i class="fa-solid fa-cloud-sun meteo-icon"></i> <strong>${descTempo}</strong></div>
+            <div>🌡️ <strong>${tMax}°C</strong> / ${tMin}°C</div>
+            <div>🌧️ Prob. Chuva: <strong>${probChuva}%</strong></div>
+          </div>
+          
+          <div class="meteo-card">
+            <i class="fa-solid fa-wind meteo-icon"></i>
+            <div class="meteo-val">${velVentoVal} <small>km/h</small></div>
+            <div class="meteo-label">Vento (${dirVento})</div>
+          </div>
 
-        containerTicker.innerHTML = mensagens
-          .map(msg => `<span class="ticker-item">${msg}</span>`)
-          .join('<span class="ticker-separador">✦</span>');
+          <div class="meteo-card">
+            <i class="fa-solid fa-tornado meteo-icon" style="color: #f97316;"></i>
+            <div class="meteo-val">${rajadaVentoVal} <small>km/h</small></div>
+            <div class="meteo-label">Rajada Máx</div>
+          </div>
+
+          <div class="meteo-card">
+            <i class="fa-solid fa-fire-flame-curved meteo-icon" style="color: #ef4444;"></i>
+            <div class="meteo-val" style="color: #ef4444;">${fwiVal}</div>
+            <div class="meteo-label">Índice FWI</div>
+          </div>
+
+          <div class="meteo-card">
+            <div class="meteo-val">${ffmcVal}</div>
+            <div class="meteo-label">Índice FFMC</div>
+          </div>
+
+          <div class="meteo-card">
+            <div class="meteo-val">${isiVal}</div>
+            <div class="meteo-label">Índice ISI</div>
+          </div>
+
+          <div class="meteo-card">
+            <div class="meteo-val" style="color: var(--accent-green);">BRAGA</div>
+            <div class="meteo-label">Concelho (0303)</div>
+          </div>
+        `;
 
       } catch (err) {
-        containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
+        container.innerHTML = `<div class="meteo-card meteo-card-wide">⚠️ Erro ao obter dados do IPMA.</div>`;
+      }
+    }
+
+    // 5. OBSERVAÇÕES (AGORA NO TICKER RODAPÉ)
+    async function carregarObservacoesTicker() {
+      const containerTicker = document.getElementById('ticker-observacoes');
+      if (!containerTicker) return;
+
+      try {
+        const res = await fetch(obterUrlGviz(GID_COMUNICACOES));
+        const csvTexto = await res.text();
+        const todasLinhas = parseCSV(csvTexto);
+
+        if (todasLinhas.length === 0) {
+          containerTicker.innerHTML = `<span class="ticker-item">Sem observações registadas.</span>`;
+          return;
+        }
+
+        const obsValidas = todasLinhas.filter(row => {
+          if (!row[1] || row[1].trim() === '') return false;
+
+          const col0 = (row[0] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+          const col1 = (row[1] || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+          if (col0.includes('titulo') || col0 === 'header' || col0 === 'data') return false;
+          if (col1 === 'observacoes' || col1 === 'observacao' || col1 === 'texto') return false;
+
+          return true;
+        });
+
+        if (obsValidas.length === 0) {
+          containerTicker.innerHTML = `<span class="ticker-item">Sem observações registadas de momento.</span>`;
+          return;
+        }
+
+        const itensHTML = obsValidas.map(row => {
+          const titulo = row[0] ? row[0].trim() : 'AVISO';
+          const texto = row[1] ? row[1].trim() : '';
+          return `<span class="ticker-item"><strong>⚠️ ${titulo}:</strong> ${texto}</span>`;
+        }).join('<span class="ticker-separador">✦</span>');
+
+        containerTicker.innerHTML = itensHTML;
+
+      } catch (err) {
+        containerTicker.innerHTML = `<span class="ticker-item">Sem observações registadas de momento.</span>`;
       }
     }
 
@@ -866,8 +792,8 @@
       carregarTeatroOperacoes();
       carregarViaturasINOP();
       carregarAgendamentos();
-      carregarObservacoes();
       carregarMeteoIPMA();
+      carregarObservacoesTicker();
     }
 
     setInterval(carregarTodosOsDados, 10000);
