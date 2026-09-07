@@ -1,9 +1,10 @@
 <!BSB html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BSB Braga - CentCom</title>
+  <title>BSB BRAGA - CENTCOM</title>
   <style>
     * {
       box-sizing: border-box;
@@ -23,7 +24,7 @@
       padding-bottom: 50px;
     }
 
-    /* CABEÇALHO COMPACTO E PROFISSIONAL */
+    /* CABEÇALHO COMPACTO E LIMPO (SEM ÍCONES) */
     header {
       display: flex;
       justify-content: space-between;
@@ -38,9 +39,6 @@
     }
 
     .header-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       color: #38bdf8;
       font-size: 1.1rem;
       font-weight: 800;
@@ -174,11 +172,29 @@
       letter-spacing: 0.5px;
     }
 
-    /* ESTILOS PARA OS MEIOS COM MINI ÍCONE */
+    /* ESTILOS DE LINHA PARA HORA E MEIOS COM MINI ÍCONES */
+    .hora-container {
+      color: #fb923c;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hora-icon-clock {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      stroke: #fb923c;
+    }
+
     .meios-container {
       color: #cbd5e1;
       font-size: 0.82rem;
-      margin-top: 6px;
+      margin-top: 4px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -297,7 +313,7 @@
   <!-- CABEÇALHO -->
   <header>
     <div class="header-title">
-      🛡️ BSB BRAGA - CENTCOM
+      BSB BRAGA - CENTCOM
     </div>
     <div class="clock" id="relogio">--:--:--</div>
   </header>
@@ -395,36 +411,30 @@
       });
     }
 
-    // Função de parsing de data corrigida e tolerante a horas/espaços
     function parseDataPT(str) {
       if (!str || !str.trim()) return null;
-      const limpo = str.trim().split(' ')[0]; // Pega apenas na parte DD/MM/AAAA
+      const limpo = str.trim().split(' ')[0];
       const partes = limpo.split('/').map(Number);
       if (partes.length < 3 || isNaN(partes[0]) || isNaN(partes[1]) || isNaN(partes[2])) return null;
       return new Date(partes[2], partes[1] - 1, partes[0]);
     }
 
-    // FILTRAGEM RIGOROSA DE INTERVALO DE DATAS
     function estaAtivoNoIntervalo(dataInicioStr, dataFimStr) {
       const agora = new Date();
-      agora.setHours(0, 0, 0, 0); // Normaliza para o início do dia atual
+      agora.setHours(0, 0, 0, 0);
 
       const dInicio = parseDataPT(dataInicioStr);
       let dFim = parseDataPT(dataFimStr);
 
-      // Se não houver data de início válida, ignora o registo
       if (!dInicio) return false;
 
-      // Se não houver data de fim, assume-se que o evento termina no próprio dia de início
       if (!dFim) {
         dFim = new Date(dInicio);
       }
 
-      // Ajusta o fim do dia para 23:59:59
       dInicio.setHours(0, 0, 0, 0);
       dFim.setHours(23, 59, 59, 999);
 
-      // O evento está ativo se a data de hoje estiver entre dInicio e dFim (inclusive)
       return agora >= dInicio && agora <= dFim;
     }
 
@@ -437,7 +447,7 @@
              d.getFullYear() === agora.getFullYear();
     }
 
-    // ÍCONE RÁDIO PORTÁTIL
+    /* ÍCONES SVG */
     const ICONE_RADIO_TELECOM = `<svg class="canal-icon-radio" viewBox="0 0 24 36" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="8" y1="1" x2="8" y2="10" stroke="#38bdf8" stroke-width="2.5"/>
       <rect x="13" y="6" width="4" height="4" fill="#0284c7" rx="1"/>
@@ -448,7 +458,6 @@
       <line x1="7" y1="28" x2="17" y2="28" stroke="#38bdf8" stroke-width="1.5"/>
     </svg>`;
 
-    // ÍCONE DE CALENDÁRIO / AGENDAMENTO
     function obterIconoAgendamento(cor = '#fb923c') {
       return `<svg viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -459,7 +468,11 @@
       </svg>`;
     }
 
-    // ÍCONE DO CAMIÃO DE BOMBEIROS (MINI PARA MEIOS)
+    const MINI_ICONE_RELOGIO = `<svg class="hora-icon-clock" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polyline points="12 6 12 12 16 14"></polyline>
+    </svg>`;
+
     const MINI_ICONE_CAMIAO = `<svg class="meios-icon-truck" viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
       <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
@@ -468,7 +481,6 @@
       <circle cx="38" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
     </svg>`;
 
-    // ÍCONE DO CAMIÃO DE BOMBEIROS PARA OS VEÍCULOS INOP
     function obterIconoCaminhaoBombeiros() {
       return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
@@ -481,14 +493,13 @@
       </svg>`;
     }
 
-    // ÍCONE CAPACETE
     const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 24 24">
       <path d="M12 2C7 2 3 6 3 11v3h18v-3c0-5-4-9-9-9zM4 15h16v2H4vz"/>
       <path d="M12 4a1 1 0 0 1 1 1v4a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1z"/>
       <rect x="2" y="17" width="20" height="2" rx="1"/>
     </svg>`;
 
-    // 1. CANAIS RÁDIO (AGRUPADOS COM FILTRAGEM RIGOROSA DE DATAS)
+    // 1. CANAIS RÁDIO (CORRIGIDO PARA MAPEAMENTO DAS COLUNAS A, B e C)
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
@@ -499,17 +510,16 @@
         const paletaCores = ['#38bdf8', '#fb923c', '#4ade80', '#facc15', '#a855f7'];
 
         linhas.forEach(col => {
-          const dataInicio = col[0]; // Coluna A
-          const evento = col[1] || 'Teatro Operacional'; // Coluna B
-          const dataFim = col[2];   // Coluna C
+          const dataInicio = col[0]; // Coluna A: Data início
+          const dataFim = col[1];    // Coluna B: Data Fim
+          const evento = col[2] || 'Teatro Operacional'; // Coluna C: Evento
 
-          // Valida estritamente se o evento está no intervalo ativo de datas
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
             if (!eventosMap[evento]) {
               eventosMap[evento] = [];
             }
             
-            // Colunas D, E, F, G e H (Índices 3 a 7)
+            // Colunas D, E, F, G, H (Índices 3 a 7)
             const colunasCanais = [col[3], col[4], col[5], col[6], col[7]];
 
             colunasCanais.forEach(canal => {
@@ -523,7 +533,6 @@
           }
         });
 
-        // Remove eventos que eventualmente tenham ficado sem canais
         Object.keys(eventosMap).forEach(key => {
           if (eventosMap[key].length === 0) delete eventosMap[key];
         });
@@ -598,7 +607,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA
+    // 3. AGENDAMENTOS DO DIA (HORA FORMATADA ABAIXO DO TÍTULO)
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
@@ -615,7 +624,7 @@
         const coresBorda = ['#fb923c', '#38bdf8', '#facc15', '#4ade80'];
 
         container.innerHTML = agendamentosHoje.map((col, index) => {
-          const hora = col[1] ? `[${col[1]}] ` : '';
+          const hora = col[1] ? col[1].trim() : '';
           const descricao = col[2] || '';
           const meios = col[3] || '';
           const equipas = col[4] || '';
@@ -633,8 +642,15 @@
               <div class="item-info">
                 <div class="item-icon-svg">${svgAgendamento}</div>
                 <div class="item-details" style="width: 100%;">
-                  <p style="color: ${corAtual}; font-weight: bold; font-size: 0.95rem;">${hora}${descricao}</p>
+                  <p style="color: ${corAtual}; font-weight: bold; font-size: 0.95rem;">${descricao}</p>
                   
+                  ${hora ? `
+                    <div class="hora-container">
+                      ${MINI_ICONE_RELOGIO}
+                      <span>${hora}</span>
+                    </div>
+                  ` : ''}
+
                   ${meios ? `
                     <div class="meios-container">
                       <strong style="color: #94a3b8;">Meios:</strong> 
