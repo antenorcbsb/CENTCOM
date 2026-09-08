@@ -104,6 +104,14 @@
       align-items: center;
       justify-content: space-between;
       border-left: 4px solid #ef4444;
+      transition: all 0.3s ease;
+    }
+
+    /* Estilo de Destaque Elevado para Informação / Alerta */
+    .item-card.card-informacao {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, #1e293b 100%);
+      border-left: 6px solid #c084fc !important;
+      box-shadow: 0 0 10px rgba(192, 132, 252, 0.2);
     }
 
     .item-info {
@@ -316,6 +324,19 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
+    @keyframes pulse-glow {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    .badge-info-destaque {
+      animation: pulse-glow 2s infinite;
+      background-color: #a855f7 !important;
+      color: #ffffff !important;
+      border: 1px solid #c084fc !important;
+    }
+
     @media (max-width: 900px) {
       .dashboard-grid, .grid-2-columns { grid-template-columns: 1fr; }
       header { justify-content: flex-start; }
@@ -475,7 +496,7 @@
           }
         }
         resultado.push(campo.trim().replace(/^"|"$/g, ''));
-        return resultado;
+        resultado;
       });
     }
 
@@ -513,6 +534,26 @@
       return d.getDate() === agora.getDate() &&
              d.getMonth() === agora.getMonth() &&
              d.getFullYear() === agora.getFullYear();
+    }
+
+    // Função para verificar se a hora agendada já expirou
+    function horaJaExpirou(horaStr) {
+      if (!horaStr || !horaStr.trim()) return false;
+
+      const agora = new Date();
+      const minutosAtuais = agora.getHours() * 60 + agora.getMinutes();
+
+      // Encontra todas as ocorrências de HH:MM
+      const horasEncontradas = horaStr.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g);
+
+      if (!horasEncontradas || horasEncontradas.length === 0) return false;
+
+      // Se houver intervalo (ex: 10:00 - 12:30), consideramos a última hora como término
+      const horaFinalStr = horasEncontradas[horasEncontradas.length - 1];
+      const [horas, minutos] = horaFinalStr.split(':').map(Number);
+      const minutosFim = horas * 60 + minutos;
+
+      return minutosAtuais >= minutosFim;
     }
 
     function obterCorVento(velocidade) {
@@ -727,24 +768,23 @@
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (Ajustado para Coluna A: Tipo, Coluna B: Data, Coluna C: Hora...)
+    // 3. AGENDAMENTOS DO DIA (Com Expiração Automática por Hora e Destaque Visual)
     async function carregarAgendamentos() {
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
         const linhas = dados.slice(1);
         const container = document.getElementById('container-agendamentos');
 
-        // Mapeamento das colunas:
-        // col[0] = Tipo (Agendamento / Informação)
-        // col[1] = Data (DD/MM/AAAA)
-        // col[2] = Hora
-        // col[3] = Descrição
-        // col[4] = Meios Alocados
-        // col[5] = Equipas
-        const agendamentosHoje = linhas.filter(col => col[1] && ehDataDeHoje(col[1]));
+        // Filtra por data de hoje e exclui os agendamentos cuja hora final já tenha expirado
+        const agendamentosHoje = linhas.filter(col => {
+          const ehHoje = col[1] && ehDataDeHoje(col[1]);
+          const horaStr = col[2] ? col[2].trim() : '';
+          const expirou = horaJaExpirou(horaStr);
+          return ehHoje && !expirou;
+        });
 
         if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para hoje.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
           return;
         }
 
@@ -758,7 +798,7 @@
           const equipas = col[5] || '';
 
           const ehInformacao = tipo.toLowerCase().includes('info');
-          const corAtual = ehInformacao ? '#a855f7' : coresBorda[index % coresBorda.length];
+          const corAtual = ehInformacao ? '#c084fc' : coresBorda[index % coresBorda.length];
           const svgAgendamento = obterIconoAgendamento(tipo, corAtual);
 
           let meiosHtml = '';
@@ -782,15 +822,18 @@
             return numLimpo ? `<span class="bombeiro-tag">${SVG_CAPACETE_BOMBEIRO} ${numLimpo}</span>` : '';
           }).join('') : '';
 
+          const classeCard = ehInformacao ? 'item-card card-informacao' : 'item-card';
+          const classeBadge = ehInformacao ? 'badge-info-destaque' : '';
+
           return `
-            <div class="item-card" style="border-left-color: ${corAtual};">
+            <div class="${classeCard}" style="border-left-color: ${corAtual};">
               <div class="item-info">
                 <div class="item-icon-svg">${svgAgendamento}</div>
                 <div class="item-details" style="width: 100%;">
                   <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                    <p style="color: ${corAtual}; font-weight: bold; font-size: 0.95rem;">${descricao}</p>
-                    <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background-color: #0f172a; border: 1px solid ${corAtual}; color: ${corAtual}; text-transform: uppercase; font-weight: bold; white-space: nowrap;">
-                      ${tipo}
+                    <p style="color: ${ehInformacao ? '#f3e8ff' : corAtual}; font-weight: bold; font-size: 0.95rem;">${descricao}</p>
+                    <span class="${classeBadge}" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background-color: #0f172a; border: 1px solid ${corAtual}; color: ${corAtual}; text-transform: uppercase; font-weight: bold; white-space: nowrap;">
+                      ${ehInformacao ? 'Destaque / Info' : tipo}
                     </span>
                   </div>
                   
