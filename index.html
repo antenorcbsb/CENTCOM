@@ -1,5 +1,4 @@
 <!BSB html>
-<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -351,17 +350,17 @@
     <div class="card">
       <div class="card-header blue">🌧️ METEOROLOGIA & RISCO (IPMA BRAGA)</div>
       <div class="meteo-header" id="meteo-resumo">
-        <span>🌤️ Céu pouco nublado</span>
-        <span>🌡️ 30°C / 14°C</span>
-        <span>🌧️ Prob. Chuva: 0.0%</span>
+        <span>🌤️ A carregar...</span>
+        <span>🌡️ --°C / --°C</span>
+        <span>🌧️ Prob. Chuva: --%</span>
       </div>
       <div class="meteo-grid" id="meteo-valores">
         <div class="meteo-item">
-          <div class="value" id="val-vento" style="color: #4ade80;">12 km/h</div>
-          <div class="label">Vento (W)</div>
+          <div class="value" id="val-vento" style="color: #4ade80;">-- km/h</div>
+          <div class="label" id="lbl-vento">Vento</div>
         </div>
         <div class="meteo-item">
-          <div class="value" id="val-rajada" style="color: #facc15;">22 km/h</div>
+          <div class="value" id="val-rajada" style="color: #facc15;">-- km/h</div>
           <div class="label">Rajada Máx</div>
         </div>
         <div class="meteo-item">
@@ -542,7 +541,7 @@
       <rect x="2" y="17" width="20" height="2" rx="1"/>
     </svg>`;
 
-    // 1. CANAIS RÁDIO (DINÂMICO E AGRUPADO POR EVENTO)
+    // 1. CANAIS RÁDIO
     async function carregarCanais() {
       try {
         const dados = await obterDadosAba(GIDS.canais);
@@ -741,22 +740,62 @@
       }
     }
 
-    function atualizarCoresMeteo(ventoVel, rajadaVel) {
-      const elVento = document.getElementById('val-vento');
-      const elRajada = document.getElementById('val-rajada');
+    // 4. METEOROLOGIA IPMA BRAGA (ID 1030300)
+    async function carregarMeteoIPMA() {
+      try {
+        const [resMeteo, resTipos] = await Promise.all([
+          fetch('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json'),
+          fetch('https://api.ipma.pt/open-data/weather-type-classe.json')
+        ]);
 
-      if (elVento) {
-        elVento.textContent = `${ventoVel} km/h`;
-        elVento.style.color = obterCorVento(ventoVel);
-      }
+        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro API IPMA");
 
-      if (elRajada) {
-        elRajada.textContent = `${rajadaVel} km/h`;
-        elRajada.style.color = obterCorVento(rajadaVel);
+        const dadosMeteo = await resMeteo.json();
+        const dadosTipos = await resTipos.json();
+
+        const previsaoHoje = dadosMeteo.data[0];
+        
+        // Mapeamento do tipo de tempo (ex: Céu Limpo, Pouco Nublado, etc.)
+        const mapaTipos = {};
+        dadosTipos.data.forEach(t => { mapaTipos[t.idWeatherType] = t.descWeatherTypePT; });
+        const estadoTempo = mapaTipos[previsaoHoje.idWeatherType] || 'Indisponível';
+
+        // Atualiza a barra de resumo
+        document.getElementById('meteo-resumo').innerHTML = `
+          <span>🌤️ ${estadoTempo}</span>
+          <span>🌡️ ${previsaoHoje.tMax}°C / ${previsaoHoje.tMin}°C</span>
+          <span>🌧️ Prob. Chuva: ${previsaoHoje.precipitaProb}%</span>
+        `;
+
+        // Direção do vento e intensidades
+        const dirVento = previsaoHoje.predWindDir || '';
+        const velVento = Math.round(parseFloat(previsaoHoje.classWindSpeed || 0) * 10); // Estimativa de km/h do IPMA
+        const rajada = Math.round(velVento * 1.5); // Valor de rajada estimado se não fornecido
+
+        const elVento = document.getElementById('val-vento');
+        const elRajada = document.getElementById('val-rajada');
+        const lblVento = document.getElementById('lbl-vento');
+
+        if (elVento) {
+          elVento.textContent = `${velVento} km/h`;
+          elVento.style.color = obterCorVento(velVento);
+        }
+
+        if (lblVento) {
+          lblVento.textContent = `Vento (${dirVento})`;
+        }
+
+        if (elRajada) {
+          elRajada.textContent = `${rajada} km/h`;
+          elRajada.style.color = obterCorVento(rajada);
+        }
+
+      } catch (e) {
+        console.error("Erro na Meteorologia IPMA:", e);
       }
     }
 
-    // 4. COMUNICADOS
+    // 5. COMUNICADOS
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
@@ -797,11 +836,15 @@
       carregarVeiculos();
       carregarAgendamentos();
       carregarComunicados();
-      atualizarCoresMeteo(12, 22);
     }
 
+    // Inicialização
     sincronizarTudo();
-    setInterval(sincronizarTudo, 30000);
+    carregarMeteoIPMA();
+
+    // Timers de Atualização
+    setInterval(sincronizarTudo, 30000); // Canais, Veículos, Agendamentos e Comunicados a cada 30 seg
+    setInterval(carregarMeteoIPMA, 3600000); // Meteorologia IPMA a cada 1 hora (3 600 000 ms)
   </script>
 </body>
 </html>
