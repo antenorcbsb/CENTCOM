@@ -388,6 +388,61 @@
       comunicados: '1196343008'
     };
 
+    // Mapeamento de SVGs por Tipologia de Veículo
+    const ICONES_VEICULOS = {
+      AMBULANCIA: `<svg viewBox="0 0 50 50">
+        <path d="M 8 38 L 42 38 L 42 18 C 42 15, 38 12, 33 12 L 8 12 Z" fill="#F8FAFC" stroke="#1E293B" stroke-width="2"/>
+        <rect x="8" y="32" width="34" height="6" fill="#EF4444"/>
+        <path d="M 33 12 L 42 18 L 42 24 L 33 24 Z" fill="#93C5FD"/>
+        <circle cx="15" cy="38" r="4" fill="#334155"/>
+        <circle cx="35" cy="38" r="4" fill="#334155"/>
+        <path d="M 22 20 H 26 V 28 H 22 Z M 20 22 H 28 V 26 H 20 Z" fill="#EF4444"/>
+      </svg>`,
+
+      PESADO: `<svg viewBox="0 0 50 50">
+        <rect x="6" y="16" width="38" height="20" rx="2" fill="#EF4444" stroke="#1E293B" stroke-width="2"/>
+        <rect x="32" y="18" width="10" height="8" fill="#93C5FD"/>
+        <rect x="10" y="20" width="12" height="10" fill="#94A3B8"/>
+        <circle cx="27" cy="25" r="4" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+        <path d="M 8 12 H 40 M 12 12 V 16 M 20 12 V 16 M 28 12 V 16 M 36 12 V 16" stroke="#64748B" stroke-width="2"/>
+        <circle cx="14" cy="36" r="4" fill="#334155"/>
+        <circle cx="36" cy="36" r="4" fill="#334155"/>
+      </svg>`,
+
+      SUV: `<svg viewBox="0 0 50 50">
+        <path d="M 8 34 L 8 22 L 16 14 L 36 14 L 42 22 L 42 34 Z" fill="#EF4444" stroke="#1E293B" stroke-width="2"/>
+        <rect x="18" y="16" width="8" height="6" fill="#93C5FD"/>
+        <rect x="28" y="16" width="8" height="6" fill="#93C5FD"/>
+        <rect x="8" y="28" width="34" height="3" fill="#22C55E"/>
+        <path d="M 14 10 H 34 M 18 10 V 14 M 26 10 V 14 M 30 10 V 14" stroke="#64748B" stroke-width="2"/>
+        <circle cx="15" cy="34" r="4" fill="#334155"/>
+        <circle cx="35" cy="34" r="4" fill="#334155"/>
+      </svg>`,
+
+      ESCADA: `<svg viewBox="0 0 50 50">
+        <rect x="6" y="22" width="38" height="14" rx="2" fill="#EF4444" stroke="#1E293B" stroke-width="2"/>
+        <rect x="30" y="24" width="12" height="6" fill="#334155"/>
+        <path d="M 8 20 L 38 8 M 12 18 L 14 20 M 20 15 L 22 17 M 28 12 L 30 14" stroke="#94A3B8" stroke-width="2.5"/>
+        <circle cx="12" cy="36" r="3.5" fill="#334155"/>
+        <circle cx="22" cy="36" r="3.5" fill="#334155"/>
+        <circle cx="36" cy="36" r="3.5" fill="#334155"/>
+      </svg>`
+    };
+
+    function obterIconeVeiculo(nomeVeiculo) {
+      const nome = (nomeVeiculo || '').toUpperCase();
+      if (nome.includes('ABSC') || nome.includes('ABTP') || nome.includes('AMB')) {
+        return ICONES_VEICULOS.AMBULANCIA;
+      }
+      if (nome.includes('VE') || nome.includes('VP')) {
+        return ICONES_VEICULOS.ESCADA;
+      }
+      if (nome.includes('VCOT') || nome.includes('VOPO') || nome.includes('VTT')) {
+        return ICONES_VEICULOS.SUV;
+      }
+      return ICONES_VEICULOS.PESADO;
+    }
+
     function atualizarRelogio() {
       const agora = new Date();
       document.getElementById('relogio').textContent = 
@@ -523,48 +578,24 @@
       return SVG_MEIO_CAMIAO;
     }
 
-    function obterIconoCaminhaoBombeiros() {
-      return `<svg viewBox="0 0 48 32" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
-        <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
-        <path d="M 33 11 L 40 11 L 43 15 L 33 15 Z" fill="#0284c7" opacity="0.6"/>
-        <path d="M 4 6 H 26 M 6 6 V 9 M 12 6 V 9 M 18 6 V 9 M 24 6 V 9" stroke="#facc15" stroke-width="1.5"/>
-        <circle cx="10" cy="24" r="4" fill="#0b1320" stroke="#f87171"/>
-        <circle cx="22" cy="24" r="4" fill="#0b1320" stroke="#f87171"/>
-        <circle cx="38" cy="24" r="4" fill="#0b1320" stroke="#f87171"/>
-      </svg>`;
-    }
-
-const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18">
-      <!-- Ombro e Farda Vermelha -->
+    const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18">
       <path d="M 11 44 C 11 34, 18 31, 25 31 C 32 31, 39 34, 39 44 Z" fill="#E64A19"/>
-      <!-- Fecho / Detalhes da Farda -->
       <rect x="23.5" y="31" width="3" height="13" fill="#D84315"/>
       <rect x="21" y="34" width="8" height="3" rx="1" fill="#37474F"/>
       <rect x="17" y="41" width="16" height="3" fill="#FFEB3B"/>
-      
-      <!-- Orelhas -->
       <circle cx="17" cy="22" r="2.5" fill="#FFA726"/>
       <circle cx="33" cy="22" r="2.5" fill="#FFA726"/>
-      
-      <!-- Rosto -->
       <circle cx="25" cy="23" r="7.5" fill="#FFCC80"/>
-      <!-- Cabelo Lateral -->
       <path d="M 17.5 19 C 17.5 22, 19 22, 19 19 Z" fill="#424242"/>
       <path d="M 32.5 19 C 32.5 22, 31 22, 31 19 Z" fill="#424242"/>
-      <!-- Olhos -->
       <circle cx="22" cy="22" r="1" fill="#3E2723"/>
       <circle cx="28" cy="22" r="1" fill="#3E2723"/>
-      
-      <!-- Aba do Capacete -->
       <path d="M 12 21 C 12 16, 38 16, 38 21 C 38 23, 12 23, 12 21 Z" fill="#D84315"/>
-      <!-- Topo do Capacete -->
       <path d="M 17 19 C 17 8, 33 8, 33 19 Z" fill="#FF3D00"/>
-      <!-- Faixa Central do Capacete -->
       <path d="M 22 9 L 28 9 L 27 18 L 23 18 Z" fill="#BF360C"/>
-      <!-- Emblema Amarelo Frontal -->
       <polygon points="25,10 28,14 25,17 22,14" fill="#FFD600"/>
     </svg>`;
+
     // 1. CANAIS RÁDIO
     async function carregarCanais() {
       try {
@@ -667,11 +698,12 @@ const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18">
         container.innerHTML = inops.map(col => {
           const nomeVeiculo = col[0] || 'Veículo';
           const observacao = col[2] || 'Avaria Registada';
+          const iconeSvg = obterIconeVeiculo(nomeVeiculo);
 
           return `
             <div class="item-card">
               <div class="item-info">
-                <div class="item-icon-svg">${obterIconoCaminhaoBombeiros()}</div>
+                <div class="item-icon-svg">${iconeSvg}</div>
                 <div class="item-details">
                   <h4>${nomeVeiculo}</h4>
                   <p>${observacao}</p>
@@ -779,22 +811,19 @@ const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18">
 
         const previsaoHoje = dadosMeteo.data[0];
         
-        // Mapeamento do tipo de tempo (ex: Céu Limpo, Pouco Nublado, etc.)
         const mapaTipos = {};
         dadosTipos.data.forEach(t => { mapaTipos[t.idWeatherType] = t.descWeatherTypePT; });
         const estadoTempo = mapaTipos[previsaoHoje.idWeatherType] || 'Indisponível';
 
-        // Atualiza a barra de resumo
         document.getElementById('meteo-resumo').innerHTML = `
           <span>🌤️ ${estadoTempo}</span>
           <span>🌡️ ${previsaoHoje.tMax}°C / ${previsaoHoje.tMin}°C</span>
           <span>🌧️ Prob. Chuva: ${previsaoHoje.precipitaProb}%</span>
         `;
 
-        // Direção do vento e intensidades
         const dirVento = previsaoHoje.predWindDir || '';
-        const velVento = Math.round(parseFloat(previsaoHoje.classWindSpeed || 0) * 10); // Estimativa de km/h do IPMA
-        const rajada = Math.round(velVento * 1.5); // Valor de rajada estimado se não fornecido
+        const velVento = Math.round(parseFloat(previsaoHoje.classWindSpeed || 0) * 10);
+        const rajada = Math.round(velVento * 1.5);
 
         const elVento = document.getElementById('val-vento');
         const elRajada = document.getElementById('val-rajada');
@@ -867,8 +896,8 @@ const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18">
     carregarMeteoIPMA();
 
     // Timers de Atualização
-    setInterval(sincronizarTudo, 30000); // Canais, Veículos, Agendamentos e Comunicados a cada 30 seg
-    setInterval(carregarMeteoIPMA, 3600000); // Meteorologia IPMA a cada 1 hora (3 600 000 ms)
+    setInterval(sincronizarTudo, 30000);
+    setInterval(carregarMeteoIPMA, 3600000);
   </script>
 </body>
 </html>
