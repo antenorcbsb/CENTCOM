@@ -535,12 +535,21 @@
       </svg>`;
     }
 
-    const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 24 24">
-      <path d="M12 2C7 2 3 6 3 11v3h18v-3c0-5-4-9-9-9zM4 15h16v2H4vz"/>
-      <path d="M12 4a1 1 0 0 1 1 1v4a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1z"/>
-      <rect x="2" y="17" width="20" height="2" rx="1"/>
+  const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Capacete / Viseira -->
+      <path d="M 3 10 C 3 4, 21 4, 21 10 C 21 11, 3 11, 3 10 Z" fill="#f97316" stroke="#f97316"/>
+      <path d="M 5 10 L 19 10 L 18 12 L 6 12 Z" fill="#38bdf8" opacity="0.8"/>
+      <!-- Cara / Rosto -->
+      <circle cx="12" cy="14" r="5" fill="#ffedd5"/>
+      <!-- Olhos -->
+      <circle cx="10" cy="14" r="0.7" fill="#0f172a"/>
+      <circle cx="14" cy="14" r="0.7" fill="#0f172a"/>
+      <!-- Sorriso / Boca -->
+      <path d="M 10.5 16.2 Q 12 17.5 13.5 16.2" stroke="#0f172a" stroke-width="1"/>
+      <!-- Bochechas / Proteção lateral -->
+      <path d="M 6 11 C 6 15, 7 17, 8 18" stroke="#f97316" stroke-width="1.5" fill="none"/>
+      <path d="M 18 11 C 18 15, 17 17, 16 18" stroke="#f97316" stroke-width="1.5" fill="none"/>
     </svg>`;
-
     // 1. CANAIS RÁDIO
     async function carregarCanais() {
       try {
