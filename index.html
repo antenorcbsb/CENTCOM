@@ -1,4 +1,4 @@
-<!BSB html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -107,7 +107,6 @@
       transition: all 0.3s ease;
     }
 
-    /* Estilo de Destaque Elevado para Informação / Alerta */
     .item-card.card-informacao {
       background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, #1e293b 100%);
       border-left: 6px solid #c084fc !important;
@@ -410,56 +409,17 @@
     };
 
     const ICONES_VEICULOS = {
-      AMBULANCIA: `<svg viewBox="0 0 50 50">
-        <path d="M 8 38 L 42 38 L 42 18 C 42 15, 38 12, 33 12 L 8 12 Z" fill="#F8FAFC" stroke="#1E293B" stroke-width="2"/>
-        <rect x="8" y="32" width="34" height="6" fill="#EF4444"/>
-        <path d="M 33 12 L 42 18 L 42 24 L 33 24 Z" fill="#93C5FD"/>
-        <circle cx="15" cy="38" r="4" fill="#334155"/>
-        <circle cx="35" cy="38" r="4" fill="#334155"/>
-        <path d="M 22 20 H 26 V 28 H 22 Z M 20 22 H 28 V 26 H 20 Z" fill="#EF4444"/>
-      </svg>`,
-
-      PESADO: `<svg viewBox="0 0 50 50">
-        <rect x="6" y="16" width="38" height="20" rx="2" fill="#EF4444" stroke="#1E293B" stroke-width="2"/>
-        <rect x="32" y="18" width="10" height="8" fill="#93C5FD"/>
-        <rect x="10" y="20" width="12" height="10" fill="#94A3B8"/>
-        <circle cx="27" cy="25" r="4" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
-        <path d="M 8 12 H 40 M 12 12 V 16 M 20 12 V 16 M 28 12 V 16 M 36 12 V 16" stroke="#64748B" stroke-width="2"/>
-        <circle cx="14" cy="36" r="4" fill="#334155"/>
-        <circle cx="36" cy="36" r="4" fill="#334155"/>
-      </svg>`,
-
-      SUV: `<svg viewBox="0 0 50 50">
-        <path d="M 8 34 L 8 22 L 16 14 L 36 14 L 42 22 L 42 34 Z" fill="#EF4444" stroke="#1E293B" stroke-width="2"/>
-        <rect x="18" y="16" width="8" height="6" fill="#93C5FD"/>
-        <rect x="28" y="16" width="8" height="6" fill="#93C5FD"/>
-        <rect x="8" y="28" width="34" height="3" fill="#22C55E"/>
-        <path d="M 14 10 H 34 M 18 10 V 14 M 26 10 V 14 M 30 10 V 14" stroke="#64748B" stroke-width="2"/>
-        <circle cx="15" cy="34" r="4" fill="#334155"/>
-        <circle cx="35" cy="34" r="4" fill="#334155"/>
-      </svg>`,
-
-      ESCADA: `<svg viewBox="0 0 50 50">
-        <rect x="6" y="22" width="38" height="14" rx="2" fill="#EF4444" stroke="#1E293B" stroke-width="2"/>
-        <rect x="30" y="24" width="12" height="6" fill="#334155"/>
-        <path d="M 8 20 L 38 8 M 12 18 L 14 20 M 20 15 L 22 17 M 28 12 L 30 14" stroke="#94A3B8" stroke-width="2.5"/>
-        <circle cx="12" cy="36" r="3.5" fill="#334155"/>
-        <circle cx="22" cy="36" r="3.5" fill="#334155"/>
-        <circle cx="36" cy="36" r="3.5" fill="#334155"/>
-      </svg>`
+      AMBULANCIA: `<svg viewBox="0 0 50 50"><path d="M 8 38 L 42 38 L 42 18 C 42 15, 38 12, 33 12 L 8 12 Z" fill="#F8FAFC" stroke="#1E293B" stroke-width="2"/><rect x="8" y="32" width="34" height="6" fill="#EF4444"/><path d="M 33 12 L 42 18 L 42 24 L 33 24 Z" fill="#93C5FD"/><circle cx="15" cy="38" r="4" fill="#334155"/><circle cx="35" cy="38" r="4" fill="#334155"/><path d="M 22 20 H 26 V 28 H 22 Z M 20 22 H 28 V 26 H 20 Z" fill="#EF4444"/></svg>`,
+      PESADO: `<svg viewBox="0 0 50 50"><rect x="6" y="16" width="38" height="20" rx="2" fill="#EF4444" stroke="#1E293B" stroke-width="2"/><rect x="32" y="18" width="10" height="8" fill="#93C5FD"/><rect x="10" y="20" width="12" height="10" fill="#94A3B8"/><circle cx="27" cy="25" r="4" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/><path d="M 8 12 H 40 M 12 12 V 16 M 20 12 V 16 M 28 12 V 16 M 36 12 V 16" stroke="#64748B" stroke-width="2"/><circle cx="14" cy="36" r="4" fill="#334155"/><circle cx="36" cy="36" r="4" fill="#334155"/></svg>`,
+      SUV: `<svg viewBox="0 0 50 50"><path d="M 8 34 L 8 22 L 16 14 L 36 14 L 42 22 L 42 34 Z" fill="#EF4444" stroke="#1E293B" stroke-width="2"/><rect x="18" y="16" width="8" height="6" fill="#93C5FD"/><rect x="28" y="16" width="8" height="6" fill="#93C5FD"/><rect x="8" y="28" width="34" height="3" fill="#22C55E"/><path d="M 14 10 H 34 M 18 10 V 14 M 26 10 V 14 M 30 10 V 14" stroke="#64748B" stroke-width="2"/><circle cx="15" cy="34" r="4" fill="#334155"/><circle cx="35" cy="34" r="4" fill="#334155"/></svg>`,
+      ESCADA: `<svg viewBox="0 0 50 50"><rect x="6" y="22" width="38" height="14" rx="2" fill="#EF4444" stroke="#1E293B" stroke-width="2"/><rect x="30" y="24" width="12" height="6" fill="#334155"/><path d="M 8 20 L 38 8 M 12 18 L 14 20 M 20 15 L 22 17 M 28 12 L 30 14" stroke="#94A3B8" stroke-width="2.5"/><circle cx="12" cy="36" r="3.5" fill="#334155"/><circle cx="22" cy="36" r="3.5" fill="#334155"/><circle cx="36" cy="36" r="3.5" fill="#334155"/></svg>`
     };
 
     function obterIconeVeiculo(nomeVeiculo) {
       const nome = (nomeVeiculo || '').toUpperCase();
-      if (nome.includes('ABSC') || nome.includes('ABTP') || nome.includes('AMB')) {
-        return ICONES_VEICULOS.AMBULANCIA;
-      }
-      if (nome.includes('VE') || nome.includes('VP')) {
-        return ICONES_VEICULOS.ESCADA;
-      }
-      if (nome.includes('VCOT') || nome.includes('VOPO') || nome.includes('VTT')) {
-        return ICONES_VEICULOS.SUV;
-      }
+      if (nome.includes('ABSC') || nome.includes('ABTP') || nome.includes('AMB')) return ICONES_VEICULOS.AMBULANCIA;
+      if (nome.includes('VE') || nome.includes('VP')) return ICONES_VEICULOS.ESCADA;
+      if (nome.includes('VCOT') || nome.includes('VOPO') || nome.includes('VTT')) return ICONES_VEICULOS.SUV;
       return ICONES_VEICULOS.PESADO;
     }
 
@@ -473,10 +433,11 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
 
+    // CORREÇÃO CRÍTICA: Adicionado o return do array resultado
     async function obterDadosAba(gid) {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
       const response = await fetch(url);
-      if (!response.ok) throw new Error("Erro de acesso");
+      if (!response.ok) throw new Error("Erro de acesso à folha");
       const texto = await response.text();
       
       const linhas = texto.split('\n').filter(l => l.trim().length > 0);
@@ -496,30 +457,38 @@
           }
         }
         resultado.push(campo.trim().replace(/^"|"$/g, ''));
-        resultado;
+        return resultado; // Retorno corrigido
       });
     }
 
-    function parseDataPT(str) {
+    // Parser flexível para lidar com DD/MM/AAAA, AAAA-MM-DD e MM/DD/AAAA
+    function parseDataGenerica(str) {
       if (!str || !str.trim()) return null;
       const limpo = str.trim().split(' ')[0];
-      const partes = limpo.split('/').map(Number);
-      if (partes.length < 3 || isNaN(partes[0]) || isNaN(partes[1]) || isNaN(partes[2])) return null;
-      return new Date(partes[2], partes[1] - 1, partes[0]);
+      
+      if (limpo.includes('/')) {
+        const partes = limpo.split('/').map(Number);
+        if (partes[0] > 1000) return new Date(partes[0], partes[1] - 1, partes[2]);
+        return new Date(partes[2], partes[1] - 1, partes[0]);
+      }
+      if (limpo.includes('-')) {
+        const partes = limpo.split('-').map(Number);
+        if (partes[0] > 1000) return new Date(partes[0], partes[1] - 1, partes[2]);
+        return new Date(partes[2], partes[1] - 1, partes[0]);
+      }
+      return null;
     }
 
     function estaAtivoNoIntervalo(dataInicioStr, dataFimStr) {
       const agora = new Date();
       agora.setHours(0, 0, 0, 0);
 
-      const dInicio = parseDataPT(dataInicioStr);
-      let dFim = parseDataPT(dataFimStr);
+      const dInicio = parseDataGenerica(dataInicioStr);
+      let dFim = parseDataGenerica(dataFimStr);
 
-      if (!dInicio) return false;
+      if (!dInicio) return true; // Mostra por predefinição caso a data não esteja formatada
 
-      if (!dFim) {
-        dFim = new Date(dInicio);
-      }
+      if (!dFim) dFim = new Date(dInicio);
 
       dInicio.setHours(0, 0, 0, 0);
       dFim.setHours(23, 59, 59, 999);
@@ -528,32 +497,25 @@
     }
 
     function ehDataDeHoje(dataStr) {
-      const d = parseDataPT(dataStr);
-      if (!d) return false;
+      const d = parseDataGenerica(dataStr);
+      if (!d) return true; 
       const agora = new Date();
       return d.getDate() === agora.getDate() &&
              d.getMonth() === agora.getMonth() &&
              d.getFullYear() === agora.getFullYear();
     }
 
-    // Função para verificar se a hora agendada já expirou
     function horaJaExpirou(horaStr) {
       if (!horaStr || !horaStr.trim()) return false;
-
       const agora = new Date();
       const minutosAtuais = agora.getHours() * 60 + agora.getMinutes();
-
-      // Encontra todas as ocorrências de HH:MM
       const horasEncontradas = horaStr.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g);
 
       if (!horasEncontradas || horasEncontradas.length === 0) return false;
 
-      // Se houver intervalo (ex: 10:00 - 12:30), consideramos a última hora como término
       const horaFinalStr = horasEncontradas[horasEncontradas.length - 1];
       const [horas, minutos] = horaFinalStr.split(':').map(Number);
-      const minutosFim = horas * 60 + minutos;
-
-      return minutosAtuais >= minutosFim;
+      return minutosAtuais >= (horas * 60 + minutos);
     }
 
     function obterCorVento(velocidade) {
@@ -576,85 +538,38 @@
 
     function obterIconoAgendamento(tipo = '', cor = '#fb923c') {
       const tipoLimpo = String(tipo).toLowerCase().trim();
-
       if (tipoLimpo.includes('info') || tipoLimpo.includes('informacao') || tipoLimpo.includes('informação')) {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="16" x2="12" y2="12"/>
-          <line x1="12" y1="8" x2="12.01" y2="8"/>
-        </svg>`;
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
       }
-
-      return `<svg viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-        <rect x="7" y="14" width="3" height="3" fill="${cor}"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="14" width="3" height="3" fill="${cor}"/></svg>`;
     }
 
-    const MINI_ICONE_RELOGIO = `<svg class="hora-icon-clock" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"></circle>
-      <polyline points="12 6 12 12 16 14"></polyline>
-    </svg>`;
-
-    const SVG_MEIO_CAMIAO = `<svg class="meios-icon-svg" viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/>
-      <path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/>
-      <circle cx="10" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
-      <circle cx="22" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
-      <circle cx="38" cy="24" r="3" fill="#0b1320" stroke="#f97316"/>
-    </svg>`;
-
-    const SVG_MEIO_LIGEIRO = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1l2-4h8l2 4h1a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm14 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
-    </svg>`;
-
-    const SVG_MEIO_BOTE = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M2 16c2 1 4 1 6 0 3-1 5-1 8 0 2 1 4 1 6 0"/>
-      <path d="M3 12l2-5h14l2 5v2H3v-2z" fill="#1e293b"/>
-      <path d="M12 3v4M9 5h6"/>
-    </svg>`;
+    const MINI_ICONE_RELOGIO = `<svg class="hora-icon-clock" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+    const SVG_MEIO_CAMIAO = `<svg class="meios-icon-svg" viewBox="0 0 48 32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="28" height="15" rx="1" fill="#1e293b"/><path d="M 30 9 H 41 L 46 15 V 24 H 30 Z" fill="#1e293b"/><circle cx="10" cy="24" r="3" fill="#0b1320" stroke="#f97316"/><circle cx="22" cy="24" r="3" fill="#0b1320" stroke="#f97316"/><circle cx="38" cy="24" r="3" fill="#0b1320" stroke="#f97316"/></svg>`;
+    const SVG_MEIO_LIGEIRO = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1l2-4h8l2 4h1a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm14 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>`;
+    const SVG_MEIO_BOTE = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c2 1 4 1 6 0 3-1 5-1 8 0 2 1 4 1 6 0"/><path d="M3 12l2-5h14l2 5v2H3v-2z" fill="#1e293b"/><path d="M12 3v4M9 5h6"/></svg>`;
 
     function obterIconoMeioEspecifico(nomeMeio) {
       const m = nomeMeio.toUpperCase();
-      if (m.includes('BRTP') || m.includes('BOTE') || m.includes('EMBARCA') || m.includes('EBD')) {
-        return SVG_MEIO_BOTE;
-      }
-      if (m.includes('VAOP') || m.includes('VLCI') || m.includes('VCOT') || m.includes('VFCI') || m.includes('LIGEIRO')) {
-        return SVG_MEIO_LIGEIRO;
-      }
+      if (m.includes('BRTP') || m.includes('BOTE') || m.includes('EMBARCA') || m.includes('EBD')) return SVG_MEIO_BOTE;
+      if (m.includes('VAOP') || m.includes('VLCI') || m.includes('VCOT') || m.includes('VFCI') || m.includes('LIGEIRO')) return SVG_MEIO_LIGEIRO;
       return SVG_MEIO_CAMIAO;
     }
 
-    const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18">
-      <path d="M 11 44 C 11 34, 18 31, 25 31 C 32 31, 39 34, 39 44 Z" fill="#E64A19"/>
-      <rect x="23.5" y="31" width="3" height="13" fill="#D84315"/>
-      <rect x="21" y="34" width="8" height="3" rx="1" fill="#37474F"/>
-      <rect x="17" y="41" width="16" height="3" fill="#FFEB3B"/>
-      <circle cx="17" cy="22" r="2.5" fill="#FFA726"/>
-      <circle cx="33" cy="22" r="2.5" fill="#FFA726"/>
-      <circle cx="25" cy="23" r="7.5" fill="#FFCC80"/>
-      <path d="M 17.5 19 C 17.5 22, 19 22, 19 19 Z" fill="#424242"/>
-      <path d="M 32.5 19 C 32.5 22, 31 22, 31 19 Z" fill="#424242"/>
-      <circle cx="22" cy="22" r="1" fill="#3E2723"/>
-      <circle cx="28" cy="22" r="1" fill="#3E2723"/>
-      <path d="M 12 21 C 12 16, 38 16, 38 21 C 38 23, 12 23, 12 21 Z" fill="#D84315"/>
-      <path d="M 17 19 C 17 8, 33 8, 33 19 Z" fill="#FF3D00"/>
-      <path d="M 22 9 L 28 9 L 27 18 L 23 18 Z" fill="#BF360C"/>
-      <polygon points="25,10 28,14 25,17 22,14" fill="#FFD600"/>
-    </svg>`;
+    const SVG_CAPACETE_BOMBEIRO = `<svg viewBox="0 0 50 50" width="18" height="18"><path d="M 11 44 C 11 34, 18 31, 25 31 C 32 31, 39 34, 39 44 Z" fill="#E64A19"/><rect x="23.5" y="31" width="3" height="13" fill="#D84315"/><rect x="21" y="34" width="8" height="3" rx="1" fill="#37474F"/><rect x="17" y="41" width="16" height="3" fill="#FFEB3B"/><circle cx="17" cy="22" r="2.5" fill="#FFA726"/><circle cx="33" cy="22" r="2.5" fill="#FFA726"/><circle cx="25" cy="23" r="7.5" fill="#FFCC80"/><path d="M 17.5 19 C 17.5 22, 19 22, 19 19 Z" fill="#424242"/><path d="M 32.5 19 C 32.5 22, 31 22, 31 19 Z" fill="#424242"/><circle cx="22" cy="22" r="1" fill="#3E2723"/><circle cx="28" cy="22" r="1" fill="#3E2723"/><path d="M 12 21 C 12 16, 38 16, 38 21 C 38 23, 12 23, 12 21 Z" fill="#D84315"/><path d="M 17 19 C 17 8, 33 8, 33 19 Z" fill="#FF3D00"/><path d="M 22 9 L 28 9 L 27 18 L 23 18 Z" fill="#BF360C"/><polygon points="25,10 28,14 25,17 22,14" fill="#FFD600"/></svg>`;
 
     // 1. CANAIS RÁDIO
     async function carregarCanais() {
+      const container = document.getElementById('container-canais');
       try {
         const dados = await obterDadosAba(GIDS.canais);
-        if (dados.length < 2) return;
+        if (!dados || dados.length < 2) {
+          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Sem dados na aba de canais.</p>';
+          return;
+        }
 
         const cabecalhos = dados[0]; 
         const linhas = dados.slice(1);
-        const container = document.getElementById('container-canais');
 
         const coresRede = {
           'Canal BSB': '#38bdf8',   
@@ -672,9 +587,7 @@
           const evento = col[2] || 'Teatro Operacional';
 
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
-            if (!eventosMap[evento]) {
-              eventosMap[evento] = [];
-            }
+            if (!eventosMap[evento]) eventosMap[evento] = [];
 
             for (let i = 3; i < col.length; i++) {
               const nomeCanal = col[i] ? col[i].trim() : '';
@@ -695,50 +608,41 @@
         });
 
         const eventosKeys = Object.keys(eventosMap);
-
         if (eventosKeys.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo para o dia de hoje.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Nenhum canal ativo no momento.</p>';
           return;
         }
 
         container.innerHTML = eventosKeys.map(evento => {
-          const listaCanais = eventosMap[evento];
-
-          const badgesHtml = listaCanais.map(item => {
-            return `<span class="badge-canal" style="background-color: ${item.cor}; color: #0b1320;" title="${item.rede}">
-              ${item.canal}
-            </span>`;
-          }).join('');
+          const badgesHtml = eventosMap[evento].map(item => 
+            `<span class="badge-canal" style="background-color: ${item.cor}; color: #0b1320;" title="${item.rede}">${item.canal}</span>`
+          ).join('');
 
           return `
             <div class="canal-card">
               ${ICONE_RADIO_TELECOM}
               <div>
                 <h4>${evento}</h4>
-                <div class="badges-container">
-                  ${badgesHtml}
-                </div>
+                <div class="badges-container">${badgesHtml}</div>
               </div>
             </div>
           `;
         }).join('');
 
       } catch (e) {
-        console.error("Erro nos Canais:", e);
+        container.innerHTML = `<p style="color:#ef4444; grid-column: span 2;">Erro nos canais: ${e.message}</p>`;
       }
     }
 
     // 2. VEÍCULOS INOPERACIONAIS
     async function carregarVeiculos() {
+      const container = document.getElementById('container-veiculos');
       try {
         const dados = await obterDadosAba(GIDS.veiculos);
-        const linhas = dados.slice(1);
-        const container = document.getElementById('container-veiculos');
+        const linhas = dados ? dados.slice(1) : [];
 
-        const inops = linhas.filter(col => {
-          const estado = (col[1] || '').toUpperCase();
-          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
-        });
+        // Filtra por INOP em qualquer coluna da linha
+        const inops = linhas.filter(col => col.some(celula => (celula || '').toUpperCase().includes('INOP')));
 
         if (inops.length === 0) {
           container.innerHTML = '<p style="color:#4ade80; grid-column: span 2; padding: 10px;">Todos os veículos estão operacionais.</p>';
@@ -747,7 +651,7 @@
 
         container.innerHTML = inops.map(col => {
           const nomeVeiculo = col[0] || 'Veículo';
-          const observacao = col[2] || 'Avaria Registada';
+          const observacao = col[2] || col[1] || 'Avaria Registada';
           const iconeSvg = obterIconeVeiculo(nomeVeiculo);
 
           return `
@@ -764,23 +668,21 @@
           `;
         }).join('');
       } catch (e) {
-        console.error("Erro nos Veículos:", e);
+        container.innerHTML = `<p style="color:#ef4444; grid-column: span 2;">Erro nos veículos: ${e.message}</p>`;
       }
     }
 
-    // 3. AGENDAMENTOS DO DIA (Com Expiração Automática por Hora e Destaque Visual)
+    // 3. AGENDAMENTOS DO DIA
     async function carregarAgendamentos() {
+      const container = document.getElementById('container-agendamentos');
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
-        const linhas = dados.slice(1);
-        const container = document.getElementById('container-agendamentos');
+        const linhas = dados ? dados.slice(1) : [];
 
-        // Filtra por data de hoje e exclui os agendamentos cuja hora final já tenha expirado
         const agendamentosHoje = linhas.filter(col => {
-          const ehHoje = col[1] && ehDataDeHoje(col[1]);
+          const ehHoje = ehDataDeHoje(col[1]);
           const horaStr = col[2] ? col[2].trim() : '';
-          const expirou = horaJaExpirou(horaStr);
-          return ehHoje && !expirou;
+          return ehHoje && !horaJaExpirou(horaStr);
         });
 
         if (agendamentosHoje.length === 0) {
@@ -804,17 +706,8 @@
           let meiosHtml = '';
           if (meiosTexto.trim()) {
             const listaMeios = meiosTexto.split(/[,;/+]/).map(m => m.trim()).filter(m => m.length > 0);
-            const itensMeios = listaMeios.map(meio => {
-              const svgIcone = obterIconoMeioEspecifico(meio);
-              return `<span class="meio-item">${svgIcone} <span>${meio}</span></span>`;
-            }).join('');
-
-            meiosHtml = `
-              <div class="meios-container">
-                <strong style="color: #94a3b8; margin-right: 2px;">Meios:</strong>
-                ${itensMeios}
-              </div>
-            `;
+            const itensMeios = listaMeios.map(meio => `${obterIconoMeioEspecifico(meio)} <span>${meio}</span>`).join('');
+            meiosHtml = `<div class="meios-container"><strong style="color: #94a3b8; margin-right: 2px;">Meios:</strong>${itensMeios}</div>`;
           }
 
           const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
@@ -836,33 +729,20 @@
                       ${ehInformacao ? 'Destaque / Info' : tipo}
                     </span>
                   </div>
-                  
-                  ${hora ? `
-                    <div class="hora-container" style="color: ${corAtual};">
-                      ${MINI_ICONE_RELOGIO}
-                      <span>${hora}</span>
-                    </div>
-                  ` : ''}
-
+                  ${hora ? `<div class="hora-container" style="color: ${corAtual};">${MINI_ICONE_RELOGIO}<span>${hora}</span></div>` : ''}
                   ${meiosHtml}
-
-                  ${bombeirosBadges ? `
-                    <div class="bombeiros-container">
-                      <span class="bombeiros-label">Equipas:</span>
-                      ${bombeirosBadges}
-                    </div>
-                  ` : ''}
+                  ${bombeirosBadges ? `<div class="bombeiros-container"><span class="bombeiros-label">Equipas:</span>${bombeirosBadges}</div>` : ''}
                 </div>
               </div>
             </div>
           `;
         }).join('');
       } catch (e) {
-        console.error("Erro nos Agendamentos:", e);
+        container.innerHTML = `<p style="color:#ef4444;">Erro nos agendamentos: ${e.message}</p>`;
       }
     }
 
-    // 4. METEOROLOGIA IPMA BRAGA (ID 1030300)
+    // 4. METEOROLOGIA IPMA BRAGA
     async function carregarMeteoIPMA() {
       try {
         const [resMeteo, resTipos] = await Promise.all([
@@ -876,7 +756,6 @@
         const dadosTipos = await resTipos.json();
 
         const previsaoHoje = dadosMeteo.data[0];
-        
         const mapaTipos = {};
         dadosTipos.data.forEach(t => { mapaTipos[t.idWeatherType] = t.descWeatherTypePT; });
         const estadoTempo = mapaTipos[previsaoHoje.idWeatherType] || 'Indisponível';
@@ -899,16 +778,11 @@
           elVento.textContent = `${velVento} km/h`;
           elVento.style.color = obterCorVento(velVento);
         }
-
-        if (lblVento) {
-          lblVento.textContent = `Vento (${dirVento})`;
-        }
-
+        if (lblVento) lblVento.textContent = `Vento (${dirVento})`;
         if (elRajada) {
           elRajada.textContent = `${rajada} km/h`;
           elRajada.style.color = obterCorVento(rajada);
         }
-
       } catch (e) {
         console.error("Erro na Meteorologia IPMA:", e);
       }
@@ -918,7 +792,7 @@
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
-        const linhas = dados.slice(1).filter(col => (col[0] || col[1]));
+        const linhas = dados ? dados.slice(1).filter(col => (col[0] || col[1])) : [];
 
         if (linhas.length > 0) {
           const coresComunicados = [
@@ -950,20 +824,16 @@
       }
     }
 
-    function sincronizarTudo() {
+    // Execução inicial de sincronização
+    function inicializarDashboard() {
       carregarCanais();
       carregarVeiculos();
       carregarAgendamentos();
+      carregarMeteoIPMA();
       carregarComunicados();
     }
 
-    // Inicialização
-    sincronizarTudo();
-    carregarMeteoIPMA();
-
-    // Timers de Atualização
-    setInterval(sincronizarTudo, 30000);
-    setInterval(carregarMeteoIPMA, 3600000);
+    inicializarDashboard();
   </script>
 </body>
 </html>
