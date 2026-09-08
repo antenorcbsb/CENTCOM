@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!BSB Braga html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -371,7 +371,7 @@
       <div class="card-header blue">🌧️ METEOROLOGIA & RISCO (IPMA BRAGA)</div>
       <div class="meteo-header" id="meteo-resumo">
         <span>🌤️ A carregar...</span>
-        <span>🌡️ --°C / --°C</span>
+        <span>🌡️ --ºC / --ºC</span>
         <span>🌧️ Prob. Chuva: --%</span>
       </div>
       <div class="meteo-grid" id="meteo-valores">
@@ -433,7 +433,6 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
 
-    // CORREÇÃO CRÍTICA: Adicionado o return do array resultado
     async function obterDadosAba(gid) {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
       const response = await fetch(url);
@@ -457,11 +456,10 @@
           }
         }
         resultado.push(campo.trim().replace(/^"|"$/g, ''));
-        return resultado; // Retorno corrigido
+        return resultado;
       });
     }
 
-    // Parser flexível para lidar com DD/MM/AAAA, AAAA-MM-DD e MM/DD/AAAA
     function parseDataGenerica(str) {
       if (!str || !str.trim()) return null;
       const limpo = str.trim().split(' ')[0];
@@ -486,7 +484,7 @@
       const dInicio = parseDataGenerica(dataInicioStr);
       let dFim = parseDataGenerica(dataFimStr);
 
-      if (!dInicio) return true; // Mostra por predefinição caso a data não esteja formatada
+      if (!dInicio) return true;
 
       if (!dFim) dFim = new Date(dInicio);
 
@@ -641,7 +639,6 @@
         const dados = await obterDadosAba(GIDS.veiculos);
         const linhas = dados ? dados.slice(1) : [];
 
-        // Filtra por INOP em qualquer coluna da linha
         const inops = linhas.filter(col => col.some(celula => (celula || '').toUpperCase().includes('INOP')));
 
         if (inops.length === 0) {
@@ -742,12 +739,14 @@
       }
     }
 
-    // 4. METEOROLOGIA IPMA BRAGA
+    // 4. METEOROLOGIA IPMA BRAGA (COM TEMPERATURA ATUAL E ALERTAS ATIVOS)
     async function carregarMeteoIPMA() {
       try {
-        const [resMeteo, resTipos] = await Promise.all([
+        const [resMeteo, resTipos, resAtual, resAlertas] = await Promise.all([
           fetch('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json'),
-          fetch('https://api.ipma.pt/open-data/weather-type-classe.json')
+          fetch('https://api.ipma.pt/open-data/weather-type-classe.json'),
+          fetch('https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json'),
+          fetch('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json')
         ]);
 
         if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro API IPMA");
@@ -755,17 +754,70 @@
         const dadosMeteo = await resMeteo.json();
         const dadosTipos = await resTipos.json();
 
+        // Previsão do dia
         const previsaoHoje = dadosMeteo.data[0];
         const mapaTipos = {};
         dadosTipos.data.forEach(t => { mapaTipos[t.idWeatherType] = t.descWeatherTypePT; });
         const estadoTempo = mapaTipos[previsaoHoje.idWeatherType] || 'Indisponível';
 
+        // Temperatura Atual (Estação IPMA de Braga - ID 1200548)
+        let tempAtualTexto = '';
+        if (resAtual.ok) {
+          const dadosAtual = await resAtual.json();
+          const horasDisponiveis = Object.keys(dadosAtual).sort().reverse();
+          for (const hora of horasDisponiveis) {
+            if (dadosAtual[hora]['1200548'] && dadosAtual[hora]['1200548'].t2m !== -99) {
+              const tempAtual = dadosAtual[hora]['1200548'].t2m;
+              tempAtualTexto = ` | <b>Atual: ${tempAtual}ºC</b>`;
+              break;
+            }
+          }
+        }
+
+        // Alertas Meteorológicos para Braga (idArea: 'BG' ou 'FA')
+        let alertasHtml = '';
+        if (resAlertas.ok) {
+          const dadosAlertas = await resAlertas.json();
+          const agora = new Date();
+
+          const alertasBraga = dadosAlertas.data.filter(a => {
+            const dFim = new Date(a.dateEnd);
+            return (a.idArea === 'BG' || a.idArea === 'FA') && dFim >= agora && a.awarenessLevelID !== 'green';
+          });
+
+          if (alertasBraga.length > 0) {
+            const coresAlerta = {
+              yellow: '#facc15',
+              orange: '#fb923c',
+              red: '#ef4444'
+            };
+
+            alertasHtml = alertasBraga.map(a => {
+              const cor = coresAlerta[a.awarenessLevelID] || '#facc15';
+              return `<div style="background-color: #1e293b; border-left: 4px solid ${cor}; color: ${cor}; padding: 6px 10px; margin-top: 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase;">
+                ⚠️ ALERTA ${a.awarenessTypeName}: ${a.text || 'Atenção às condições meteo'}
+              </div>`;
+            }).join('');
+          }
+        }
+
+        // Atualização do Cabeçalho da Meteorologia
         document.getElementById('meteo-resumo').innerHTML = `
           <span>🌤️ ${estadoTempo}</span>
-          <span>🌡️ ${previsaoHoje.tMax}°C / ${previsaoHoje.tMin}°C</span>
+          <span>🌡️ ${previsaoHoje.tMin}ºC / ${previsaoHoje.tMax}ºC${tempAtualTexto}</span>
           <span>🌧️ Prob. Chuva: ${previsaoHoje.precipitaProb}%</span>
         `;
 
+        // Inserção dos alertas abaixo dos indicadores
+        let containerAlertas = document.getElementById('meteo-alertas-container');
+        if (!containerAlertas) {
+          containerAlertas = document.createElement('div');
+          containerAlertas.id = 'meteo-alertas-container';
+          document.getElementById('meteo-valores').after(containerAlertas);
+        }
+        containerAlertas.innerHTML = alertasHtml;
+
+        // Atualização dos Ventos
         const dirVento = previsaoHoje.predWindDir || '';
         const velVento = Math.round(parseFloat(previsaoHoje.classWindSpeed || 0) * 10);
         const rajada = Math.round(velVento * 1.5);
