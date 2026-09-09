@@ -307,7 +307,7 @@
       display: inline-block;
       white-space: nowrap;
       padding-left: 100%;
-      animation: ticker 50s linear infinite; /* Velocidade reduzida (aumentado para 50s) */
+      animation: ticker 50s linear infinite;
       font-size: 0.95rem;
       letter-spacing: 0.4px;
     }
@@ -603,8 +603,8 @@
         const linhas = dados.slice(1);
 
         const coresRede = {
-          'Canal BSB': '#38bdf8',   
-          'Canal ROB': '#fb923c',   
+          'Canal BSB': '#38bdf8',    
+          'Canal ROB': '#fb923c',    
           'Canal REPC': '#facc15',  
           'Canal SIRESP': '#4ade80',
           'BSB_DMO': '#a855f7'     
@@ -840,34 +840,28 @@
       const container = document.getElementById('ticker-comunicados');
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
-        if (!dados || dados.length === 0) {
-          container.innerHTML = '<span style="color: #94a3b8;">Sem comunicados registados.</span>';
-          return;
-        }
+        const linhas = dados ? dados.slice(1) : [];
 
-        const linhas = dados.slice(1);
-        const comunicados = [];
-
-        linhas.forEach(col => {
-          // Procura nas colunas da linha o texto que não seja o título ou cabeçalho indesejado
-          col.forEach(celula => {
-            const textoLimpo = celula ? celula.trim() : '';
-            if (textoLimpo.length > 0 && !textoLimpo.toLowerCase().includes('observações') && !textoLimpo.toLowerCase().includes('titulo')) {
-              comunicados.push(textoLimpo);
-            }
-          });
+        const comunicadosAtivos = linhas.filter(col => {
+          const dataInicio = col[0];
+          const dataFim = col[1];
+          return estaAtivoNoIntervalo(dataInicio, dataFim);
         });
 
-        if (comunicados.length === 0) {
-          container.innerHTML = '<span style="color: #94a3b8;">Sem comunicados ativos.</span>';
+        if (comunicadosAtivos.length === 0) {
+          container.innerHTML = '<span style="color: #94a3b8;">Nenhum comunicado ativo de momento.</span>';
           return;
         }
 
-        const separador = '<span style="color: #38bdf8; margin: 0 30px;">⚡</span>';
-        container.innerHTML = comunicados.join(separador);
+        const htmlComunicados = comunicadosAtivos.map(col => {
+          const texto = col[2] || col[0] || '';
+          return `<span style="margin-right: 50px;"><span style="color: #38bdf8; font-weight: bold; margin-right: 8px;">📢</span>${texto}</span>`;
+        }).join('');
 
+        container.innerHTML = htmlComunicados;
       } catch (e) {
-        container.innerHTML = '<span style="color: #ef4444;">Erro ao carregar comunicados.</span>';
+        console.error("Erro Comunicados:", e);
+        container.innerHTML = '<span style="color: #ef4444;">Erro ao carregar comunicados do rodapé.</span>';
       }
     }
 
@@ -883,7 +877,7 @@
       carregarAgendamentos();
       carregarMeteoOpenMeteo();
       carregarComunicados();
-    }, 60000);
+    }, 300000);
   </script>
 </body>
 </html>
