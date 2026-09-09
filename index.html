@@ -841,50 +841,48 @@
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
         if (!dados || dados.length < 2) {
-          container.innerHTML = '<span style="color: #38bdf8; font-weight: bold;">📢 SEM COMUNICADOS REGISTADOS NO MOMENTO.</span>';
+          container.innerHTML = '<span style="color: #38bdf8;">📢 Sem comunicados ativos de momento.</span>';
           return;
         }
 
         const linhas = dados.slice(1);
-        const comunicadosArr = [];
+        const comunicadosTextos = [];
 
         linhas.forEach(col => {
           const titulo = col[0] ? col[0].trim() : '';
-          const observacoes = col[1] ? col[1].trim() : '';
-          
-          if (titulo || observacoes) {
-            let textoItem = titulo;
-            if (observacoes) {
-              textoItem += titulo ? ` — ${observacoes}` : observacoes;
-            }
-            comunicadosArr.push(textoItem);
+          const observacao = col[1] ? col[1].trim() : '';
+
+          if (titulo) {
+            const textoItem = observacao ? `${titulo} — ${observacao}` : titulo;
+            comunicadosTextos.push(textoItem);
           }
         });
 
-        if (comunicadosArr.length === 0) {
-          container.innerHTML = '<span style="color: #38bdf8; font-weight: bold;">📢 SEM COMUNICADOS REGISTADOS NO MOMENTO.</span>';
+        if (comunicadosTextos.length === 0) {
+          container.innerHTML = '<span style="color: #38bdf8;">📢 Sem comunicados ativos de momento.</span>';
           return;
         }
 
-        const separador = '<span style="color: #38bdf8; margin: 0 30px;">⚡</span>';
-        container.innerHTML = comunicadosArr.map(comunicado => 
-          `<span style="margin-right: 20px;">${comunicado}</span>`
-        ).join(separador);
+        const htmlTicker = comunicadosTextos.map(item => 
+          `<span style="margin-right: 50px;"><span style="color: #f97316; font-weight: bold;">📢</span> ${item}</span>`
+        ).join('');
+
+        container.innerHTML = htmlTicker;
 
       } catch (e) {
         console.error("Erro Comunicados:", e);
-        container.innerHTML = '<span style="color: #ef4444; font-weight: bold;">📢 ERRO AO CARREGAR COMUNICADOS.</span>';
+        container.innerHTML = '<span style="color: #ef4444;">Erro ao carregar comunicados do rodapé.</span>';
       }
     }
 
-    // Inicialização
+    // Executar carregamentos iniciais
     carregarCanais();
     carregarVeiculos();
     carregarAgendamentos();
     carregarMeteoOpenMeteo();
     carregarComunicados();
 
-    // Atualizações periódicas
+    // Atualizações periódicas automáticas
     setInterval(() => {
       carregarCanais();
       carregarVeiculos();
@@ -892,7 +890,7 @@
       carregarComunicados();
     }, 60000);
 
-    setInterval(carregarMeteoOpenMeteo, 300000);
+    setInterval(carregarMeteoOpenMeteo, 600000);
   </script>
 </body>
 </html>
