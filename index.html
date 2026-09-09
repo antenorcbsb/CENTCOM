@@ -286,13 +286,13 @@
     .meteo-item .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
     .fwi-high { color: #ef4444; }
 
-    /* ================= RODAPÉ / TICKER CORRIGIDO ================= */
+    /* ================= RODAPÉ / TICKER ================= */
     .footer-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 42px; /* Aumentado ligeiramente para melhor legibilidade */
+      height: 42px;
       background: #020617;
       border-top: 2px solid #38bdf8;
       color: #ffffff;
@@ -310,7 +310,6 @@
       animation: ticker 50s linear infinite;
       font-size: 0.95rem;
       letter-spacing: 0.4px;
-      /* Otimização visual para leitura de ecrã */
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8); 
     }
 
@@ -322,7 +321,6 @@
       0% { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-100%, 0, 0); }
     }
-    /* ============================================================ */
 
     @keyframes pulse-glow {
       0% { opacity: 1; }
@@ -470,11 +468,7 @@
       const csvText = await resCsv.text();
       
       const linhasCsv = csvText.split('\n').map(linha => {
-        const regex = /(?:["([^"]*)"|([^,]+))/g;
-        const cols = [];
-        let match;
-        let linhaLimpa = linha.trim();
-        return linhaLimpa.split(',').map(val => val.replace(/^"|"$/g, '').trim());
+        return linha.split(',').map(val => val.replace(/^"|"$/g, '').trim());
       });
 
       return linhasCsv;
@@ -609,7 +603,7 @@
           'Canal ROB': '#fb923c',    
           'Canal REPC': '#facc15',  
           'Canal SIRESP': '#4ade80',
-          'BSB_DMO': '#a855f7'       
+          'BSB_DMO': '#a855f7'        
         };
 
         const eventosMap = {};
@@ -783,13 +777,17 @@
         if (!resMeteo.ok) throw new Error("Falha ao obter dados meteorológicos.");
         const dataMeteo = await resMeteo.json();
 
-        const resFwi = await fetch(`https://previous-runs-api.open-meteo.com/v1/fire_weather?latitude=${lat}&longitude=${lon}&daily=fwi&timezone=Europe%2FLisbon`);
         let valorFwi = '--';
-        if (resFwi.ok) {
-          const dataFwi = await resFwi.json();
-          if (dataFwi.daily && dataFwi.daily.fwi && dataFwi.daily.fwi[0] !== undefined) {
-            valorFwi = Number(dataFwi.daily.fwi[0]).toFixed(1);
+        try {
+          const resFwi = await fetch(`https://previous-runs-api.open-meteo.com/v1/fire_weather?latitude=${lat}&longitude=${lon}&daily=fwi&timezone=Europe%2FLisbon`);
+          if (resFwi.ok) {
+            const dataFwi = await resFwi.json();
+            if (dataFwi.daily && dataFwi.daily.fwi && dataFwi.daily.fwi[0] !== undefined) {
+              valorFwi = Number(dataFwi.daily.fwi[0]).toFixed(1);
+            }
           }
+        } catch (fwiErr) {
+          console.warn("Aviso: Não foi possível carregar o FWI", fwiErr);
         }
 
         const tempAtual = Math.round(dataMeteo.current.temperature_2m);
@@ -805,7 +803,6 @@
         const valorTempAtual = `<b style="color: #facc15; font-size: 1.05rem;">${tempAtual}ºC</b>`;
         const previsaoMinMax = `<span style="color: #94a3b8; font-size: 0.85rem;">(Mín: ${tempMin}ºC / Máx: ${tempMax}ºC)</span>`;
 
-        // CORREÇÃO: Fecho do bloco que estava incompleto
         document.getElementById('meteo-resumo').innerHTML = `
           <span>🌤️ ${estadoTempo}</span>
           <span>🌡️ Atual: ${valorTempAtual} ${previsaoMinMax}</span>
@@ -815,90 +812,23 @@
         document.getElementById('val-vento').textContent = `${velVento} km/h`;
         document.getElementById('val-vento').style.color = obterCorVento(velVento);
         document.getElementById('lbl-vento').textContent = `Vento (${dirVento})`;
-        
+
         document.getElementById('val-rajada').textContent = `${rajada} km/h`;
         document.getElementById('val-fwi').textContent = valorFwi;
 
-      } catch (e) {
-        console.error("Erro Meteo:", e);
-        document.getElementById('meteo-resumo').innerHTML = `<span style="color:#ef4444;">Erro ao carregar meteorologia.</span>`;
+      } catch (err) {
+        console.error("Erro na Meteorologia:", err);
+        document.getElementById('meteo-resumo').innerHTML = `<span>⚠️ Erro ao carregar dados meteorológicos</span>`;
       }
     }
 
-    // CORREÇÃO: Função para gerir o ticker, ignorando a primeira linha e separando o Título da Observação com cores
-    async function carregarComunicados() {
-      const ticker = document.getElementById('ticker-comunicados');
-      try {
-        const dados = await obterDadosAba(GIDS.comunicados);
-        
-        // 1. Omitir a primeira linha que normalmente tem os cabeçalhos ('Título' e 'Observações')
-        const linhas = dados && dados.length > 1 ? dados.slice(1) : [];
-
-        // 2. Filtrar para ter a certeza que não estamos a ler texto de cabeçalho residual
-        const validas = linhas.filter(col => {
-          const t = (col[0] || '').toLowerCase().trim();
-          const o = (col[1] || '').toLowerCase().trim();
-          if (!t && !o) return false;
-          // Ignorar se a célula for exatamente a palavra "Título" ou "Observações"
-          if (t === 'título' || t === 'titulo' || o === 'observações' || o === 'observacoes') return false;
-          return true;
-        });
-
-        if (validas.length === 0) {
-          ticker.innerHTML = '<span style="color: #94a3b8; padding-left: 20px;">Nenhum alerta / comunicado em vigor.</span>';
-          return;
-        }
-
-        const comunicadosHtml = validas.map(col => {
-          const titulo = col[0] ? col[0].trim() : '';
-          const obs = col[1] ? col[1].trim() : '';
-
-          // Estrutura de design atrativa com icon + titulo a Laranja Dourado + Texto Branco
-          let html = '<span style="display: inline-flex; align-items: center;">';
-          html += '<svg style="width: 18px; height: 18px; fill: #ef4444; margin-right: 8px;" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>';
-          
-          if (titulo) {
-            // Título em cor Laranja (apelativa)
-            html += `<span style="color: #fb923c; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${titulo}</span>`;
-          }
-          
-          if (obs) {
-            if (titulo) {
-               // Hífen separador se houver título
-               html += `<span style="color: #475569; margin: 0 8px;">—</span>`;
-            }
-            // Observações em texto legível branco/prata
-            html += `<span style="color: #f8fafc; font-weight: 500;">${obs}</span>`;
-          }
-          
-          html += '</span>';
-          return html;
-        }).join('<span style="color: #334155; margin: 0 40px; font-weight:bold;"> | </span>');
-
-        // Duplicar conteúdo para criar um loop fluído infinito no Ticker
-        ticker.innerHTML = comunicadosHtml + '<span style="color: #334155; margin: 0 40px; font-weight:bold;"> | </span>' + comunicadosHtml;
-
-      } catch (e) {
-        console.error("Erro Comunicados:", e);
-        ticker.innerHTML = `<span style="color:#ef4444; padding-left: 20px;">Erro ao carregar comunicados.</span>`;
-      }
-    }
-
-    // CORREÇÃO: Arrancar todos os widgets do Dashboard
-    async function inicializarDashboard() {
-      await Promise.all([
-        carregarCanais(),
-        carregarVeiculos(),
-        carregarAgendamentos(),
-        carregarMeteoOpenMeteo(),
-        carregarComunicados()
-      ]);
-    }
-
-    // Correr na primeira vez e depois atualizar a cada 5 minutos
-    inicializarDashboard();
-    setInterval(inicializarDashboard, 5 * 60 * 1000);
-
+    // Inicialização principal ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      carregarCanais();
+      carregarVeiculos();
+      carregarAgendamentos();
+      carregarMeteoOpenMeteo();
+    });
   </script>
 </body>
 </html>
