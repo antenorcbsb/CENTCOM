@@ -286,7 +286,6 @@
     .meteo-item .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
     .fwi-high { color: #ef4444; }
 
-    /* --- RODAPÉ E TICKER COM ESTILOS REFORMULADOS --- */
     .footer-bar {
       position: fixed;
       bottom: 0;
@@ -311,35 +310,6 @@
       animation: ticker 130s linear infinite;
       font-size: 0.95rem;
       letter-spacing: 0.4px;
-    }
-
-    .msg-block {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 2px 14px;
-      border-radius: 4px;
-      background-color: rgba(30, 41, 59, 0.7);
-      border: 1px solid #1e293b;
-    }
-
-    .msg-titulo {
-      color: #facc15;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    .msg-corpo {
-      color: #f8fafc;
-      font-weight: 500;
-    }
-
-    .msg-divisor {
-      color: #38bdf8;
-      margin: 0 25px;
-      font-weight: bold;
-      opacity: 0.6;
     }
 
     @keyframes ticker {
@@ -417,7 +387,7 @@
   </div>
 
   <div class="footer-bar">
-    <div class="footer-text" id="ticker-comunicacoes">
+    <div class="footer-text" id="ticker-comunicados">
       <span style="color: #38bdf8; font-weight: bold;">📢 A CARREGAR DADOS...</span>
     </div>
   </div>
@@ -457,31 +427,34 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
 
+    // Função de leitura via Google Viz API (compatível com GitHub Pages sem erros CORS)
     async function obterDadosAba(gid) {
-      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}&t=${Date.now()}`;
       const response = await fetch(url);
-      if (!response.ok) throw new Error("Erro de acesso à folha");
-      const texto = await response.text();
+      if (!response.ok) throw new Error("Erro na ligação ao Sheets");
       
-      const linhas = texto.replace(/\r/g, '').split('\n').filter(l => l.trim().length > 0);
-      return linhas.map(linha => {
-        const resultado = [];
-        let dentroDeAspas = false;
-        let campo = '';
-        
-        for (let c of linha) {
-          if (c === '"') {
-            dentroDeAspas = !dentroDeAspas;
-          } else if (c === ',' && !dentroDeAspas) {
-            resultado.push(campo.trim().replace(/^"|"$/g, ''));
-            campo = '';
-          } else {
-            campo += c;
+      const texto = await response.text();
+      const jsonTexto = texto.substring(texto.indexOf('{'), texto.lastIndexOf('}') + 1);
+      const dadosJson = JSON.parse(jsonTexto);
+      
+      const linhas = [];
+      
+      if (dadosJson.table.cols) {
+        linhas.push(dadosJson.table.cols.map(c => c.label || c.id || ''));
+      }
+      
+      if (dadosJson.table.rows) {
+        dadosJson.table.rows.forEach(r => {
+          if (r.c) {
+            const linha = r.c.map(cel => {
+              if (!cel) return '';
+              return cel.f ? cel.f : (cel.v !== null && cel.v !== undefined ? String(cel.v) : '');
+            });
+            linhas.push(linha);
           }
-        }
-        resultado.push(campo.trim().replace(/^"|"$/g, ''));
-        return resultado;
-      });
+        });
+      }
+      return linhas;
     }
 
     function parseDataGenerica(str) {
@@ -509,7 +482,6 @@
       let dFim = parseDataGenerica(dataFimStr);
 
       if (!dInicio) return true;
-
       if (!dFim) dFim = new Date(dInicio);
 
       dInicio.setHours(0, 0, 0, 0);
@@ -730,7 +702,8 @@
         const linhas = dados ? dados.slice(1) : [];
 
         const agendamentosHoje = linhas.filter(col => {
-          const ehHoje = ehDataDeHoje(col[1]);
+          const dataStr = col[1] || '';
+          const ehHoje = ehDataDeHoje(dataStr);
           const horaStr = col[2] ? col[2].trim() : '';
           return ehHoje && !horaJaExpirou(horaStr);
         });
@@ -788,7 +761,8 @@
           `;
         }).join('');
       } catch (e) {
-        container.innerHTML = `<p style="color:#ef4444;">Erro nos agendamentos: ${e.message}</p>`;
+        console.error("Erro Agendamentos:", e);
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: Não foi possível carregar dados do Sheets.</p>`;
       }
     }
 
@@ -798,12 +772,10 @@
       const lon = -8.4200;
 
       try {
-        // Pedido Meteorologia Geral
         const resMeteo = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FLisbon`);
         if (!resMeteo.ok) throw new Error("Falha ao obter dados meteorológicos.");
         const dataMeteo = await resMeteo.json();
 
-        // Pedido Índice FWI
         const resFwi = await fetch(`https://previous-runs-api.open-meteo.com/v1/fire_weather?latitude=${lat}&longitude=${lon}&daily=fwi&timezone=Europe%2FLisbon`);
         let valorFwi = '--';
         if (resFwi.ok) {
@@ -851,46 +823,15 @@
         }
 
       } catch (e) {
-        document.getElementById('meteo-resumo').innerHTML = `<span style="color:#ef4444;">Erro na meteorologia: ${e.message}</span>`;
+        console.error("Erro Meteo:", e);
       }
     }
 
-    // 5. TICKER DE COMUNICADOS NA BARRA INFERIOR
-    async function carregarComunicados() {
-      const container = document.getElementById('ticker-comunicacoes');
-      try {
-        const dados = await obterDadosAba(GIDS.comunicados);
-        const linhas = dados ? dados.slice(1) : [];
-
-        if (linhas.length === 0) {
-          container.innerHTML = '<span class="msg-block"><span class="msg-titulo">📢 INFO:</span> <span class="msg-corpo">Sem comunicados ativos</span></span>';
-          return;
-        }
-
-        const mensagens = linhas.map(col => {
-          const titulo = col[0] ? col[0].trim() : 'COMUNICADO';
-          const texto = col[1] ? col[1].trim() : '';
-          return `<span class="msg-block"><span class="msg-titulo">📢 ${titulo}:</span> <span class="msg-corpo">${texto}</span></span>`;
-        });
-
-        container.innerHTML = mensagens.join('<span class="msg-divisor">///</span>');
-      } catch (e) {
-        container.innerHTML = '<span class="msg-block"><span class="msg-titulo">⚠️ ERRO:</span> <span class="msg-corpo">Não foi possível carregar os comunicados</span></span>';
-      }
-    }
-
-    // Inicialização do Dashboard
-    function carregarTudo() {
-      carregarCanais();
-      carregarVeiculos();
-      carregarAgendamentos();
-      carregarMeteoOpenMeteo();
-      carregarComunicados();
-    }
-
-    carregarTudo();
-    // Atualiza os dados a cada 2 minutos (120000 ms)
-    setInterval(carregarTudo, 120000);
+    // Inicialização de todas as secções
+    carregarCanais();
+    carregarVeiculos();
+    carregarAgendamentos();
+    carregarMeteoOpenMeteo();
   </script>
 </body>
 </html>
