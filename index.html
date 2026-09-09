@@ -440,7 +440,7 @@
       if (!response.ok) throw new Error("Erro de acesso à folha");
       const texto = await response.text();
       
-      const linhas = texto.split('\n').filter(l => l.trim().length > 0);
+      const linhas = texto.replace(/\r/g, '').split('\n').filter(l => l.trim().length > 0);
       return linhas.map(linha => {
         const resultado = [];
         let dentroDeAspas = false;
@@ -848,8 +848,11 @@
       carregarComunicados();
     }
 
-    carregarTudo();
-    setInterval(carregarTudo, 60000);
+    window.addEventListener('DOMContentLoaded', () => {
+      carregarTudo();
+      // Atualiza os dados do Google Sheets a cada 60 segundos
+      setInterval(carregarTudo, 60000);
+    });
   </script>
 </body>
 </html>
