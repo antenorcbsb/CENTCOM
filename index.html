@@ -307,7 +307,7 @@
       display: inline-block;
       white-space: nowrap;
       padding-left: 100%;
-      animation: ticker 40s linear infinite;
+      animation: ticker 60s linear infinite; /* Alterado de 40s para 60s (mais lento) */
       font-size: 0.95rem;
       letter-spacing: 0.4px;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8); 
@@ -826,41 +826,37 @@
         const tempMin = Math.round(dataMeteo.daily.temperature_2m_min[0]);
         const tempMax = Math.round(dataMeteo.daily.temperature_2m_max[0]);
         const probChuva = dataMeteo.daily.precipitation_probability_max[0] ?? 0;
-        const estadoTempo = converterCodigoTempo(dataMeteo.current.weather_code);
-
-        const velVento = Math.round(dataMeteo.current.wind_speed_10m);
-        const dirVento = converterDirecaoVento(dataMeteo.current.wind_direction_10m);
-        const rajada = Math.round(dataMeteo.current.wind_gusts_10m);
-
-        const valorTempAtual = `<b style="color: #facc15; font-size: 1.05rem;">${tempAtual}ºC</b>`;
-        const previsaoMinMax = `<span style="color: #94a3b8; font-size: 0.85rem;">(Mín: ${tempMin}ºC / Máx: ${tempMax}ºC)</span>`;
+        const descTempo = converterCodigoTempo(dataMeteo.current.weather_code);
+        const ventoVel = dataMeteo.current.wind_speed_10m;
+        const ventoDir = converterDirecaoVento(dataMeteo.current.wind_direction_10m);
+        const rajada = dataMeteo.current.wind_gusts_10m;
 
         document.getElementById('meteo-resumo').innerHTML = `
-          <span>🌤️ ${estadoTempo}</span>
-          <span>🌡️ Atual: ${valorTempAtual} ${previsaoMinMax}</span>
+          <span>🌤️ ${descTempo}</span>
+          <span>🌡️ Atual: ${tempAtual}ºC <span style="color: #94a3b8; font-size: 0.85rem;">(Mín: ${tempMin}ºC / Máx: ${tempMax}ºC)</span></span>
           <span>🌧️ Prob. Chuva: ${probChuva}%</span>
         `;
-        
-        document.getElementById('val-vento').textContent = `${velVento} km/h`;
-        document.getElementById('val-vento').style.color = obterCorVento(velVento);
-        document.getElementById('lbl-vento').textContent = `Vento (${dirVento})`;
+
+        const elVento = document.getElementById('val-vento');
+        elVento.textContent = `${ventoVel} km/h (${ventoDir})`;
+        elVento.style.color = obterCorVento(ventoVel);
+        document.getElementById('lbl-vento').textContent = `Vento (${ventoDir})`;
 
         document.getElementById('val-rajada').textContent = `${rajada} km/h`;
         document.getElementById('val-fwi').textContent = valorFwi;
 
-      } catch (err) {
-        console.error("Erro meteo:", err);
+      } catch (e) {
+        console.error("Erro Meteorologia:", e);
+        document.getElementById('meteo-resumo').innerHTML = `<span>⚠️ Erro ao carregar dados meteorológicos.</span>`;
       }
     }
 
-    // Inicialização geral de todos os blocos
     carregarCanais();
     carregarVeiculos();
     carregarAgendamentos();
     carregarComunicados();
     carregarMeteoOpenMeteo();
 
-    // Atualizações periódicas automáticas
     setInterval(carregarCanais, 60000);
     setInterval(carregarVeiculos, 60000);
     setInterval(carregarAgendamentos, 60000);
