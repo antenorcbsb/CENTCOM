@@ -1,4 +1,5 @@
 <!BSB Braga html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -261,6 +262,7 @@
     .meteo-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       background-color: #1e293b;
       padding: 8px 12px;
       border-radius: 6px;
@@ -371,7 +373,7 @@
       <div class="card-header blue">🌧️ METEOROLOGIA & RISCO (IPMA BRAGA)</div>
       <div class="meteo-header" id="meteo-resumo">
         <span>🌤️ A carregar...</span>
-        <span>🌡️ --ºC / --ºC</span>
+        <span>🌡️ Atual: --ºC <span style="color: #94a3b8; font-size: 0.85rem;">(Mín: --ºC / Máx: --ºC)</span></span>
         <span>🌧️ Prob. Chuva: --%</span>
       </div>
       <div class="meteo-grid" id="meteo-valores">
@@ -739,9 +741,8 @@
       }
     }
 
-// 4. METEOROLOGIA IPMA BRAGA (VIA ALLORIGINS PROXY COM TRATAMENTO INDIVIDUAL)
+    // 4. METEOROLOGIA IPMA BRAGA (VIA ALLORIGINS PROXY COM TRATAMENTO INDIVIDUAL)
     async function carregarMeteoIPMA() {
-      // Função auxiliar para procurar dados através de proxy público sem bloqueio de CORS
       async function fetchIPMA(urlOriginal) {
         try {
           const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlOriginal)}`;
@@ -756,7 +757,7 @@
       }
 
       try {
-        // 1. Obter Previsão e Tipos de Tempo de forma independente
+        // 1. Obter Previsão e Tipos de Tempo
         const dataMeteo = await fetchIPMA('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json');
         const dataTipos = await fetchIPMA('https://api.ipma.pt/open-data/weather-type-classe.json');
 
@@ -774,22 +775,25 @@
         }
 
         // 2. Tentar obter Temperatura Atual (Estação Braga 1200548)
-        let tempAtualTexto = '';
+        let tempAtualTexto = null;
         const dataAtual = await fetchIPMA('https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json');
         if (dataAtual) {
           const horas = Object.keys(dataAtual).sort().reverse();
           for (const h of horas) {
             if (dataAtual[h] && dataAtual[h]['1200548'] && dataAtual[h]['1200548'].t2m !== -99) {
-              tempAtualTexto = ` | <b>Atual: ${dataAtual[h]['1200548'].t2m}ºC</b>`;
+              tempAtualTexto = dataAtual[h]['1200548'].t2m;
               break;
             }
           }
         }
 
-        // 3. Atualizar Cabeçalho da Meteorologia
+        // 3. Atualizar Cabeçalho da Meteorologia (com destaque na Temperatura Atual)
+        const valorTempAtual = tempAtualTexto !== null ? `<b style="color: #facc15; font-size: 1.05rem;">${tempAtualTexto}ºC</b>` : '--ºC';
+        const previsaoMinMax = `<span style="color: #94a3b8; font-size: 0.85rem;">(Mín: ${previsaoHoje.tMin}ºC / Máx: ${previsaoHoje.tMax}ºC)</span>`;
+
         document.getElementById('meteo-resumo').innerHTML = `
           <span>🌤️ ${estadoTempo}</span>
-          <span>🌡️ ${previsaoHoje.tMin}ºC / ${previsaoHoje.tMax}ºC${tempAtualTexto}</span>
+          <span>🌡️ Atual: ${valorTempAtual} ${previsaoMinMax}</span>
           <span>🌧️ Prob. Chuva: ${previsaoHoje.precipitaProb}%</span>
         `;
 
@@ -850,52 +854,21 @@
           <span style="color:#ef4444;">⚠️ Erro ao carregar meteorologia</span>
         `;
       }
-    }    // 5. COMUNICADOS
-    async function carregarComunicados() {
-      try {
-        const dados = await obterDadosAba(GIDS.comunicados);
-        const linhas = dados ? dados.slice(1).filter(col => (col[0] || col[1])) : [];
-
-        if (linhas.length > 0) {
-          const coresComunicados = [
-            { titulo: '#facc15', obs: '#ffffff' },
-            { titulo: '#38bdf8', obs: '#e2e8f0' },
-            { titulo: '#4ade80', obs: '#ffffff' },
-            { titulo: '#f97316', obs: '#ffedd5' }
-          ];
-
-          const texto = linhas.map((col, index) => {
-            const titulo = col[0] || '';
-            const obs = col[1] ? ` — ${col[1]}` : '';
-            const esquematizacaoCor = coresComunicados[index % coresComunicados.length];
-
-            return `
-              <span class="msg-block">
-                <span style="color: ${esquematizacaoCor.titulo}; font-weight: bold;">📢 ${titulo}</span>
-                <span style="color: ${esquematizacaoCor.obs};">${obs}</span>
-              </span>
-            `;
-          }).join(' <span style="color: #64748b; margin-right: 20px;">★</span> ');
-
-          document.getElementById('ticker-comunicacoes').innerHTML = texto;
-        } else {
-          document.getElementById('ticker-comunicacoes').innerHTML = '<span style="color: #38bdf8; font-weight: bold;">📢 SEM COMUNICADOS ATIVOS NO MOMENTO</span>';
-        }
-      } catch (e) {
-        console.error("Erro nos Comunicados:", e);
-      }
     }
 
-    // Execução inicial de sincronização
-    function inicializarDashboard() {
+    // Inicialização do Painel
+    carregarCanais();
+    carregarVeiculos();
+    carregarAgendamentos();
+    carregarMeteoIPMA();
+
+    // Atualização automática a cada 60 segundos
+    setInterval(() => {
       carregarCanais();
       carregarVeiculos();
       carregarAgendamentos();
       carregarMeteoIPMA();
-      carregarComunicados();
-    }
-
-    inicializarDashboard();
+    }, 60000);
   </script>
 </body>
 </html>
