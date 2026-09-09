@@ -739,49 +739,54 @@
       }
     }
 
-  // 4. METEOROLOGIA IPMA BRAGA (COM PROXY CORS E TRATAMENTO DE ERROS)
+// 4. METEOROLOGIA IPMA BRAGA (VIA ALLORIGINS PROXY COM TRATAMENTO INDIVIDUAL)
     async function carregarMeteoIPMA() {
-      const proxy = 'https://corsproxy.io/?';
-
-      const endpoints = {
-        meteo: `${proxy}${encodeURIComponent('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json')}`,
-        tipos: `${proxy}${encodeURIComponent('https://api.ipma.pt/open-data/weather-type-classe.json')}`,
-        atual: `${proxy}${encodeURIComponent('https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json')}`,
-        alertas: `${proxy}${encodeURIComponent('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json')}`
-      };
+      // Função auxiliar para procurar dados através de proxy público sem bloqueio de CORS
+      async function fetchIPMA(urlOriginal) {
+        try {
+          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlOriginal)}`;
+          const response = await fetch(proxyUrl);
+          if (!response.ok) return null;
+          const data = await response.json();
+          return JSON.parse(data.contents);
+        } catch (e) {
+          console.warn(`Erro a carregar ${urlOriginal}:`, e);
+          return null;
+        }
+      }
 
       try {
-        const [resMeteo, resTipos] = await Promise.all([
-          fetch(endpoints.meteo).then(r => r.json()),
-          fetch(endpoints.tipos).then(r => r.json())
-        ]);
+        // 1. Obter Previsão e Tipos de Tempo de forma independente
+        const dataMeteo = await fetchIPMA('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json');
+        const dataTipos = await fetchIPMA('https://api.ipma.pt/open-data/weather-type-classe.json');
 
-        // 1. Previsão Geral e Estado do Tempo
-        const previsaoHoje = resMeteo.data[0];
-        const mapaTipos = {};
-        if (resTipos && resTipos.data) {
-          resTipos.data.forEach(t => { mapaTipos[t.idWeatherType] = t.descWeatherTypePT; });
+        if (!dataMeteo || !dataMeteo.data || !dataMeteo.data[0]) {
+          throw new Error("Dados de previsão indisponíveis.");
         }
-        const estadoTempo = mapaTipos[previsaoHoje.idWeatherType] || 'Céu Limpo';
 
-        // 2. Temperatura Atual (Estação Braga 1200548)
+        const previsaoHoje = dataMeteo.data[0];
+
+        // Mapear descrição do estado do tempo
+        let estadoTempo = 'Céu Limpo';
+        if (dataTipos && dataTipos.data) {
+          const tipoEncontrado = dataTipos.data.find(t => t.idWeatherType === previsaoHoje.idWeatherType);
+          if (tipoEncontrado) estadoTempo = tipoEncontrado.descWeatherTypePT;
+        }
+
+        // 2. Tentar obter Temperatura Atual (Estação Braga 1200548)
         let tempAtualTexto = '';
-        try {
-          const resAtual = await fetch(endpoints.atual).then(r => r.json());
-          if (resAtual) {
-            const horas = Object.keys(resAtual).sort().reverse();
-            for (const h of horas) {
-              if (resAtual[h] && resAtual[h]['1200548'] && resAtual[h]['1200548'].t2m !== -99) {
-                tempAtualTexto = ` | <b>Atual: ${resAtual[h]['1200548'].t2m}ºC</b>`;
-                break;
-              }
+        const dataAtual = await fetchIPMA('https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json');
+        if (dataAtual) {
+          const horas = Object.keys(dataAtual).sort().reverse();
+          for (const h of horas) {
+            if (dataAtual[h] && dataAtual[h]['1200548'] && dataAtual[h]['1200548'].t2m !== -99) {
+              tempAtualTexto = ` | <b>Atual: ${dataAtual[h]['1200548'].t2m}ºC</b>`;
+              break;
             }
           }
-        } catch (e) {
-          console.warn("Temperatura em tempo real indisponível, a mostrar previsão.");
         }
 
-        // 3. Atualizar Painel de Resumo
+        // 3. Atualizar Cabeçalho da Meteorologia
         document.getElementById('meteo-resumo').innerHTML = `
           <span>🌤️ ${estadoTempo}</span>
           <span>🌡️ ${previsaoHoje.tMin}ºC / ${previsaoHoje.tMax}ºC${tempAtualTexto}</span>
@@ -790,7 +795,8 @@
 
         // 4. Calcular e Atualizar Ventos
         const dirVento = previsaoHoje.predWindDir || 'N/A';
-        const velVento = Math.round(parseFloat(previsaoHoje.classWindSpeed || 1) * 12); 
+        const classVento = parseInt(previsaoHoje.classWindSpeed) || 1;
+        const velVento = classVento * 12; 
         const rajada = Math.round(velVento * 1.4);
 
         const elVento = document.getElementById('val-vento');
@@ -808,46 +814,43 @@
         }
 
         // 5. Alertas Meteorológicos
-        try {
-          const resAlertas = await fetch(endpoints.alertas).then(r => r.json());
-          if (resAlertas && resAlertas.data) {
-            const agora = new Date();
-            const alertasBraga = resAlertas.data.filter(a => 
-              (a.idArea === 'BG' || a.idArea === 'FA') && 
-              new Date(a.dateEnd) >= agora && 
-              a.awarenessLevelID !== 'green'
-            );
+        const dataAlertas = await fetchIPMA('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json');
+        let containerAlertas = document.getElementById('meteo-alertas-container');
+        
+        if (!containerAlertas) {
+          containerAlertas = document.createElement('div');
+          containerAlertas.id = 'meteo-alertas-container';
+          const elementoValores = document.getElementById('meteo-valores');
+          if (elementoValores) elementoValores.after(containerAlertas);
+        }
 
-            let containerAlertas = document.getElementById('meteo-alertas-container');
-            if (!containerAlertas) {
-              containerAlertas = document.createElement('div');
-              containerAlertas.id = 'meteo-alertas-container';
-              document.getElementById('meteo-valores').after(containerAlertas);
-            }
+        if (dataAlertas && Array.isArray(dataAlertas)) {
+          const agora = new Date();
+          const alertasBraga = dataAlertas.filter(a => 
+            (a.idArea === 'BG' || a.idArea === 'FA') && 
+            new Date(a.dateEnd) >= agora && 
+            a.awarenessLevelID !== 'green'
+          );
 
-            if (alertasBraga.length > 0) {
-              const cores = { yellow: '#facc15', orange: '#fb923c', red: '#ef4444' };
-              containerAlertas.innerHTML = alertasBraga.map(a => `
-                <div style="background-color: #1e293b; border-left: 4px solid ${cores[a.awarenessLevelID] || '#facc15'}; color: ${cores[a.awarenessLevelID] || '#facc15'}; padding: 6px 10px; margin-top: 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase;">
-                  ⚠️ ALERTA ${a.awarenessTypeName}: ${a.text || 'Atenção às condições meteorológicas'}
-                </div>
-              `).join('');
-            } else {
-              containerAlertas.innerHTML = '';
-            }
+          if (alertasBraga.length > 0) {
+            const cores = { yellow: '#facc15', orange: '#fb923c', red: '#ef4444' };
+            containerAlertas.innerHTML = alertasBraga.map(a => `
+              <div style="background-color: #1e293b; border-left: 4px solid ${cores[a.awarenessLevelID] || '#facc15'}; color: ${cores[a.awarenessLevelID] || '#facc15'}; padding: 6px 10px; margin-top: 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase;">
+                ⚠️ ALERTA ${a.awarenessTypeName}: ${a.text || 'Atenção às condições meteorológicas'}
+              </div>
+            `).join('');
+          } else {
+            containerAlertas.innerHTML = '';
           }
-        } catch (e) {
-          console.warn("Sem alertas ativos ou erro ao carregar avisos.");
         }
 
       } catch (erro) {
         console.error("Erro IPMA:", erro);
         document.getElementById('meteo-resumo').innerHTML = `
-          <span style="color:#ef4444;">⚠️ Erro ao ligar ao IPMA</span>
+          <span style="color:#ef4444;">⚠️ Erro ao carregar meteorologia</span>
         `;
       }
-    }
-    // 5. COMUNICADOS
+    }    // 5. COMUNICADOS
     async function carregarComunicados() {
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
