@@ -316,7 +316,7 @@
       display: inline-block;
       padding: 2px 10px;
       border-radius: 4px;
-      margin-right: 30px;
+      margin-right: 40px;
     }
 
     @keyframes ticker {
@@ -816,24 +816,35 @@
       }
     }
 
-    // 5. TICKER DE COMUNICADOS NA BARRA INFERIOR
+    // 5. TICKER DE COMUNICADOS NA BARRA INFERIOR (CORRIGIDO)
     async function carregarComunicados() {
       const container = document.getElementById('ticker-comunicacoes');
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
         const linhas = dados ? dados.slice(1) : [];
 
-        const ativos = linhas.filter(col => estaAtivoNoIntervalo(col[0], col[1]));
-
-        if (ativos.length === 0) {
+        if (linhas.length === 0) {
           container.innerHTML = '<span style="color: #94a3b8;">📢 SEM COMUNICADOS ATIVOS</span>';
           return;
         }
 
-        container.innerHTML = ativos.map(col => {
-          const msg = col[2] || '';
-          return `<span class="msg-block" style="color: #38bdf8;">📢 ${msg}</span>`;
-        }).join(' ');
+        const mensagens = linhas.map(col => {
+          const titulo = col[0] ? col[0].trim() : '';
+          const obs = col[1] ? col[1].trim() : '';
+          
+          if (!titulo && !obs) return '';
+          
+          if (titulo && obs) {
+            return `<span class="msg-block" style="color: #38bdf8;">📢 <strong>${titulo}:</strong> ${obs}</span>`;
+          }
+          return `<span class="msg-block" style="color: #38bdf8;">📢 ${titulo || obs}</span>`;
+        }).filter(m => m !== '');
+
+        if (mensagens.length === 0) {
+          container.innerHTML = '<span style="color: #94a3b8;">📢 SEM COMUNICADOS ATIVOS</span>';
+        } else {
+          container.innerHTML = mensagens.join(' ');
+        }
       } catch (e) {
         container.innerHTML = '<span style="color: #ef4444;">⚠️ ERRO AO CARREGAR COMUNICADOS</span>';
       }
@@ -848,7 +859,6 @@
       carregarComunicados();
     }
 
-    // Primeira carga e atualização periódica (a cada 60 segundos)
     carregarTudo();
     setInterval(carregarTudo, 60000);
   </script>
