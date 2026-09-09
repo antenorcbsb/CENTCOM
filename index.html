@@ -835,29 +835,32 @@
       }
     }
 
-    // 5. COMUNICADOS / TICKER DE RODAPÉ (Opcional, caso queiras ligar à aba)
+    // 5. COMUNICADOS / TICKER DE RODAPÉ
     async function carregarComunicados() {
       const container = document.getElementById('ticker-comunicados');
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
-        const linhas = dados ? dados.slice(1) : [];
+        const linhas = dados ? dados.slice(1) : []; // Ignora o cabeçalho
 
         if (linhas.length === 0) {
-          container.innerHTML = '<span style="color: #38bdf8; font-weight: bold;">📢 SEM COMUNICADOS OPERACIONAIS REGISTADOS NO MOMENTO.</span>';
+          container.innerHTML = '<span style="color: #94a3b8;">Sem comunicados registados.</span>';
           return;
         }
 
-        // Junta as linhas dos comunicados separadas por um símbolo claro
-        const textos = linhas.map(col => col[0] || '').filter(t => t.trim() !== '');
-        if (textos.length > 0) {
-          container.innerHTML = `<span style="color: #38bdf8; font-weight: bold;">📢 ${textos.join(' &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 📢 ')}</span>`;
-        }
+        const comunicadosHtml = linhas.map(col => {
+          const titulo = col[0] ? col[0].trim() : 'COMUNICADO';
+          const observacao = col[1] ? col[1].trim() : '';
+          return `<span style="margin-right: 60px;"><strong style="color: #38bdf8;">📢 ${titulo}:</strong> ${observacao}</span>`;
+        }).join('');
+
+        container.innerHTML = comunicadosHtml;
       } catch (e) {
-        container.innerHTML = '<span style="color: #38bdf8; font-weight: bold;">📢 BSB BRAGA - CENTRO DE COMUNICAÇÕES E OPERAÇÕES</span>';
+        console.error("Erro Comunicados:", e);
+        container.innerHTML = '<span style="color: #ef4444;">Erro ao carregar comunicados.</span>';
       }
     }
 
-    // Inicialização de todas as secções
+    // Inicialização de todas as funções ao carregar a página
     carregarCanais();
     carregarVeiculos();
     carregarAgendamentos();
