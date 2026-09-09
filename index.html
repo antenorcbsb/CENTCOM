@@ -848,11 +848,9 @@
       carregarComunicados();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      carregarTudo();
-      // Atualiza os dados do Google Sheets a cada 60 segundos
-      setInterval(carregarTudo, 60000);
-    });
+    // Primeira carga e atualização periódica (a cada 60 segundos)
+    carregarTudo();
+    setInterval(carregarTudo, 60000);
   </script>
 </body>
 </html>
