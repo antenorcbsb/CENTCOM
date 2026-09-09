@@ -835,62 +835,49 @@
       }
     }
 
-    // 5. COMUNICADOS / TICKER DE RODAPÉ (CORRIGIDO)
+    // 5. COMUNICADOS / TICKER DE RODAPÉ
     async function carregarComunicados() {
       const container = document.getElementById('ticker-comunicados');
       try {
         const dados = await obterDadosAba(GIDS.comunicados);
-        if (!dados || dados.length < 2) {
-          container.innerHTML = '<span style="color: #38bdf8;">📢 Sem comunicados ativos de momento.</span>';
+        const linhas = dados ? dados.slice(1) : [];
+
+        if (linhas.length === 0) {
+          container.innerHTML = '<span style="color: #94a3b8; font-weight: bold;">📢 SEM COMUNICADOS REGISTADOS NO MOMENTO.</span>';
           return;
         }
 
-        const linhas = dados.slice(1);
-        const comunicadosTextos = [];
+        // Recolhe o texto da primeira coluna de cada linha de comunicados
+        const comunicados = linhas.map(col => col[0]).filter(texto => texto && texto.trim().length > 0);
 
-        linhas.forEach(col => {
-          const titulo = col[0] ? col[0].trim() : '';
-          const observacao = col[1] ? col[1].trim() : '';
-
-          if (titulo) {
-            const textoItem = observacao ? `${titulo} — ${observacao}` : titulo;
-            comunicadosTextos.push(textoItem);
-          }
-        });
-
-        if (comunicadosTextos.length === 0) {
-          container.innerHTML = '<span style="color: #38bdf8;">📢 Sem comunicados ativos de momento.</span>';
+        if (comunicados.length === 0) {
+          container.innerHTML = '<span style="color: #94a3b8; font-weight: bold;">📢 SEM COMUNICADOS ATIVOS.</span>';
           return;
         }
 
-        const htmlTicker = comunicadosTextos.map(item => 
-          `<span style="margin-right: 50px;"><span style="color: #f97316; font-weight: bold;">📢</span> ${item}</span>`
-        ).join('');
-
-        container.innerHTML = htmlTicker;
+        // Une com um separador visual distincto para o letreiro rodar fluidamente
+        const textoTicker = comunicados.join(' &nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp; ');
+        container.innerHTML = `<span style="color: #38bdf8; font-weight: bold;">📢 ${textoTicker}</span>`;
 
       } catch (e) {
         console.error("Erro Comunicados:", e);
-        container.innerHTML = '<span style="color: #ef4444;">Erro ao carregar comunicados do rodapé.</span>';
+        container.innerHTML = '<span style="color: #ef4444; font-weight: bold;">📢 ERRO AO CARREGAR COMUNICADOS.</span>';
       }
     }
 
-    // Executar carregamentos iniciais
-    carregarCanais();
-    carregarVeiculos();
-    carregarAgendamentos();
-    carregarMeteoOpenMeteo();
-    carregarComunicados();
-
-    // Atualizações periódicas automáticas
-    setInterval(() => {
+    // Execução inicial e ciclos de atualização automática
+    function iniciarDashboard() {
       carregarCanais();
       carregarVeiculos();
       carregarAgendamentos();
+      carregarMeteoOpenMeteo();
       carregarComunicados();
-    }, 60000);
+    }
 
-    setInterval(carregarMeteoOpenMeteo, 600000);
+    iniciarDashboard();
+
+    // Atualizar dados a cada 5 minutos
+    setInterval(iniciarDashboard, 5 * 60 * 1000);
   </script>
 </body>
 </html>
