@@ -410,12 +410,12 @@
           <div class="label" id="lbl-vento">Vento</div>
         </div>
         <div class="meteo-item">
-          <div class="value" id="val-pressao" style="color: #38bdf8;">-- hPa</div>
-          <div class="label">Pressão Atmosférica</div>
-        </div>
-        <div class="meteo-item">
           <div class="value" id="val-rajada" style="color: #facc15;">-- km/h</div>
           <div class="label">Rajada Máx</div>
+        </div>
+        <div class="meteo-item">
+          <div class="value" id="val-pressao" style="color: #38bdf8;">-- hPa</div>
+          <div class="label">Pressão Atmosférica</div>
         </div>
       </div>
       <div class="meteo-footer-bar">
@@ -870,7 +870,7 @@
         document.getElementById('val-pressao').textContent = `${pressaoAtual} hPa`;
 
         // 2. Sincronização real de Avisos Meteorológicos do IPMA para Braga (Distrito: BRG)
-        let textoAlerta = '🚨 Alertas: <span style="color: #4ade80; font-weight: bold;">Nenhum Alerta Ativo</span>';
+        let textoAlerta = '⚠️ Alertas: <span style="color: #4ade80; font-weight: bold;">Nenhum Alerta Ativo</span>';
         try {
           const resIpma = await fetch('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json');
           if (resIpma.ok) {
@@ -882,14 +882,14 @@
               const nomeNivelPt = nivel === 'red' ? 'VERMELHO' : (nivel === 'orange' ? 'LARANJA' : 'AMARELO');
               const descricaoAviso = avisoBraga.text || 'Aviso Meteorológico Adverso';
               
-              textoAlerta = `🚨 Alertas: <span style="color: ${corNivel}; font-weight: 800; letter-spacing: 0.5px;">AVISO ${nomeNivelPt}</span> <span style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(${descricaoAviso})</span>`;
+              textoAlerta = '⚠️ Alertas: ' + `<span style="color: ${corNivel}; font-weight: 800; letter-spacing: 0.5px;">AVISO ${nomeNivelPt}</span> <span style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(${descricaoAviso})</span>`;
             } else {
-              textoAlerta = `🚨 Alertas: <span style="color: #4ade80; font-weight: 600;">Estado Normal - Sem alertas ativos</span>`;
+              textoAlerta = '⚠️ Alertas: ' + '<span style="color: #4ade80; font-weight: 600;">Estado Normal - Sem alertas ativos</span>';
             }
           }
         } catch (ipmaErr) {
           console.warn("Não foi possível carregar avisos do IPMA diretamente, a usar estado padrão.", ipmaErr);
-          textoAlerta = `🚨 Alertas: <span style="color: #4ade80; font-weight: 600;">Estado Normal - Sem alertas ativos</span>`;
+          textoAlerta = '⚠️ Alertas: ' + '<span style="color: #4ade80; font-weight: 600;">Estado Normal - Sem alertas ativos</span>';
         }
         
         document.getElementById('meteo-alertas').innerHTML = textoAlerta;
