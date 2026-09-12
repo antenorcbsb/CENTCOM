@@ -104,6 +104,12 @@
       gap: 10px;
     }
 
+    .grid-1-column {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
     .item-card {
       background-color: #1e293b;
       border-radius: 6px;
@@ -357,7 +363,7 @@
     }
 
     @media (max-width: 900px) {
-      .dashboard-grid, .grid-2-columns, .meteo-grid { grid-template-columns: 1fr; }
+      .dashboard-grid, .grid-2-columns, .grid-1-column, .meteo-grid { grid-template-columns: 1fr; }
       header { justify-content: flex-start; padding-left: 55px; }
       .header-logo { left: 10px; }
       .clock { position: static; margin-left: auto; }
@@ -386,7 +392,7 @@
 
     <div class="card">
       <div class="card-header orange">📅 AGENDAMENTOS DO DIA</div>
-      <div class="grid-2-columns" id="container-agendamentos"></div>
+      <div class="grid-1-column" id="container-agendamentos"></div>
     </div>
 
     <div class="card">
@@ -743,7 +749,7 @@
         });
 
         if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
           return;
         }
 
@@ -796,7 +802,7 @@
         }).join('');
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; grid-column: span 2; padding: 10px;">Erro nos agendamentos: Não foi possível carregar dados do Sheets.</p>`;
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: Não foi possível carregar dados do Sheets.</p>`;
       }
     }
 
