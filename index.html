@@ -104,15 +104,22 @@
       gap: 10px;
     }
 
+    .agendamentos-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .item-card {
       background-color: #1e293b;
       border-radius: 6px;
       padding: 10px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 6px;
       border-left: 4px solid #ef4444;
       transition: all 0.3s ease;
+      width: 100%;
     }
 
     .item-card.card-informacao {
@@ -191,7 +198,6 @@
       color: #fb923c;
       font-size: 0.82rem;
       font-weight: 600;
-      margin-top: 4px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -208,7 +214,6 @@
     .meios-container {
       color: #cbd5e1;
       font-size: 0.82rem;
-      margin-top: 6px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -237,7 +242,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 6px;
       flex-wrap: wrap;
     }
 
@@ -273,7 +277,7 @@
       background-color: #1e293b;
       padding: 8px 12px;
       border-radius: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-size: 0.85rem;
     }
 
@@ -282,6 +286,7 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       text-align: center;
+      margin-bottom: 10px;
     }
 
     .meteo-item {
@@ -385,7 +390,7 @@
 
     <div class="card">
       <div class="card-header orange">📅 AGENDAMENTOS DO DIA</div>
-      <div class="grid-2-columns" id="container-agendamentos"></div>
+      <div class="agendamentos-list" id="container-agendamentos"></div>
     </div>
 
     <div class="card">
@@ -415,7 +420,7 @@
       </div>
       <div class="meteo-footer-bar">
         <span id="meteo-risco">🔥 Risco de Incêndio: <span style="color: #4ade80; font-weight: bold;">A calcular...</span></span>
-        <span id="meteo-alertas">⚠️ Alertas: <span style="color: #4ade80;">A verificar IPMA...</span></span>
+        <span id="meteo-alertas" style="font-weight: bold; color: #4ade80;">⚠️ Alertas: A verificar...</span>
         <span id="meteo-sync" style="font-size: 0.65rem; color: #64748b;" title="Última sincronização meteorológica">🔄 --:--</span>
       </div>
     </div>
@@ -734,7 +739,7 @@
         });
 
         if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
           return;
         }
 
@@ -754,8 +759,8 @@
           let meiosHtml = '';
           if (meiosTexto.trim()) {
             const listaMeios = meiosTexto.split(/[,;/+]/).map(m => m.trim()).filter(m => m.length > 0);
-            const itensMeios = listaMeios.map(meio => `${obterIconoMeioEspecifico(meio)} <span>${meio}</span>`).join('');
-            meiosHtml = `<div class="meios-container"><strong style="color: #94a3b8; margin-right: 2px;">Meios:</strong>${itensMeios}</div>`;
+            const itensMeios = listaMeios.map(meio => `<div class="meio-item">${obterIconoMeioEspecifico(meio)} <span>${meio}</span></div>`).join('');
+            meiosHtml = `<div class="meios-container"><span style="color: #94a3b8; font-weight: 600;">Meios:</span>${itensMeios}</div>`;
           }
 
           const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
@@ -768,26 +773,26 @@
 
           return `
             <div class="${classeCard}" style="border-left-color: ${corAtual};">
-              <div class="item-info">
-                <div class="item-icon-svg">${svgAgendamento}</div>
-                <div class="item-details" style="width: 100%;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                    <p style="color: ${ehInformacao ? '#f3e8ff' : corAtual}; font-weight: bold; font-size: 0.95rem;">${descricao}</p>
-                    <span class="${classeBadge}" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background-color: #0f172a; border: 1px solid ${corAtual}; color: ${corAtual}; text-transform: uppercase; font-weight: bold; white-space: nowrap;">
-                      ${ehInformacao ? 'Destaque / Info' : tipo}
-                    </span>
-                  </div>
-                  ${hora ? `<div class="hora-container" style="color: ${corAtual};">${MINI_ICONE_RELOGIO}<span>${hora}</span></div>` : ''}
-                  ${meiosHtml}
-                  ${bombeirosBadges ? `<div class="bombeiros-container"><span class="bombeiros-label">Equipas:</span>${bombeirosBadges}</div>` : ''}
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="item-icon-svg" style="width: 24px; height: 24px;">${svgAgendamento}</div>
+                  <span style="color: ${ehInformacao ? '#f3e8ff' : '#f8fafc'}; font-weight: bold; font-size: 0.9rem;">${descricao}</span>
                 </div>
+                <span class="${classeBadge}" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background-color: #0f172a; border: 1px solid ${corAtual}; color: ${corAtual}; text-transform: uppercase; font-weight: bold; white-space: nowrap;">
+                  ${ehInformacao ? 'Destaque / Info' : tipo}
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-left: 34px;">
+                ${hora ? `<div class="hora-container" style="color: ${corAtual};">${MINI_ICONE_RELOGIO}<span>${hora}</span></div>` : ''}
+                ${meiosHtml}
+                ${bombeirosBadges ? `<div class="bombeiros-container"><span class="bombeiros-label">Equipas:</span>${bombeirosBadges}</div>` : ''}
               </div>
             </div>
           `;
         }).join('');
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; grid-column: span 2; padding: 10px;">Erro nos agendamentos.</p>`;
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos.</p>`;
       }
     }
 
@@ -865,23 +870,29 @@
         document.getElementById('val-pressao').textContent = `${pressaoAtual} hPa`;
 
         // 2. Sincronização real de Avisos Meteorológicos do IPMA para Braga (Distrito: BRG)
-        let textoAlerta = '<span style="color: #4ade80;">Nenhum Alerta Ativo</span>';
+        let textoAlerta = '🚨 Alertas: <span style="color: #4ade80; font-weight: bold;">Nenhum Alerta Ativo</span>';
         try {
           const resIpma = await fetch('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json');
           if (resIpma.ok) {
             const avisosData = await resIpma.json();
-            // Filtrar avisos para o distrito de Braga ('BRG') ativos hoje
             const avisoBraga = avisosData.find(a => a.idAreaAviso === 'BRG');
             if (avisoBraga && avisoBraga.awarenessLevelID && avisoBraga.awarenessLevelID !== 'green') {
               const nivel = avisoBraga.awarenessLevelID; // yellow, orange, red
               const corNivel = nivel === 'red' ? '#ef4444' : (nivel === 'orange' ? '#fb923c' : '#facc15');
-              textoAlerta = `<span style="color: ${corNivel}; font-weight: bold; text-transform: uppercase;">⚠️ Aviso ${nivel} (${avisoBraga.text || 'Meteorológico'})</span>`;
+              const nomeNivelPt = nivel === 'red' ? 'VERMELHO' : (nivel === 'orange' ? 'LARANJA' : 'AMARELO');
+              const descricaoAviso = avisoBraga.text || 'Aviso Meteorológico Adverso';
+              
+              textoAlerta = `🚨 Alertas: <span style="color: ${corNivel}; font-weight: 800; letter-spacing: 0.5px;">AVISO ${nomeNivelPt}</span> <span style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(${descricaoAviso})</span>`;
+            } else {
+              textoAlerta = `🚨 Alertas: <span style="color: #4ade80; font-weight: 600;">Estado Normal - Sem alertas ativos</span>`;
             }
           }
         } catch (ipmaErr) {
           console.warn("Não foi possível carregar avisos do IPMA diretamente, a usar estado padrão.", ipmaErr);
+          textoAlerta = `🚨 Alertas: <span style="color: #4ade80; font-weight: 600;">Estado Normal - Sem alertas ativos</span>`;
         }
-        document.getElementById('meteo-alertas').innerHTML = `Alertas: ${textoAlerta}`;
+        
+        document.getElementById('meteo-alertas').innerHTML = textoAlerta;
 
         // 3. Estimativa de Risco de Incêndio com base nas condições reais atuais
         let riscoTexto = 'Moderado';
