@@ -299,7 +299,6 @@
 
     .meteo-item .value { font-size: 1.15rem; font-weight: bold; margin-top: 2px; }
     .meteo-item .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
-    .fwi-high { color: #ef4444; }
 
     .meteo-footer-bar {
       display: flex;
@@ -416,8 +415,8 @@
           <div class="label">Rajada Máx</div>
         </div>
         <div class="meteo-item">
-          <div class="value" id="val-fwi" style="color: #f87171;">--</div>
-          <div class="label">Índice FWI</div>
+          <div class="value" id="val-pressao" style="color: #c084fc;">-- hPa</div>
+          <div class="label">Pressão Atmosférica</div>
         </div>
       </div>
       <div class="meteo-footer-bar">
@@ -590,6 +589,56 @@
         80: 'Aguaceiros Fracos', 81: 'Aguaceiros Moderados', 82: 'Aguaceiros Violentos', 95: 'Trovoada'
       };
       return codigos[code] || 'Variável';
+    }
+
+    // Função de meteorologia atualizada para carregar a Pressão Atmosférica
+    async function carregarMeteorologia() {
+      try {
+        // Coordenadas para Braga (Latitude: 41.5518, Longitude: -8.4229)
+        const lat = 41.5518;
+        const lon = -8.4229;
+        const urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FLisbon`;
+
+        const response = await fetch(urlMeteo);
+        if (!response.ok) throw new Error("Erro ao obter dados meteorológicos");
+        const data = await response.json();
+
+        if (data && data.current) {
+          const tempAtual = data.current.temperature_2m;
+          const ventoVelocidade = data.current.wind_speed_10m;
+          const ventoDirecao = converterDirecaoVento(data.current.wind_direction_10m);
+          const rajadaMax = data.current.wind_gusts_10m;
+          const pressaoSuperficie = data.current.surface_pressure;
+          const weatherCode = data.current.weather_code;
+          const descricaoTempo = converterCodigoTempo(weatherCode);
+
+          const tempMax = data.daily && data.daily.temperature_2m_max ? data.daily.temperature_2m_max[0] : '--';
+          const tempMin = data.daily && data.daily.temperature_2m_min ? data.daily.temperature_2m_min[0] : '--';
+          const probChuva = data.daily && data.daily.precipitation_probability_max ? data.daily.precipitation_probability_max[0] : '--';
+
+          // Atualizar elementos na interface
+          document.getElementById('val-temp').textContent = `${tempAtual !== undefined ? tempAtual : '--'}ºC`;
+          
+          const elVento = document.getElementById('val-vento');
+          elVento.textContent = `${ventoVelocidade !== undefined ? ventoVelocidade : '--'} km/h (${ventoDirecao})`;
+          elVento.style.color = obterCorVento(ventoVelocidade);
+          
+          document.getElementById('val-rajada').textContent = `${rajadaMax !== undefined ? rajadaMax : '--'} km/h`;
+          document.getElementById('val-pressao').textContent = `${pressaoSuperficie !== undefined ? pressaoSuperficie : '--'} hPa`;
+
+          document.getElementById('meteo-resumo').innerHTML = `
+            <span>🌤️ ${descricaoTempo}</span>
+            <span>🌡️ Máx: ${tempMax}ºC / Mín: ${tempMin}ºC</span>
+            <span>🌧️ Prob. Chuva: ${probChuva}%</span>
+          `;
+
+          const agora = new Date();
+          const horaSync = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
+          document.getElementById('meteo-sync').textContent = `🔄 ${horaSync}`;
+        }
+      } catch (err) {
+        console.warn("Erro ao carregar meteorologia:", err);
+      }
     }
 
     const ICONE_RADIO_TELECOM = `<svg class="canal-icon-radio" viewBox="0 0 24 36" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -832,82 +881,30 @@
           
           let htmlTitulo = titulo ? `<span style="color: #38bdf8; font-weight: 800; text-transform: uppercase; margin-right: 8px; background: rgba(56, 189, 248, 0.15); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">📌 ${titulo}</span>` : '';
           let htmlMensagem = `<span style="color: #f8fafc; font-weight: 600;">${mensagem}</span>`;
+          return `${htmlTitulo}${htmlMensagem}`;
+        });
 
-          return `<span style="display: inline-flex; align-items: center; margin-right: 50px;">${htmlTitulo}${htmlMensagem}</span>`;
-        }).join('');
+        const conteudoTicker = mensagens.join('<span style="margin: 0 40px; color: #38bdf8;">✦</span>');
+        tickerContainer.innerHTML = conteudoTicker;
 
-        tickerContainer.innerHTML = mensagens;
       } catch (e) {
-        tickerContainer.innerHTML = '<span style="color: #f87171; font-weight: bold;">⚠️ ERRO AO CARREGAR COMUNICADOS</span>';
+        tickerContainer.innerHTML = '<span style="color: #ef4444; font-weight: bold;">⚠️ ERRO AO CARREGAR COMUNICADOS</span>';
       }
     }
 
-    // Função para carregar a meteorologia (Open-Meteo para Braga)
-    async function carregarMeteorologia() {
-      try {
-        // Coordenadas aproximadas para Braga
-        const lat = 41.5518;
-        const lon = -8.4229;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe/Lisbon`;
+    // Inicialização geral
+    carregarCanais();
+    carregarVeiculos();
+    carregarAgendamentos();
+    carregarMeteorologia();
+    carregarComunicados();
 
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Erro ao obter dados meteorológicos");
-        
-        const data = await response.json();
-        
-        if (data.current && data.daily) {
-          const tempAtual = Math.round(data.current.temperature_2m);
-          const ventoAtual = Math.round(data.current.wind_speed_10m);
-          const rajadaAtual = Math.round(data.current.wind_gusts_10m || 0);
-          const direcaoVento = converterDirecaoVento(data.current.wind_direction_10m);
-          const condicaoTempo = converterCodigoTempo(data.current.weather_code);
-          
-          const tempMax = Math.round(data.daily.temperature_2m_max[0]);
-          const tempMin = Math.round(data.daily.temperature_2m_min[0]);
-          const probChuva = data.daily.precipitation_probability_max[0] ?? 0;
-
-          document.getElementById('meteo-resumo').innerHTML = `
-            <span>🌤️ ${condicaoTempo}</span>
-            <span>🌡️ Máx: ${tempMax}ºC / Mín: ${tempMin}ºC</span>
-            <span>🌧️ Prob. Chuva: ${probChuva}%</span>
-          `;
-
-          document.getElementById('val-temp').textContent = `${tempAtual}ºC`;
-          document.getElementById('val-vento').textContent = `${ventoAtual} km/h`;
-          document.getElementById('lbl-vento').textContent = `Vento (${direcaoVento})`;
-          document.getElementById('val-rajada').textContent = `${rajadaAtual} km/h`;
-
-          // Exemplo visual para FWI / Risco simulado ou adaptado
-          document.getElementById('val-fwi').textContent = 'Moderado';
-          document.getElementById('meteo-risco').innerHTML = `🔥 Risco de Incêndio: <span style="color: #fb923c; font-weight: bold;">Moderado/Elevado</span>`;
-          document.getElementById('meteo-alertas').innerHTML = `⚠️ Alertas: <span style="color: #4ade80;">Nenhum</span>`;
-
-          const agora = new Date();
-          const horaSync = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
-          document.getElementById('meteo-sync').textContent = `🔄 ${horaSync}`;
-        }
-      } catch (e) {
-        console.warn("Erro ao carregar meteorologia:", e);
-      }
-    }
-
-    // Inicialização de todas as secções ao carregar a página
-    window.addEventListener('DOMContentLoaded', () => {
-      carregarCanais();
-      carregarVeiculos();
-      carregarAgendamentos();
-      carregarComunicados();
-      carregarMeteorologia();
-
-      // Atualizações periódicas automáticas (a cada 5 minutos)
-      setInterval(() => {
-        carregarCanais();
-        carregarVeiculos();
-        carregarAgendamentos();
-        carregarComunicados();
-        carregarMeteorologia();
-      }, 300000);
-    });
+    // Atualizações periódicas
+    setInterval(carregarCanais, 60000);
+    setInterval(carregarVeiculos, 60000);
+    setInterval(carregarAgendamentos, 60000);
+    setInterval(carregarMeteorologia, 300000); // A cada 5 minutos
+    setInterval(carregarComunicados, 60000);
   </script>
 </body>
 </html>
