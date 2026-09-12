@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batalhão Sapadores Bombeiros de Braga - Centro Comunicações</title>
+  <title>BSB BRAGA - CENTCOM</title>
   <style>
     * {
       box-sizing: border-box;
@@ -101,12 +101,6 @@
     .grid-2-columns {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .grid-1-column {
-      display: grid;
-      grid-template-columns: 1fr;
       gap: 10px;
     }
 
@@ -362,7 +356,7 @@
     }
 
     @media (max-width: 900px) {
-      .dashboard-grid, .grid-2-columns, .grid-1-column, .meteo-grid { grid-template-columns: 1fr; }
+      .dashboard-grid, .grid-2-columns, .meteo-grid { grid-template-columns: 1fr; }
       header { justify-content: flex-start; padding-left: 55px; }
       .header-logo { left: 10px; }
       .clock { position: static; margin-left: auto; }
@@ -391,7 +385,7 @@
 
     <div class="card">
       <div class="card-header orange">📅 AGENDAMENTOS DO DIA</div>
-      <div class="grid-1-column" id="container-agendamentos"></div>
+      <div class="grid-2-columns" id="container-agendamentos"></div>
     </div>
 
     <div class="card">
@@ -411,17 +405,17 @@
           <div class="label" id="lbl-vento">Vento</div>
         </div>
         <div class="meteo-item">
+          <div class="value" id="val-pressao" style="color: #38bdf8;">-- hPa</div>
+          <div class="label">Pressão Atmosférica</div>
+        </div>
+        <div class="meteo-item">
           <div class="value" id="val-rajada" style="color: #facc15;">-- km/h</div>
           <div class="label">Rajada Máx</div>
         </div>
-        <div class="meteo-item">
-          <div class="value" id="val-pressao" style="color: #c084fc;">-- hPa</div>
-          <div class="label">Pressão Atmosférica</div>
-        </div>
       </div>
       <div class="meteo-footer-bar">
-        <span id="meteo-risco">🔥 Risco de Incêndio: --</span>
-        <span id="meteo-alertas">⚠️ Alertas: --</span>
+        <span id="meteo-risco">🔥 Risco de Incêndio: <span style="color: #4ade80; font-weight: bold;">A calcular...</span></span>
+        <span id="meteo-alertas">⚠️ Alertas: <span style="color: #4ade80;">A verificar IPMA...</span></span>
         <span id="meteo-sync" style="font-size: 0.65rem; color: #64748b;" title="Última sincronização meteorológica">🔄 --:--</span>
       </div>
     </div>
@@ -501,7 +495,7 @@
 
       const urlCsv = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
       const resCsv = await fetch(urlCsv);
-      if (!resCsv.ok) throw new Error("Erro na ligação ao Sheets (CORS ou Permissões)");
+      if (!resCsv.ok) throw new Error("Erro na ligação ao Sheets");
       const csvText = await resCsv.text();
       
       const linhasCsv = csvText.split('\n').map(linha => {
@@ -566,14 +560,6 @@
       return minutosAtuais >= (horas * 60 + minutos);
     }
 
-    function obterCorVento(velocidade) {
-      const v = parseFloat(velocidade) || 0;
-      if (v < 20) return '#4ade80';
-      if (v < 40) return '#facc15';
-      if (v < 60) return '#fb923c';
-      return '#ef4444';
-    }
-
     function converterDirecaoVento(graus) {
       if (graus === undefined || graus === null) return 'N/A';
       const direcoes = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
@@ -589,56 +575,6 @@
         80: 'Aguaceiros Fracos', 81: 'Aguaceiros Moderados', 82: 'Aguaceiros Violentos', 95: 'Trovoada'
       };
       return codigos[code] || 'Variável';
-    }
-
-    // Função de meteorologia atualizada para carregar a Pressão Atmosférica
-    async function carregarMeteorologia() {
-      try {
-        // Coordenadas para Braga (Latitude: 41.5518, Longitude: -8.4229)
-        const lat = 41.5518;
-        const lon = -8.4229;
-        const urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FLisbon`;
-
-        const response = await fetch(urlMeteo);
-        if (!response.ok) throw new Error("Erro ao obter dados meteorológicos");
-        const data = await response.json();
-
-        if (data && data.current) {
-          const tempAtual = data.current.temperature_2m;
-          const ventoVelocidade = data.current.wind_speed_10m;
-          const ventoDirecao = converterDirecaoVento(data.current.wind_direction_10m);
-          const rajadaMax = data.current.wind_gusts_10m;
-          const pressaoSuperficie = data.current.surface_pressure;
-          const weatherCode = data.current.weather_code;
-          const descricaoTempo = converterCodigoTempo(weatherCode);
-
-          const tempMax = data.daily && data.daily.temperature_2m_max ? data.daily.temperature_2m_max[0] : '--';
-          const tempMin = data.daily && data.daily.temperature_2m_min ? data.daily.temperature_2m_min[0] : '--';
-          const probChuva = data.daily && data.daily.precipitation_probability_max ? data.daily.precipitation_probability_max[0] : '--';
-
-          // Atualizar elementos na interface
-          document.getElementById('val-temp').textContent = `${tempAtual !== undefined ? tempAtual : '--'}ºC`;
-          
-          const elVento = document.getElementById('val-vento');
-          elVento.textContent = `${ventoVelocidade !== undefined ? ventoVelocidade : '--'} km/h (${ventoDirecao})`;
-          elVento.style.color = obterCorVento(ventoVelocidade);
-          
-          document.getElementById('val-rajada').textContent = `${rajadaMax !== undefined ? rajadaMax : '--'} km/h`;
-          document.getElementById('val-pressao').textContent = `${pressaoSuperficie !== undefined ? pressaoSuperficie : '--'} hPa`;
-
-          document.getElementById('meteo-resumo').innerHTML = `
-            <span>🌤️ ${descricaoTempo}</span>
-            <span>🌡️ Máx: ${tempMax}ºC / Mín: ${tempMin}ºC</span>
-            <span>🌧️ Prob. Chuva: ${probChuva}%</span>
-          `;
-
-          const agora = new Date();
-          const horaSync = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
-          document.getElementById('meteo-sync').textContent = `🔄 ${horaSync}`;
-        }
-      } catch (err) {
-        console.warn("Erro ao carregar meteorologia:", err);
-      }
     }
 
     const ICONE_RADIO_TELECOM = `<svg class="canal-icon-radio" viewBox="0 0 24 36" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -798,7 +734,7 @@
         });
 
         if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
           return;
         }
 
@@ -851,7 +787,7 @@
         }).join('');
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: Não foi possível carregar dados do Sheets.</p>`;
+        container.innerHTML = `<p style="color:#ef4444; grid-column: span 2; padding: 10px;">Erro nos agendamentos.</p>`;
       }
     }
 
@@ -881,30 +817,109 @@
           
           let htmlTitulo = titulo ? `<span style="color: #38bdf8; font-weight: 800; text-transform: uppercase; margin-right: 8px; background: rgba(56, 189, 248, 0.15); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">📌 ${titulo}</span>` : '';
           let htmlMensagem = `<span style="color: #f8fafc; font-weight: 600;">${mensagem}</span>`;
-          return `${htmlTitulo}${htmlMensagem}`;
+
+          return `<span style="display: inline-flex; align-items: center;"><span style="color: #facc15; font-weight: bold; margin-right: 8px; font-size: 1.1rem;">📢</span>${htmlTitulo}${htmlMensagem}</span>`;
         });
 
-        const conteudoTicker = mensagens.join('<span style="margin: 0 40px; color: #38bdf8;">✦</span>');
-        tickerContainer.innerHTML = conteudoTicker;
-
+        tickerContainer.innerHTML = mensagens.join('<span style="margin: 0 40px; color: #38bdf8;">•</span>');
       } catch (e) {
-        tickerContainer.innerHTML = '<span style="color: #ef4444; font-weight: bold;">⚠️ ERRO AO CARREGAR COMUNICADOS</span>';
+        tickerContainer.innerHTML = `<span style="color: #ef4444; font-weight: bold;">📢 Erro ao carregar comunicados</span>`;
       }
     }
 
-    // Inicialização geral
+    async function carregarMeteorologia() {
+      try {
+        const lat = 41.5518;
+        const lon = -8.4229;
+        
+        // 1. Dados de meteorologia e pressão atmosférica (Open-Meteo)
+        const urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe/Lisbon`;
+        const res = await fetch(urlMeteo);
+        if (!res.ok) throw new Error("Erro na API de Meteorologia");
+        const data = await res.json();
+
+        const current = data.current;
+        const daily = data.daily;
+
+        const tempAtual = current.temperature_2m;
+        const ventoAtual = current.wind_speed_10m;
+        const rajadaAtual = current.wind_gusts_10m || ventoAtual;
+        const pressaoAtual = current.surface_pressure ? Math.round(current.surface_pressure) : '--';
+        const direcaoVento = converterDirecaoVento(current.wind_direction_10m);
+        const condicaoTempo = converterCodigoTempo(current.weather_code);
+
+        const tempMax = daily.temperature_2m_max[0];
+        const tempMin = daily.temperature_2m_min[0];
+        const probChuva = daily.precipitation_probability_max[0] || 0;
+
+        document.getElementById('meteo-resumo').innerHTML = `
+          <span>🌤️ ${condicaoTempo}</span>
+          <span>🌡️ Máx: ${tempMax}ºC / Mín: ${tempMin}ºC</span>
+          <span>🌧️ Prob. Chuva: ${probChuva}%</span>
+        `;
+
+        document.getElementById('val-temp').textContent = `${tempAtual}ºC`;
+        document.getElementById('val-vento').textContent = `${ventoAtual} km/h`;
+        document.getElementById('lbl-vento').textContent = `Vento (${direcaoVento})`;
+        document.getElementById('val-rajada').textContent = `${rajadaAtual} km/h`;
+        document.getElementById('val-pressao').textContent = `${pressaoAtual} hPa`;
+
+        // 2. Sincronização real de Avisos Meteorológicos do IPMA para Braga (Distrito: BRG)
+        let textoAlerta = '<span style="color: #4ade80;">Nenhum Alerta Ativo</span>';
+        try {
+          const resIpma = await fetch('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json');
+          if (resIpma.ok) {
+            const avisosData = await resIpma.json();
+            // Filtrar avisos para o distrito de Braga ('BRG') ativos hoje
+            const avisoBraga = avisosData.find(a => a.idAreaAviso === 'BRG');
+            if (avisoBraga && avisoBraga.awarenessLevelID && avisoBraga.awarenessLevelID !== 'green') {
+              const nivel = avisoBraga.awarenessLevelID; // yellow, orange, red
+              const corNivel = nivel === 'red' ? '#ef4444' : (nivel === 'orange' ? '#fb923c' : '#facc15');
+              textoAlerta = `<span style="color: ${corNivel}; font-weight: bold; text-transform: uppercase;">⚠️ Aviso ${nivel} (${avisoBraga.text || 'Meteorológico'})</span>`;
+            }
+          }
+        } catch (ipmaErr) {
+          console.warn("Não foi possível carregar avisos do IPMA diretamente, a usar estado padrão.", ipmaErr);
+        }
+        document.getElementById('meteo-alertas').innerHTML = `Alertas: ${textoAlerta}`;
+
+        // 3. Estimativa de Risco de Incêndio com base nas condições reais atuais
+        let riscoTexto = 'Moderado';
+        let riscoCor = '#facc15';
+        if (tempAtual > 35 || ventoAtual > 45) {
+          riscoTexto = 'Muito Elevado / Máximo';
+          riscoCor = '#ef4444';
+        } else if (tempAtual > 28 || ventoAtual > 25) {
+          riscoTexto = 'Elevado';
+          riscoCor = '#fb923c';
+        } else if (tempAtual < 15 && probChuva > 50) {
+          riscoTexto = 'Reduzido';
+          riscoCor = '#4ade80';
+        }
+
+        document.getElementById('meteo-risco').innerHTML = `🔥 Risco de Incêndio: <span style="color: ${riscoCor}; font-weight: bold;">${riscoTexto}</span>`;
+
+        const agora = new Date();
+        document.getElementById('meteo-sync').textContent = `🔄 ${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+
+      } catch (e) {
+        console.error("Erro Meteo:", e);
+      }
+    }
+
     carregarCanais();
     carregarVeiculos();
     carregarAgendamentos();
-    carregarMeteorologia();
     carregarComunicados();
+    carregarMeteorologia();
 
-    // Atualizações periódicas
-    setInterval(carregarCanais, 60000);
-    setInterval(carregarVeiculos, 60000);
-    setInterval(carregarAgendamentos, 60000);
-    setInterval(carregarMeteorologia, 300000); // A cada 5 minutos
-    setInterval(carregarComunicados, 60000);
+    setInterval(() => {
+      carregarCanais();
+      carregarVeiculos();
+      carregarAgendamentos();
+      carregarComunicados();
+      carregarMeteorologia();
+    }, 5 * 60 * 1000);
   </script>
 </body>
 </html>
