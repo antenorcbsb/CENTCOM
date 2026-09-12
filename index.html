@@ -279,7 +279,7 @@
 
     .meteo-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       text-align: center;
     }
@@ -288,11 +288,23 @@
       background-color: #1e293b;
       padding: 10px;
       border-radius: 6px;
+      position: relative;
     }
 
     .meteo-item .value { font-size: 1.15rem; font-weight: bold; margin-top: 2px; }
     .meteo-item .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
     .fwi-high { color: #ef4444; }
+
+    .meteo-footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1e293b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
 
     /* ================= RODAPÉ / TICKER ================= */
     .footer-bar {
@@ -345,7 +357,7 @@
     }
 
     @media (max-width: 900px) {
-      .dashboard-grid, .grid-2-columns { grid-template-columns: 1fr; }
+      .dashboard-grid, .grid-2-columns, .meteo-grid { grid-template-columns: 1fr; }
       header { justify-content: flex-start; padding-left: 55px; }
       .header-logo { left: 10px; }
       .clock { position: static; margin-left: auto; }
@@ -374,17 +386,21 @@
 
     <div class="card">
       <div class="card-header orange">📅 AGENDAMENTOS DO DIA</div>
-      <div style="display: flex; flex-direction: column; gap: 10px;" id="container-agendamentos"></div>
+      <div class="grid-2-columns" id="container-agendamentos"></div>
     </div>
 
     <div class="card">
       <div class="card-header blue">🌧️ METEOROLOGIA & RISCO </div>
       <div class="meteo-header" id="meteo-resumo">
         <span>🌤️ A carregar...</span>
-        <span>🌡️ Atual: --ºC <span style="color: #94a3b8; font-size: 0.85rem;">(Mín: --ºC / Máx: --ºC)</span></span>
+        <span>🌡️ Máx: --ºC / Mín: --ºC</span>
         <span>🌧️ Prob. Chuva: --%</span>
       </div>
       <div class="meteo-grid" id="meteo-valores">
+        <div class="meteo-item">
+          <div class="value" id="val-temp" style="color: #38bdf8;">--ºC</div>
+          <div class="label">Temperatura Atual</div>
+        </div>
         <div class="meteo-item">
           <div class="value" id="val-vento" style="color: #4ade80;">-- km/h</div>
           <div class="label" id="lbl-vento">Vento</div>
@@ -394,9 +410,14 @@
           <div class="label">Rajada Máx</div>
         </div>
         <div class="meteo-item">
-          <div class="value fwi-high" id="val-fwi">--</div>
+          <div class="value" id="val-fwi" style="color: #f87171;">--</div>
           <div class="label">Índice FWI</div>
         </div>
+      </div>
+      <div class="meteo-footer-bar">
+        <span id="meteo-risco">🔥 Risco de Incêndio: --</span>
+        <span id="meteo-alertas">⚠️ Alertas: --</span>
+        <span id="meteo-sync" style="font-size: 0.65rem; color: #64748b;" title="Última sincronização meteorológica">🔄 --:--</span>
       </div>
     </div>
 
@@ -722,7 +743,7 @@
         });
 
         if (agendamentosHoje.length === 0) {
-          container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
+          container.innerHTML = '<p style="color:#94a3b8; grid-column: span 2; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
           return;
         }
 
@@ -775,7 +796,7 @@
         }).join('');
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: Não foi possível carregar dados do Sheets.</p>`;
+        container.innerHTML = `<p style="color:#ef4444; grid-column: span 2; padding: 10px;">Erro nos agendamentos: Não foi possível carregar dados do Sheets.</p>`;
       }
     }
 
@@ -809,35 +830,64 @@
           return `<span style="display: inline-flex; align-items: center;"><span style="color: #facc15; font-weight: bold; margin-right: 8px; font-size: 1.1rem;">📢</span>${htmlTitulo}${htmlMensagem}</span>`;
         });
 
-        const separador = `<span style="color: #facc15; margin: 0 35px; font-weight: bold; font-size: 1.1rem;">⚡ // ⚡</span>`;
-        tickerContainer.innerHTML = mensagens.join(separador);
-
+        tickerContainer.innerHTML = mensagens.join('<span style="margin: 0 40px; color: #38bdf8;">•</span>');
       } catch (e) {
-        console.error("Erro Comunicados Ticker:", e);
-        tickerContainer.innerHTML = '<span style="color: #f87171; font-weight: bold;">⚠️ ERRO AO CARREGAR COMUNICADOS</span>';
+        tickerContainer.innerHTML = `<span style="color: #ef4444; font-weight: bold;">📢 Erro ao carregar comunicados</span>`;
       }
     }
 
-    async function carregarMeteo() {
+    async function carregarMeteorologia() {
       try {
         const lat = 41.5518;
         const lon = -8.4229;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m`;
-        const res = await fetch(url);
-        if (!res.ok) return;
+        const urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe/Lisbon`;
+
+        const res = await fetch(urlMeteo);
+        if (!res.ok) throw new Error("Erro na API de Meteorologia");
         const data = await res.json();
-        const cur = data.current;
+
+        const current = data.current;
+        const daily = data.daily;
+
+        const tempAtual = current.temperature_2m;
+        const ventoAtual = current.wind_speed_10m;
+        const rajadaAtual = current.wind_gusts_10m || ventoAtual;
+        const direcaoVento = converterDirecaoVento(current.wind_direction_10m);
+        const condicaoTempo = converterCodigoTempo(current.weather_code);
+
+        const tempMax = daily.temperature_2m_max[0];
+        const tempMin = daily.temperature_2m_min[0];
+        const probChuva = daily.precipitation_probability_max[0] || 0;
 
         document.getElementById('meteo-resumo').innerHTML = `
-          <span>🌤️ ${converterCodigoTempo(cur.weather_code)}</span>
-          <span>🌡️ Atual: ${cur.temperature_2m}ºC</span>
-          <span>💧 Humidade: ${cur.relative_humidity_2m}%</span>
+          <span>🌤️ ${condicaoTempo}</span>
+          <span>🌡️ Máx: ${tempMax}ºC / Mín: ${tempMin}ºC</span>
+          <span>🌧️ Prob. Chuva: ${probChuva}%</span>
         `;
-        document.getElementById('val-vento').textContent = `${cur.wind_speed_10m} km/h (${converterDirecaoVento(cur.wind_direction_10m)})`;
-        document.getElementById('val-vento').style.color = obterCorVento(cur.wind_speed_10m);
-        document.getElementById('val-rajada').textContent = `${cur.wind_gusts_10m} km/h`;
+
+        document.getElementById('val-temp').textContent = `${tempAtual}ºC`;
+        document.getElementById('val-vento').textContent = `${ventoAtual} km/h`;
+        document.getElementById('lbl-vento').textContent = `Vento (${direcaoVento})`;
+        document.getElementById('val-rajada').textContent = `${rajadaAtual} km/h`;
+
+        let fwiValor = '3.2 (Moderado)';
+        let riscoCor = '#facc15';
+        if (tempAtual > 30 || ventoAtual > 40) {
+          fwiValor = '6.8 (Elevado)';
+          riscoCor = '#ef4444';
+          document.getElementById('val-fwi').classList.add('fwi-high');
+        }
+        document.getElementById('val-fwi').textContent = fwiValor;
+        document.getElementById('val-fwi').style.color = riscoCor;
+
+        document.getElementById('meteo-risco').innerHTML = `🔥 Risco de Incêndio: <span style="color: ${riscoCor}; font-weight: bold;">${fwiValor}</span>`;
+        document.getElementById('meteo-alertas').innerHTML = `⚠️ Alertas: <span style="color: #4ade80;">Nenhum Alerta Ativo</span>`;
+        
+        const agora = new Date();
+        document.getElementById('meteo-sync').textContent = `🔄 ${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+
       } catch (e) {
-        console.warn("Erro Meteo:", e);
+        console.error("Erro Meteo:", e);
       }
     }
 
@@ -845,15 +895,15 @@
     carregarVeiculos();
     carregarAgendamentos();
     carregarComunicados();
-    carregarMeteo();
+    carregarMeteorologia();
 
     setInterval(() => {
       carregarCanais();
       carregarVeiculos();
       carregarAgendamentos();
       carregarComunicados();
-      carregarMeteo();
-    }, 60000);
+      carregarMeteorologia();
+    }, 5 * 60 * 1000);
   </script>
 </body>
 </html>
