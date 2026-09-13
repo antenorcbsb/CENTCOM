@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -511,18 +511,27 @@
     }
 
     function parseDataGenerica(str) {
-      if (!str || !str.trim()) return null;
-      const limpo = str.trim().split(' ')[0];
-      
-      if (limpo.includes('/')) {
-        const partes = limpo.split('/').map(Number);
-        if (partes[0] > 1000) return new Date(partes[0], partes[1] - 1, partes[2]);
-        return new Date(partes[2], partes[1] - 1, partes[0]);
+      if (!str || !String(str).trim()) return null;
+      const cleanStr = String(str).trim();
+
+      let d = new Date(cleanStr);
+      if (!isNaN(d.getTime())) {
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
       }
-      if (limpo.includes('-')) {
-        const partes = limpo.split('-').map(Number);
-        if (partes[0] > 1000) return new Date(partes[0], partes[1] - 1, partes[2]);
-        return new Date(partes[2], partes[1] - 1, partes[0]);
+
+      const partes = cleanStr.split(/[\/\-]/);
+      if (partes.length === 3) {
+        let dia, mes, ano;
+        if (partes[0].length === 4) { // YYYY-MM-DD
+          ano = parseInt(partes[0], 10);
+          mes = parseInt(partes[1], 10) - 1;
+          dia = parseInt(partes[2], 10);
+        } else { // DD/MM/YYYY
+          dia = parseInt(partes[0], 10);
+          mes = parseInt(partes[1], 10) - 1;
+          ano = parseInt(partes[2], 10);
+        }
+        return new Date(ano, mes, dia);
       }
       return null;
     }
@@ -545,7 +554,7 @@
 
     function ehDataDeHoje(dataStr) {
       const d = parseDataGenerica(dataStr);
-      if (!d) return true; 
+      if (!d) return false; 
       const agora = new Date();
       return d.getDate() === agora.getDate() &&
              d.getMonth() === agora.getMonth() &&
@@ -553,16 +562,18 @@
     }
 
     function horaJaExpirou(horaStr) {
-      if (!horaStr || !horaStr.trim()) return false;
+      if (!horaStr || !String(horaStr).trim()) return false;
       const agora = new Date();
       const minutosAtuais = agora.getHours() * 60 + agora.getMinutes();
-      const horasEncontradas = horaStr.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g);
+      const horasEncontradas = String(horaStr).match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g);
 
       if (!horasEncontradas || horasEncontradas.length === 0) return false;
 
       const horaFinalStr = horasEncontradas[horasEncontradas.length - 1];
       const [horas, minutos] = horaFinalStr.split(':').map(Number);
-      return minutosAtuais >= (horas * 60 + minutos);
+      const minutosFim = horas * 60 + minutos;
+
+      return minutosAtuais > minutosFim;
     }
 
     function converterDirecaoVento(graus) {
@@ -733,9 +744,10 @@
 
         const agendamentosHoje = linhas.filter(col => {
           const dataStr = col[1] || '';
-          const ehHoje = ehDataDeHoje(dataStr);
           const horaStr = col[2] ? col[2].trim() : '';
-          return ehHoje && !horaJaExpirou(horaStr);
+          const ehHoje = ehDataDeHoje(dataStr);
+          const expirou = horaJaExpirou(horaStr);
+          return ehHoje && !expirou;
         });
 
         if (agendamentosHoje.length === 0) {
@@ -837,7 +849,6 @@
         const lat = 41.5518;
         const lon = -8.4229;
         
-        // 1. Dados de meteorologia e pressão atmosférica (Open-Meteo)
         const urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe/Lisbon`;
         const res = await fetch(urlMeteo);
         if (!res.ok) throw new Error("Erro na API de Meteorologia");
@@ -869,7 +880,6 @@
         document.getElementById('val-rajada').textContent = `${rajadaAtual} km/h`;
         document.getElementById('val-pressao').textContent = `${pressaoAtual} hPa`;
 
-        // 2. Sincronização real de Avisos Meteorológicos do IPMA para Braga (Distrito: BRG)
         let textoAlerta = '⚠️ Alertas: <span style="color: #4ade80; font-weight: bold;">Nenhum Alerta Ativo</span>';
         try {
           const resIpma = await fetch('https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json');
@@ -877,7 +887,7 @@
             const avisosData = await resIpma.json();
             const avisoBraga = avisosData.find(a => a.idAreaAviso === 'BRG');
             if (avisoBraga && avisoBraga.awarenessLevelID && avisoBraga.awarenessLevelID !== 'green') {
-              const nivel = avisoBraga.awarenessLevelID; // yellow, orange, red
+              const nivel = avisoBraga.awarenessLevelID;
               const corNivel = nivel === 'red' ? '#ef4444' : (nivel === 'orange' ? '#fb923c' : '#facc15');
               const nomeNivelPt = nivel === 'red' ? 'VERMELHO' : (nivel === 'orange' ? 'LARANJA' : 'AMARELO');
               const descricaoAviso = avisoBraga.text || 'Aviso Meteorológico Adverso';
@@ -894,7 +904,6 @@
         
         document.getElementById('meteo-alertas').innerHTML = textoAlerta;
 
-        // 3. Estimativa de Risco de Incêndio com base nas condições reais atuais
         let riscoTexto = 'Moderado';
         let riscoCor = '#facc15';
         if (tempAtual > 35 || ventoAtual > 45) {
