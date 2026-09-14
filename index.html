@@ -310,7 +310,6 @@
       font-size: 0.8rem;
     }
 
-    /* ================= RODAPÉ / TICKER ================= */
     .footer-bar {
       position: fixed;
       bottom: 0;
@@ -716,7 +715,7 @@
 
         container.innerHTML = inops.map(col => {
           const nomeVeiculo = col[0] || 'Veículo';
-          const observacao = col || col || 'Avaria Registada';
+          const observacao = col.slice(1).join(', ') || 'Avaria Registada';
           const iconeSvg = obterIconeVeiculo(nomeVeiculo);
 
           return `
@@ -751,7 +750,6 @@
           return ehHoje && !expirou;
         });
 
-        // Limita ao número definido em ITENS_POR_PAGINA
         agendamentosHoje = agendamentosHoje.slice(0, ITENS_POR_PAGINA);
 
         if (agendamentosHoje.length === 0) {
@@ -808,7 +806,7 @@
         }).join('');
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos.</p>`;
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: ${e.message}</p>`;
       }
     }
 
