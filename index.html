@@ -617,7 +617,7 @@
     const SVG_MEIO_BOTE = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c2 1 4 1 6 0 3-1 5-1 8 0 2 1 4 1 6 0"/><path d="M3 12l2-5h14l2 5v2H3v-2z" fill="#1e293b"/><path d="M12 3v4M9 5h6"/></svg>`;
 
     function obterIconoMeioEspecifico(nomeMeio) {
-      const m = nomeMeio.toUpperCase();
+      const m = (nomeMeio || '').toUpperCase();
       if (m.includes('BRTP') || m.includes('BOTE') || m.includes('EMBARCA') || m.includes('EBD')) return SVG_MEIO_BOTE;
       if (m.includes('VAOP') || m.includes('VLCI') || m.includes('VCOT') || m.includes('VFCI') || m.includes('LIGEIRO')) return SVG_MEIO_LIGEIRO;
       return SVG_MEIO_CAMIAO;
@@ -648,8 +648,8 @@
         const eventosMap = {};
 
         linhas.forEach(col => {
-          const dataInicio = col[0];
-          const dataFim = col;
+          const dataInicio = col[0] || '';
+          const dataFim = col || '';
           const evento = col || 'Teatro Operacional';
 
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
@@ -745,7 +745,7 @@
       const hora = col ? col.trim() : '';
       const descricao = col || '';
       const meiosTexto = col || '';
-      const equipas = col[5] || '';
+      const equipas = col || '';
 
       const ehInformacao = tipo.toLowerCase().includes('info');
       const corAtual = ehInformacao ? '#c084fc' : coresBorda[index % coresBorda.length];
@@ -758,7 +758,7 @@
         meiosHtml = `<div class="meios-container"><span style="color: #94a3b8; font-weight: 600;">Meios:</span>${itensMeios}</div>`;
       }
 
-      const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
+      const bombeirosBadges = equipas ? String(equipas).split(/[,;/]/).map(num => {
         const numLimpo = num.trim();
         return numLimpo ? `<span class="bombeiro-tag">${SVG_CAPACETE_BOMBEIRO} ${numLimpo}</span>` : '';
       }).join('') : '';
@@ -808,7 +808,7 @@
         const linhas = dados ? dados.slice(1) : [];
 
         const agendamentosHoje = linhas.filter(col => {
-          const dataStr = col || '';
+          const dataStr = col[0] || '';
           const horaStr = col ? col.trim() : '';
           const ehHoje = ehDataDeHoje(dataStr);
           const expirou = horaJaExpirou(horaStr);
@@ -841,7 +841,7 @@
         }
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos.</p>`;
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: ${e.message}</p>`;
       }
     }
 
