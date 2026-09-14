@@ -524,12 +524,12 @@
         let dia, mes, ano;
         if (partes[0].length === 4) { // YYYY-MM-DD
           ano = parseInt(partes[0], 10);
-          mes = parseInt(partes, 10) - 1;
-          dia = parseInt(partes, 10);
+          mes = parseInt(partes[1], 10) - 1;
+          dia = parseInt(partes[2], 10);
         } else { // DD/MM/YYYY
           dia = parseInt(partes[0], 10);
-          mes = parseInt(partes, 10) - 1;
-          ano = parseInt(partes, 10);
+          mes = parseInt(partes[1], 10) - 1;
+          ano = parseInt(partes[2], 10);
         }
         return new Date(ano, mes, dia);
       }
@@ -617,7 +617,7 @@
     const SVG_MEIO_BOTE = `<svg class="meios-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c2 1 4 1 6 0 3-1 5-1 8 0 2 1 4 1 6 0"/><path d="M3 12l2-5h14l2 5v2H3v-2z" fill="#1e293b"/><path d="M12 3v4M9 5h6"/></svg>`;
 
     function obterIconoMeioEspecifico(nomeMeio) {
-      const m = (nomeMeio || '').toUpperCase();
+      const m = nomeMeio.toUpperCase();
       if (m.includes('BRTP') || m.includes('BOTE') || m.includes('EMBARCA') || m.includes('EBD')) return SVG_MEIO_BOTE;
       if (m.includes('VAOP') || m.includes('VLCI') || m.includes('VCOT') || m.includes('VFCI') || m.includes('LIGEIRO')) return SVG_MEIO_LIGEIRO;
       return SVG_MEIO_CAMIAO;
@@ -648,9 +648,9 @@
         const eventosMap = {};
 
         linhas.forEach(col => {
-          const dataInicio = col[0] || '';
-          const dataFim = col || '';
-          const evento = col || 'Teatro Operacional';
+          const dataInicio = col[0];
+          const dataFim = col[1];
+          const evento = col[2] || 'Teatro Operacional';
 
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
             if (!eventosMap[evento]) eventosMap[evento] = [];
@@ -715,7 +715,7 @@
 
         container.innerHTML = inops.map(col => {
           const nomeVeiculo = col[0] || 'Veículo';
-          const observacao = col || col || 'Avaria Registada';
+          const observacao = col[2] || col[1] || 'Avaria Registada';
           const iconeSvg = obterIconeVeiculo(nomeVeiculo);
 
           return `
@@ -742,10 +742,10 @@
 
     function renderizarItemAgendamento(col, index, coresBorda) {
       const tipo = col[0] ? col[0].trim() : 'Agendamento';
-      const hora = col ? col.trim() : '';
-      const descricao = col || '';
-      const meiosTexto = col || '';
-      const equipas = col || '';
+      const hora = col[2] ? col[2].trim() : '';
+      const descricao = col[3] || '';
+      const meiosTexto = col[4] || '';
+      const equipas = col[5] || '';
 
       const ehInformacao = tipo.toLowerCase().includes('info');
       const corAtual = ehInformacao ? '#c084fc' : coresBorda[index % coresBorda.length];
@@ -758,7 +758,7 @@
         meiosHtml = `<div class="meios-container"><span style="color: #94a3b8; font-weight: 600;">Meios:</span>${itensMeios}</div>`;
       }
 
-      const bombeirosBadges = equipas ? String(equipas).split(/[,;/]/).map(num => {
+      const bombeirosBadges = equipas ? equipas.split(/[,;/]/).map(num => {
         const numLimpo = num.trim();
         return numLimpo ? `<span class="bombeiro-tag">${SVG_CAPACETE_BOMBEIRO} ${numLimpo}</span>` : '';
       }).join('') : '';
@@ -808,8 +808,8 @@
         const linhas = dados ? dados.slice(1) : [];
 
         const agendamentosHoje = linhas.filter(col => {
-          const dataStr = col[0] || '';
-          const horaStr = col ? col.trim() : '';
+          const dataStr = col[1] || '';
+          const horaStr = col[2] ? col[2].trim() : '';
           const ehHoje = ehDataDeHoje(dataStr);
           const expirou = horaJaExpirou(horaStr);
           return ehHoje && !expirou;
@@ -841,7 +841,7 @@
         }
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: ${e.message}</p>`;
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos.</p>`;
       }
     }
 
@@ -853,7 +853,7 @@
 
         const comunicadosAtivos = linhas.filter(col => {
           const titulo = (col[0] || '').trim();
-          const mensagem = (col || '').trim();
+          const mensagem = (col[1] || '').trim();
           if (titulo.toLowerCase() === 'título' && mensagem.toLowerCase() === 'observações') {
             return false;
           }
@@ -867,7 +867,7 @@
 
         const mensagens = comunicadosAtivos.map(col => {
           const titulo = col[0] || '';
-          const mensagem = col || '';
+          const mensagem = col[1] || '';
           
           let htmlTitulo = titulo ? `<span style="color: #38bdf8; font-weight: 800; text-transform: uppercase; margin-right: 8px; background: rgba(56, 189, 248, 0.15); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">📌 ${titulo}</span>` : '';
           let htmlMensagem = `<span style="color: #f8fafc; font-weight: 600;">${mensagem}</span>`;
