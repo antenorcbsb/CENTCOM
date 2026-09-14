@@ -310,6 +310,7 @@
       font-size: 0.8rem;
     }
 
+    /* ================= RODAPÉ / TICKER ================= */
     .footer-bar {
       position: fixed;
       bottom: 0;
@@ -433,7 +434,6 @@
   </div>
 
   <script>
-    const ITENS_POR_PAGINA = 3;
     const SPREADSHEET_ID = '1SBvUBwqw7ZOaptKK6YehF8WErcOxzR9pmxtKnehRCx8';
 
     const GIDS = {
@@ -525,11 +525,11 @@
         if (partes[0].length === 4) { // YYYY-MM-DD
           ano = parseInt(partes[0], 10);
           mes = parseInt(partes, 10) - 1;
-          dia = parseInt(partes, 10);
+          dia = parseInt(partes[2], 10);
         } else { // DD/MM/YYYY
           dia = parseInt(partes[0], 10);
           mes = parseInt(partes, 10) - 1;
-          ano = parseInt(partes, 10);
+          ano = parseInt(partes[2], 10);
         }
         return new Date(ano, mes, dia);
       }
@@ -650,7 +650,7 @@
         linhas.forEach(col => {
           const dataInicio = col[0];
           const dataFim = col;
-          const evento = col || 'Teatro Operacional';
+          const evento = col[2] || 'Teatro Operacional';
 
           if (estaAtivoNoIntervalo(dataInicio, dataFim)) {
             if (!eventosMap[evento]) eventosMap[evento] = [];
@@ -715,7 +715,7 @@
 
         container.innerHTML = inops.map(col => {
           const nomeVeiculo = col[0] || 'Veículo';
-          const observacao = col.slice(1).join(', ') || 'Avaria Registada';
+          const observacao = col[2] || col || 'Avaria Registada';
           const iconeSvg = obterIconeVeiculo(nomeVeiculo);
 
           return `
@@ -736,21 +736,24 @@
       }
     }
 
+    let agendamentosCardsCache = [];
+    let agendamentoPaginaIndex = 0;
+    let agendamentoIntervalId = null;
+    const ITENS_POR_PAGINA = 3; // Quantidade de agendamentos exibidos por cada rotação de 30 segundos
+
     async function carregarAgendamentos() {
       const container = document.getElementById('container-agendamentos');
       try {
         const dados = await obterDadosAba(GIDS.agendamentos);
         const linhas = dados ? dados.slice(1) : [];
 
-        let agendamentosHoje = linhas.filter(col => {
+        const agendamentosHoje = linhas.filter(col => {
           const dataStr = col || '';
-          const horaStr = col ? col.trim() : '';
+          const horaStr = col[2] ? col[2].trim() : '';
           const ehHoje = ehDataDeHoje(dataStr);
           const expirou = horaJaExpirou(horaStr);
           return ehHoje && !expirou;
         });
-
-        agendamentosHoje = agendamentosHoje.slice(0, ITENS_POR_PAGINA);
 
         if (agendamentosHoje.length === 0) {
           container.innerHTML = '<p style="color:#94a3b8; padding: 10px;">Sem agendamentos previstos para este momento.</p>';
@@ -759,9 +762,9 @@
 
         const coresBorda = ['#fb923c', '#38bdf8', '#facc15', '#4ade80'];
 
-        container.innerHTML = agendamentosHoje.map((col, index) => {
+        agendamentosCardsCache = agendamentosHoje.map((col, index) => {
           const tipo = col[0] ? col[0].trim() : 'Agendamento';
-          const hora = col ? col.trim() : '';
+          const hora = col[2] ? col[2].trim() : '';
           const descricao = col[3] || '';
           const meiosTexto = col[4] || '';
           const equipas = col[5] || '';
@@ -803,10 +806,35 @@
               </div>
             </div>
           `;
-        }).join('');
+        });
+
+        agendamentoPaginaIndex = 0;
+        if (agendamentoIntervalId) clearInterval(agendamentoIntervalId);
+
+        const renderizarPaginaAgendamentos = () => {
+          const totalPaginas = Math.ceil(agendamentosCardsCache.length / ITENS_POR_PAGINA);
+          const inicio = agendamentoPaginaIndex * ITENS_POR_PAGINA;
+          const fim = inicio + ITENS_POR_PAGINA;
+          const fatia = agendamentosCardsCache.slice(inicio, fim);
+
+          let indicadorPaginacao = '';
+          if (totalPaginas > 1) {
+            indicadorPaginacao = `<div style="text-align: right; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px;">Página ${agendamentoPaginaIndex + 1} de ${totalPaginas}</div>`;
+          }
+
+          container.innerHTML = indicadorPaginacao + fatia.join('');
+          agendamentoPaginaIndex = (agendamentoPaginaIndex + 1) % totalPaginas;
+        };
+
+        renderizarPaginaAgendamentos();
+
+        if (agendamentosCardsCache.length > ITENS_POR_PAGINA) {
+          agendamentoIntervalId = setInterval(renderizarPaginaAgendamentos, 30000);
+        }
+
       } catch (e) {
         console.error("Erro Agendamentos:", e);
-        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos: ${e.message}</p>`;
+        container.innerHTML = `<p style="color:#ef4444; padding: 10px;">Erro nos agendamentos.</p>`;
       }
     }
 
